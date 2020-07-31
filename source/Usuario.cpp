@@ -16,7 +16,7 @@ void Usuario::establecerNombreUsuario( string nombreUsuario )
 }
 
 // Obtiene el nombre del usuario
-string Usuario::obtenerNombreUsuario()
+string Usuario::obtenerNombreUsuario() const
 {
     return nombreUsuario;
 }
@@ -28,7 +28,7 @@ void Usuario::establecerNombre( string nombre )
 }
 
 // Obtiene el nombre real del usuario
-string Usuario::obtenerNombre()
+string Usuario::obtenerNombre() const
 {
     return nombre;
 }
@@ -40,7 +40,7 @@ void Usuario::establecerApellidos( string apellidos )
 }
 
 // Obtiene los apellidos del usuario
-string Usuario::obtenerApellidos()
+string Usuario::obtenerApellidos() const
 {
     return apellidos;
 }
@@ -52,7 +52,7 @@ void Usuario::establecerAdministrador( bool permiso )
 }
 
 // Revisa si el usuario tiene permisos de administrador
-bool Usuario::esAdministrador()
+bool Usuario::esAdministrador() const
 {
     return administrador;
 }

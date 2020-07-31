@@ -1,5 +1,7 @@
 *.glade~
 *.o
+*.gch
+*.swp
 /build
 /resources/images/users
 

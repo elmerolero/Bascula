@@ -1,3 +1,5 @@
 *.glade~
+*.o
 /build
+/resources/images/users
 

@@ -21,8 +21,8 @@ class Usuario
         void establecerApellidos( std::string apellidos );
         std::string obtenerApellidos() const;
 
-        // Establece los permisos de administrador
-        void establecerPermisosAdministrador( bool permiso );
+        // Permisos de administrador
+        void establecerAdministrador( bool permiso );
         bool esAdministrador() const;
 
     private:

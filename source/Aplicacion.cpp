@@ -15,7 +15,7 @@ int Aplicacion::iniciar()
 {
     try{
         // Carga la ventana principal y conecta la función para cerrar la ventana y finalizar el programa
-        ventana = new Widget( "../resources/interfaces/RecuperacionContrasena.glade" );
+        ventana = new Widget( "../resources/interfaces/Bascula.glade" );
         ventana -> conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_main_quit ), nullptr );
     }
     catch( runtime_error &excepcion ){

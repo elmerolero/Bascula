@@ -19,11 +19,11 @@ int main( int argc, char * argv[] )
     // Inicia la ventana principal
     aplicacion.iniciar();
 	
-	// Establece la hora
-	actualizarTiempo( nullptr, nullptr );
+    // Establece la hora
+    actualizarTiempo( nullptr, nullptr );
 	
-	// Habilita actulizar la hora
-	g_timeout_add( 1000, G_SOURCE_FUNC( actualizarTiempo ), aplicacion.obtenerWidget() );
+    // Habilita actulizar la hora
+    g_timeout_add( 1000, G_SOURCE_FUNC( actualizarTiempo ), aplicacion.obtenerWidget() );
 	
     // Bucle principal
     gtk_main();
@@ -48,12 +48,12 @@ void actualizarTiempo( GtkWidget *widget, gpointer ptr )
     stringTiempo << "Hora: " << setfill( '0' ) << setw( 2 ) << ( ( tiempo -> tm_hour == 0 || tiempo -> tm_hour == 12 ) ? 12 : tiempo -> tm_hour % 12 ) 
 				 << ":" << setw( 2 ) << to_string( tiempo -> tm_min ) << ":" << setw( 2 ) << to_string( tiempo -> tm_sec )
 				 << ( ( tiempo -> tm_hour < 12 ) ? " am" : " pm" ) << setfill( ' ' );
-	aplicacion.obtenerWidget()->establecerTextoEtiqueta( "Hora", stringTiempo.str() );
+    aplicacion.obtenerWidget()->establecerTextoEtiqueta( "Hora", stringTiempo.str() );
 	
-	// Limpia el buffer
-	stringTiempo.str( "" );
+    // Limpia el buffer
+    stringTiempo.str( "" );
 	
-	// Establece la fecha
+    // Establece la fecha
     stringTiempo << "Fecha: " << setfill( '0' ) << setw( 2 ) << to_string( tiempo -> tm_mday ) << setfill( ' ' ) << " de " << meses.at( tiempo -> tm_mon ) << " de " << to_string( ( 1900 + tiempo -> tm_year ) );
 	aplicacion.obtenerWidget()->establecerTextoEtiqueta( "Fecha", stringTiempo.str() );
 }

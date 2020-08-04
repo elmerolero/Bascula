@@ -64,15 +64,10 @@ void Widget::insertarElementoAGrid( const Widget *elemento, string idFuente, str
             if( GTK_IS_CONTAINER( objetoDestino ) ){
                 GList *children = gtk_container_get_children( GTK_CONTAINER( objetoDestino ) );
                 if( g_list_find( children, objetoFuente ) == NULL ){
-                    cout << "Se agrega." << endl;
+                    // Se agrega
                     gtk_grid_attach( GTK_GRID( objetoDestino ), GTK_WIDGET( objetoFuente ), left, top, width, height );
                 }
-                else{
-                    cout << "No se agrega." << endl;
-                }
             }
-            // Agrega el objeto fuente en el objeto destino
-            //igtk_grid_attach( GTK_GRID( objetoDestino ), GTK_WIDGET( objetoFuente ), left, top, width, height );
         }
     }
 }

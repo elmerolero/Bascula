@@ -77,13 +77,13 @@
           </packing>
         </child>
         <child>
-          <object class="GtkGrid" id="Contenido">
+          <object class="GtkGrid" id="ReemplazarContrasena">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">center</property>
             <property name="vexpand">True</property>
             <child>
-              <object class="GtkLabel" id="RecuperacionContrasena">
+              <object class="GtkLabel" id="TituloReemplazarContrasena">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
@@ -115,7 +115,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="EntradaUsuario">
+              <object class="GtkEntry" id="EntradaReemplazarContrasena">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="max_length">20</property>
@@ -150,7 +150,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="EntradaCodigoSeguridad">
+              <object class="GtkEntry" id="EntradaReemplazarConfirmacion">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="max_length">20</property>
@@ -165,7 +165,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="BotonCambiarContrasena">
+              <object class="GtkButton" id="BotonReemplazarContrasena">
                 <property name="label" translatable="yes">Cambiar contraseña</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -181,7 +181,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="MensajeError">
+              <object class="GtkLabel" id="MensajeErrorReemplazarContrasena">
                 <property name="name">MensajeError</property>
                 <property name="can_focus">False</property>
                 <property name="margin_top">3</property>

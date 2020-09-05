@@ -4,7 +4,7 @@ using namespace std;
 
 // Constructor
 Usuario::Usuario():
-    nombreUsuario( 0 ), nombre( 0 ), apellidos( 0 ), administrador( false )
+    administrador( false )
 {
     // Nada que hacer
 }

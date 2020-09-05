@@ -77,7 +77,7 @@
           </packing>
         </child>
         <child>
-          <object class="GtkGrid" id="Contenido">
+          <object class="GtkGrid" id="RegistrarUsuario">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">center</property>
@@ -206,7 +206,6 @@
                     <property name="caps_lock_warning">False</property>
                     <property name="progress_pulse_step">0</property>
                     <property name="input_purpose">alpha</property>
-                    <property name="show_emoji_icon">True</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>

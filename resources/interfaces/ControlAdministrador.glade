@@ -6,18 +6,18 @@
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="margin_top">5</property>
-    <property name="pixbuf">../images/Bascula.png</property>
+    <property name="pixbuf">../images/icons/Bascula.png</property>
   </object>
   <object class="GtkImage" id="ImagenRegistros">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="margin_top">5</property>
-    <property name="pixbuf">../images/Registro.png</property>
+    <property name="pixbuf">../images/icons/Registro.png</property>
   </object>
   <object class="GtkImage" id="ImagenUsuarios">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/Usuario.png</property>
+    <property name="pixbuf">../images/icons/Usuario.png</property>
   </object>
   <object class="GtkWindow" id="VentanaPrincipal">
     <property name="visible">True</property>
@@ -27,6 +27,9 @@
     <property name="default_width">800</property>
     <property name="default_height">550</property>
     <property name="deletable">False</property>
+    <child>
+      <placeholder/>
+    </child>
     <child>
       <object class="GtkGrid" id="GridPrincipal">
         <property name="visible">True</property>

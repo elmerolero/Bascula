@@ -77,13 +77,13 @@
           </packing>
         </child>
         <child>
-          <object class="GtkGrid" id="Contenido">
+          <object class="GtkGrid" id="RecuperarContrasena">
             <property name="visible">True</property>
             <property name="can_focus">False</property>
             <property name="halign">center</property>
             <property name="vexpand">True</property>
             <child>
-              <object class="GtkLabel" id="RecuperacionContrasena">
+              <object class="GtkLabel" id="TituloRecuperarContrasena">
                 <property name="visible">True</property>
                 <property name="can_focus">False</property>
                 <property name="halign">center</property>
@@ -117,7 +117,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="EntradaUsuario">
+              <object class="GtkEntry" id="EntradaRecuperacionUsuario">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="tooltip_text" translatable="yes">Nombre de usuario con el que accedes al programa.</property>
@@ -129,7 +129,6 @@
                 <property name="secondary_icon_tooltip_text" translatable="yes">Insert Emoji</property>
                 <property name="secondary_icon_tooltip_markup" translatable="yes">Insert Emoji</property>
                 <property name="input_purpose">alpha</property>
-                <property name="show_emoji_icon">True</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>
@@ -153,7 +152,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkEntry" id="EntradaCodigoSeguridad">
+              <object class="GtkEntry" id="EntradaRecuperacionCodigoSeguridad">
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="tooltip_text" translatable="yes">Código de seguridad que es provisto por el administrador del sistema.</property>
@@ -168,7 +167,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkButton" id="BotonIniciarSesion">
+              <object class="GtkButton" id="BotonReemplazarContrasena">
                 <property name="label" translatable="yes">Siguiente</property>
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
@@ -216,16 +215,13 @@ aquí para reestablecer tu contraseña.</property>
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="LinkIniciarSesion">
+              <object class="GtkLinkButton" id="EnlaceRecuperarContrasenaRegresar">
+                <property name="label" translatable="yes">button</property>
                 <property name="visible">True</property>
-                <property name="can_focus">False</property>
-                <property name="margin_top">15</property>
-                <property name="margin_bottom">5</property>
-                <property name="label" translatable="yes">Volver</property>
-                <attributes>
-                  <attribute name="underline" value="True"/>
-                  <attribute name="foreground" value="#1ac95ad2bae0"/>
-                </attributes>
+                <property name="can_focus">True</property>
+                <property name="receives_default">True</property>
+                <property name="relief">none</property>
+                <property name="uri">http://glade.gnome.org</property>
               </object>
               <packing>
                 <property name="left_attach">0</property>

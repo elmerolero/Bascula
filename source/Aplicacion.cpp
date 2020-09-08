@@ -239,11 +239,15 @@ void conectarSenales()
     interfaz.conectarSenal( "BotonBascula", "clicked", G_CALLBACK( irHacia ), (void *)"Bascula" );
     
     // Báscula pública
-    interfaz.conectarSenal( "BotonBasculaPublica", "clicked", G_CALLBACK( irHacia ), (void *)"BasculaPublica" );
-    
-    // Nuevo para báscula publica
-    interfaz.conectarSenal( "EntradaCampo", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
     interfaz.conectarSenal( "BotonBasculaPublicaNuevo", "clicked", G_CALLBACK( basculaPublicaNuevo ), nullptr );
+    
+    // Nuevo para ticket interno
+    interfaz.conectarSenal( "EntradaNombreEmpresaInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.conectarSenal( "EntradaNombreProductoInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.conectarSenal( "EntradaNombreConductorInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.conectarSenal( "EntradaNumeroPlacasInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.establecerBotonEtiqueta( "EnlaceRegresarInterno", "Regresar" );
+    interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( irHacia ), (void *)"BasculaPublica" );
 }
 
 // Obtiene la hora en un formato válido para la base de datos
@@ -255,7 +259,7 @@ string obtenerHora()
     
 	// Construye la hora en el formato de la base de datos
 	stringstream hora;
-	hora << setfill( '0' ) << "'" << setw( 2 ) << tiempo.tm_hour << ":" << setw( 2 ) << tiempo.tm_min << ":" << setw( 2 ) << tiempo.tm_sec << "'" << setfill( ' ' );
+	hora << setfill( '0' ) << setw( 2 ) << tiempo.tm_hour << ":" << setw( 2 ) << tiempo.tm_min << ":" << setw( 2 ) << tiempo.tm_sec << setfill( ' ' );
 	
 	// Devuelve la hora
 	return hora.str();
@@ -270,7 +274,7 @@ string obtenerFecha()
     
     // Construye la fecha en el formato de la base de datos
     stringstream fecha;
-    fecha << setfill( '0' ) << setw( 4 ) << (tiempo.tm_year + 1900) << "-" << setw( 2 ) << tiempo.tm_mon << "-" << tiempo.tm_mday << setfill( ' ' );
+    fecha << setfill( '0' ) << setw( 4 ) << (tiempo.tm_year + 1900) << "-" << setw( 2 ) << tiempo.tm_mon << "-" << setw( 2 ) << tiempo.tm_mday << setfill( ' ' );
     
     // Devuelve la fecha
     return fecha.str();

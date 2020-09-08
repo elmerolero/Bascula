@@ -16,11 +16,6 @@ extern Ticket *nuevo;
 extern int pasoRegistroBasculaPublica;
 
 void basculaPublicaNuevo( GtkWidget *widget, gpointer ptr );
-void pasosRegistroBasculaPublica();
-void leerPlacas();
-void leerNombreConductor();
-void leerNombreProducto();
-void leerTipoViaje();
 void convertirMayusculas( GtkEditable *editable, const gchar *text, gint length, gint *position, gpointer data );
 
 #endif

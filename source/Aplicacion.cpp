@@ -248,6 +248,10 @@ void conectarSenales()
     interfaz.conectarSenal( "EntradaNumeroPlacasInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
     interfaz.establecerBotonEtiqueta( "EnlaceRegresarInterno", "Regresar" );
     interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( irHacia ), (void *)"BasculaPublica" );
+    //interfaz.conectarSenal( "BotonLeerPesoBrutoInterno", G_CALLBACK( irHacia ), (v ), 
+
+    // Vista de registro de peso
+    interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( gtk_widget_hide ), nullptr );
 }
 
 // Obtiene la hora en un formato válido para la base de datos

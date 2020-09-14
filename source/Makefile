@@ -1,9 +1,10 @@
 CC=g++
 CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3`
 LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
+OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o
 
-../build/aplicacion:  main.cpp Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o
-	$(CC) main.cpp $(CFLAGS) -g -o ../build/aplicacion Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o $(LIBS)
+../build/aplicacion:  main.cpp Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o
+	$(CC) main.cpp $(CFLAGS) -g -o ../build/aplicacion $(OBJS) $(LIBS)
 
 Aplicacion.o:	Aplicacion.h Aplicacion.cpp
 	$(CC) $(CFLAGS) -c Aplicacion.h Aplicacion.cpp $(LIBS)
@@ -25,3 +26,9 @@ Registro.o: Registro.h Registro.cpp
 
 Database.o: Database.h Database.cpp
 	$(CC) $(CFLAGS) -c Database.h Database.cpp $(LIBS)
+
+ContenedorRegistros.o: ContenedorRegistros.h ContenedorRegistros.cpp
+	$(CC) $(CFLAGS) -c ContenedorRegistros.h ContenedorRegistros.cpp $(LIBS)
+
+Vistas.o: Vistas.h Vistas.cpp
+	$(CC) $(CFLAGS) -c Vistas.h Vistas.cpp $(LIBS)

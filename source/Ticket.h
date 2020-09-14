@@ -3,9 +3,8 @@
 #include <string>
 #include "Registro.h"
 
-const int VIAJE_INTERNO = 0;
-const int VIAJE_LOCAL = 1;
-const int VIAJE_FORANEO = 2;
+const int TIPO_REGISTRO_ENTRADA = 0;
+const int TIPO_REGISTRO_SALIDA = 1;
 
 class Ticket
 {
@@ -17,6 +16,10 @@ class Ticket
 		// Fecha de registro
 		void establecerFechaRegistro( std::string fechaRegistro );
 		std::string obtenerFechaRegistro() const;
+		
+		// Tipo de registro
+		void establecerTipoRegistro( int tipoRegistro );
+		int obtenerTipoRegistro() const;
 		
 		// Empresa
 		void establecerEmpresa( Registro *empresa );
@@ -34,20 +37,31 @@ class Ticket
 		void establecerNombreConductor( std::string nombreConductor );
 		std::string obtenerNombreConductor() const;
 		
-		// Tipo de viaje
-		void establecerTipoViaje( int claveTipo );
-		int obtenerTipoViaje() const;
-		
 		// Peso bruto
+		void establecerPesoBruto( std::string pesoBrutoStr );
 		void establecerPesoBruto( double pesoBruto );
 		double obtenerPesoBruto() const;
 		
 		// Peso tara
+		void establecerPesoTara( std::string pesoTara );
 		void establecerPesoTara( double pesoTara );
 		double obtenerPesoTara() const;
 		
+		// Bandera que indica si permite descuento o no
+		void permitirDescuento( bool opcionDescuento );
+		bool permitirDescuento() const;
+		
+		// Descuento
+		void establecerDescuento( std::string descuentoStr );
+		void establecerDescuento( double descuento );
+		double obtenerDescuento() const;
+		
 		// Peso neto
-		void calcularPesoNeto();
+		static double calcularPesoNeto( double pesoBruto, double pesoTara, double descuento ){
+			double diferencia = abs( pesoBruto - pesoTara );
+			return diferencia - ( ( diferencia * descuento ) / 100 );
+		}
+	
 		void establecerPesoNeto( double pesoNeto );
 		double obtenerPesoNeto() const;
 
@@ -67,6 +81,10 @@ class Ticket
 		void establecerPendiente( bool pendiente );
 		bool estaPendiente() const;
 		
+		// Establece si el peso se introdujo de manera manual o automática
+		void establecerEntradaManual( bool entradaManual );
+		bool esEntradaManual() const;
+		
 		// Imprime los datos del ticket
 		void imprimir() const;
 	
@@ -77,14 +95,17 @@ class Ticket
 		Registro *producto;
 		std::string numeroPlacas;
 		std::string nombreConductor;
-		int tipoViaje;
+		int tipoRegistro;
 		std::string horaEntrada;
 		std::string horaSalida;
 		double pesoBruto;
 		double pesoTara;
+		double descuento;
 		double pesoNeto;
 		std::string observaciones;
+		bool entradaManual;
 		bool pendiente;
+		bool habilitarDescuento;
 };
 
 #endif

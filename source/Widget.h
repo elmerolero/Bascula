@@ -25,7 +25,7 @@ class Widget
         guint conectarSenal( std::string id, std::string tipoSenal, GCallback funcion, gpointer data );
 
         // Desconecta la señal del elemento indicado
-        void desconectarSenal( std::string idElemento, guint idSenal );
+        void desconectarSenal( std::string idElemento, guint &idSenal );
 
         // Permite obtener el objeto de un widget indicando su ID
         GObject * obtenerObjeto( std::string id ) const;
@@ -45,6 +45,12 @@ class Widget
         // Establece el tamaño máximo de la entrada (cuantos caracteres puede introducir)
         void establecerTamanoEntrada( std::string idEntrada, int tamano );
         
+        // Habilita la posibilidad de poder editar la entrada
+        void habilitarEdicionEntrada( std::string idEntrada );
+        
+        // Deshabilita la posibilidad de poder editar la entrada
+        void deshabilitarEdicionEntrada( std::string idEntrada );
+        
         // Establece un completador para la entrada dada (osea, para sugerencia dependiendo la entrada)
         void establecerCompletadorEntrada( std::string idEntrada, GtkEntryCompletion *completador );
         
@@ -62,6 +68,24 @@ class Widget
         
         // Oculta el widget con el ID indicado
         void ocultarElemento( std::string id ) const;
+        
+        // Establece el boton activo
+        void establecerActivoBotonToggle( std::string idBoton );
+        
+        // Obtiene el estado de un toggle button (si esta activo o inactivo)
+        bool obtenerEstadoBotonToggle( std::string id );
+        
+        // Agrega una opcion al combobox text indicado
+        void agregarOpcionComboBoxText( std::string idComboBox, std::string opcion, const char *idOpcion );
+        
+        // Establece la opcion con el id indicado como el objeto activo
+        void establecerActivoComboBoxText( std::string idComboBox, std::string idOpcion );
+        
+        // Obtiene la opcion seleccionada
+        const char *obtenerOpcionComboBoxText( std::string idComboBox );
+        
+        // Limpia el combobox text indicado removiendo todas las opciones
+        void limpiarComboBoxText( std::string idComboBox );
         
         // Permite obtener el builder de un Widget
         const GtkBuilder *obtenerBuilder() const;

@@ -32,7 +32,7 @@ unsigned int Registro::obtenerClave() const
 // Nombre
 void Registro::establecerNombre( string nombre )
 {
-	regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ\\s]*" );
+	regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ.\\s]*" );
 	if( nombre.empty() ){
 		throw  invalid_argument( "Error, no puede establecerse un nombre vacío a un registro." );
 	}

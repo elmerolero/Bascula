@@ -65,13 +65,16 @@ guint Widget::conectarSenal( string id, string tipoSenal, GCallback funcion, gpo
 }
 
 // Desconecta la señal dado el id correspondiente
-void Widget::desconectarSenal( string idElemento, guint idSenal )
+void Widget::desconectarSenal( string idElemento, guint &idSenal )
 {
     // Obtiene el objeto indicado por la señal
     GObject *object = obtenerObjeto( idElemento );
 
     // Desconecta la señal
     g_signal_handler_disconnect( object, idSenal );
+    
+    // Establece el identificador en cero
+    idSenal = 0;
 }
 
 // Inserta el elemento de un Widget dado dentro de otro del uno de los elementos de este Widget
@@ -189,6 +192,20 @@ void Widget::establecerTamanoEntrada( std::string idEntrada, int tamano )
     gtk_entry_set_max_length( GTK_ENTRY( objeto ), tamano );
 }
 
+void Widget::habilitarEdicionEntrada( std::string idEntrada )
+{
+    GObject *objeto = obtenerObjeto( idEntrada );
+    
+    gtk_editable_set_editable( GTK_EDITABLE( objeto ), TRUE );
+}
+
+void Widget::deshabilitarEdicionEntrada( std::string idEntrada )
+{
+    GObject *objeto = obtenerObjeto( idEntrada );
+    
+    gtk_editable_set_editable( GTK_EDITABLE( objeto ), FALSE );
+}
+
 void Widget::establecerCompletadorEntrada( std::string idEntrada, GtkEntryCompletion *completador )
 {
     GObject *objecto = obtenerObjeto( idEntrada );
@@ -209,6 +226,54 @@ const char *Widget::obtenerTextoEntrada( std::string idEntrada )
     GObject *objeto = obtenerObjeto( idEntrada );
     
     return gtk_entry_get_text( GTK_ENTRY( objeto ) );
+}
+
+void Widget::establecerActivoBotonToggle( std::string idBoton )
+{
+    GObject *objeto = obtenerObjeto( idBoton );
+    
+    gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( objeto ), TRUE );
+}
+
+// Obtiene el estado de un toggle button (si esta activo o inactivo)
+bool Widget::obtenerEstadoBotonToggle( std::string id )
+{
+    // Obtiene el objeto que necesita
+    GObject *objeto = obtenerObjeto( id );
+    
+    return gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( objeto ) );
+}
+
+// Agrega una opcion al combobox text indicado
+void Widget::agregarOpcionComboBoxText( std::string idComboBox, std::string opcion, const char *idOpcion )
+{
+    GObject *objeto = obtenerObjeto( idComboBox.c_str() );
+    
+    gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( objeto ), idOpcion, opcion.c_str() );
+}
+
+// Establece la opcion con el id indicado como el objeto activo
+void Widget::establecerActivoComboBoxText( std::string idComboBox, std::string idOpcion )
+{
+    GObject *objeto = obtenerObjeto( idComboBox.c_str() );
+    
+    gtk_combo_box_set_active_id( GTK_COMBO_BOX( objeto ), idOpcion.c_str() );
+}
+
+// Obtiene la opcion seleccionada
+const char *Widget::obtenerOpcionComboBoxText( std::string idComboBox )
+{
+    GObject *objeto = obtenerObjeto( idComboBox.c_str() );
+    
+    return gtk_combo_box_text_get_active_text( GTK_COMBO_BOX_TEXT( objeto ) );
+}
+
+// Limpia el combobox text indicado removiendo todas las opciones
+void Widget::limpiarComboBoxText( std::string idComboBox )
+{
+    GObject *objeto = obtenerObjeto( idComboBox.c_str() );
+    
+    gtk_combo_box_text_remove_all( GTK_COMBO_BOX_TEXT( objeto ) );
 }
 
 void Widget::removerElementosHijos( std::string idContenedor )

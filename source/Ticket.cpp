@@ -62,6 +62,23 @@ Registro *Ticket::obtenerProducto() const
 	return producto;
 }
 
+// Establece el tipo de registro
+void Ticket::establecerTipoRegistro( int tipoRegistro )
+{
+	// Un número dentro del rango
+	if( tipoRegistro < 0 || tipoRegistro > 1 ){
+		throw invalid_argument( "Tipo de registro no conocido." );
+	}
+	
+	this -> tipoRegistro = tipoRegistro;
+}
+
+// Obtiene el tipo de registro
+int Ticket::obtenerTipoRegistro() const
+{
+	return tipoRegistro;
+}
+
 // Establece el numero de placas
 void Ticket::establecerNumeroPlacas( std::string numeroPlacas )
 {
@@ -107,30 +124,34 @@ string Ticket::obtenerNombreConductor() const
 	return nombreConductor;
 }
 
-// Establece la clave de la procedencia
-void Ticket::establecerTipoViaje( int claveTipo )
-{
-	// Es una clave entera positiva
-	if( claveTipo < 0 || claveTipo < 3 ){
-		throw invalid_argument( "Se intento introducir un\ntipo de viaje inválido." );
-	}
-	
-	this -> tipoViaje = claveTipo;
-}
-
-// Obtiene la clave de procedencia
-int Ticket::obtenerTipoViaje() const
-{
-	return tipoViaje;
-}
-
 // Establece el peso bruto del ticket
+void Ticket::establecerPesoBruto( string pesoBrutoStr )
+{
+	try{
+		// Convierte el string a un número entero
+		double pesoBruto = stod( pesoBrutoStr );
+		
+		// Establece el peso bruto
+		establecerPesoBruto( pesoBruto );
+	}
+	catch( invalid_argument &ia ){
+		string what = ia.what();
+		if( what.compare( "stod" ) == 0 ){
+			throw invalid_argument( "El número introducido no es válido." );
+		}
+		
+		throw invalid_argument( ia.what() );
+	}
+}
+
 void Ticket::establecerPesoBruto( double pesoBruto )
 {
+	// Debe ser un número positivo
 	if( pesoBruto < 0 ){
-		throw invalid_argument( "Mala lectura de la báscula,\ninténtalo de nuevo." );
+		throw invalid_argument( "El peso bruto introducido no es válido, inténtalo de nuevo." );
 	}
 
+	// Establece el peso bruto
 	this -> pesoBruto = pesoBruto;
 }
 
@@ -141,6 +162,25 @@ double Ticket::obtenerPesoBruto() const
 }
 
 // Establece el peso tara del ticket
+void Ticket::establecerPesoTara( std::string pesoTaraStr )
+{
+	try{
+		// Convierte el string en un double
+		double pesoTara = stod( pesoTaraStr );
+		
+		// Establece el número convertido
+		establecerPesoTara( pesoTara );
+	}
+	catch( invalid_argument &ia ){
+		string what = ia.what();
+		if( what.compare( "stod" ) == 0 ){
+			throw invalid_argument( "El número que se intenta registrar no es válido." );
+		}
+		
+		throw invalid_argument( ia.what() );
+	}
+}
+
 void Ticket::establecerPesoTara( double pesoTara )
 {
 	if( pesoBruto < 0 ){
@@ -156,10 +196,48 @@ double Ticket::obtenerPesoTara() const
 	return pesoTara;
 }
 
-// Calcula el peso neto
-void Ticket::calcularPesoNeto()
+// Bandera que decide si calcular con descuento o no
+void Ticket::permitirDescuento( bool opcion )
 {
-	establecerPesoNeto( abs( obtenerPesoBruto() - obtenerPesoTara() ) );
+	// Establece el descuento
+	this -> habilitarDescuento = opcion;
+}
+
+bool Ticket::permitirDescuento() const
+{
+	return habilitarDescuento;
+}
+
+// Descuento
+void Ticket::establecerDescuento( string descuentoStr )
+{
+	try{
+		double descuento = permitirDescuento() ? stod( descuentoStr ) : 0;
+		
+		establecerDescuento( descuento );
+ 	}
+	catch( invalid_argument &ia ){
+		string what = ia.what();
+		if( what.compare( "stod" ) == 0 ){
+			throw invalid_argument( "El número introducido no es válido." );
+		}
+		
+		throw invalid_argument( ia.what() );
+	}
+}
+
+void Ticket::establecerDescuento( double descuento )
+{
+	if( descuento < 0 || descuento > 100 ){
+		throw invalid_argument( "Un descuento debe ser un número positivo no mayor a cien." );
+	}
+	
+	this -> descuento = descuento;
+}
+
+double Ticket::obtenerDescuento() const
+{
+	return descuento;
 }
 
 // Establece el peso bruto del ticket
@@ -225,6 +303,17 @@ void Ticket::establecerObservaciones( string observaciones )
 string Ticket::obtenerObservaciones() const
 {
 	return observaciones;
+}
+
+// Establece si el peso se introdujo de manera manual o automática
+void Ticket::establecerEntradaManual( bool entradaManual )
+{
+	this -> entradaManual = entradaManual;
+}
+
+bool Ticket::esEntradaManual() const
+{
+	return entradaManual;
 }
 
 // Establece si está pendiente

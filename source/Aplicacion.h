@@ -6,7 +6,7 @@
 #include "Widget.h"
 #include "Database.h"
 #include "Ticket.h"
-#include "Registro.h"
+#include "ContenedorRegistros.h"
 
 // La base de datos
 extern Database database;
@@ -15,23 +15,14 @@ extern Database database;
 extern Widget interfaz;
 extern std::string vistaActual;
 
-// Completador a usar
-extern GtkEntryCompletion * completador;
-
 // Lista de tickets registrados del día en curso
 extern unsigned int folioActual;
 extern std::list< Ticket * > ticketsPendientes;
 extern std::list< Ticket * > ticketsRegistrados;
 
-// Lista de empresas
-extern std::list< Registro * > empresas;
-extern GtkListStore *listaEmpresas;
-extern unsigned int claveEmpresaActual;
-
-// Lista de productos
-extern std::list< Registro * > productos;
-extern GtkListStore *listaProductos;
-extern unsigned int claveProductoActual;
+// Registros
+extern ContenedorRegistros productos;
+extern ContenedorRegistros empresas;
 
 // Meses para mostrar la fecha en formato humano
 const std::array< std::string, 12 > meses{ "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
@@ -42,15 +33,14 @@ void irHacia( GtkWidget *widget, gpointer ptr );
 // Obtiene los tickets registrados
 void obtenerTicketsRegistrados();
 
-// Obtiene las empresas registradas de la base de datos
-void obtenerEmpresasRegistradas();
+//
+void agregarTicketPendiente( Ticket *ticket );
 
-// Obtiene los productos registrados de la base de datos
-void obtenerProductosRegistrados();
+// Busca un ticket por folio
+Ticket *buscarTicketPorFolio( unsigned int folio );
 
-// Busca un producto con el texto indicado
-Registro *buscarRegistro( unsigned int clave, std::list< Registro * > &registros );
-Registro *buscarRegistro( std::string nombre, std::list< Registro * > &registros );
+// Busca un ticket por numero de placa
+Ticket *buscarTicketPorNumeroPlaca( std::string numeroPlacas );
 
 // Inicializa la aplicacion
 void iniciar();

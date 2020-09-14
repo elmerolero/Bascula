@@ -7,6 +7,7 @@
 #include <iomanip>
 #include "Widget.h"
 #include "Funciones.h"
+#include "Vistas.h"
 #include <array>
 using namespace std;
 
@@ -30,15 +31,9 @@ unsigned int folioActual;
 std::list< Ticket * > ticketsPendientes;
 std::list< Ticket * > ticketsRegistrados;
 
-// Lista de empresas
-std::list< Registro * > empresas;
-GtkListStore *listaEmpresas;
-unsigned int claveEmpresaActual;
-
-// Lista de productos
-std::list< Registro * > productos;
-GtkListStore *listaProductos;
-unsigned int claveProductoActual;
+//
+ContenedorRegistros productos;
+ContenedorRegistros empresas;
 
 // Inicializa la aplicacion
 void iniciar()
@@ -57,21 +52,24 @@ void iniciar()
         interfaz.establecerBotonEtiqueta( "EnlaceRegistrarNuevoUsuario", "Crear un nuevo usuario" );
         interfaz.establecerBotonEtiqueta( "EnlaceRecuperarContrasenaRegresar", "Volver" );
         
-        // Establece el completador que será usado
-        completador = gtk_entry_completion_new();
-        interfaz.establecerCompletadorEntrada( "EntradaCampo", completador );
-        gtk_entry_completion_set_text_column( completador, 0);
+        // Obtiene las empresas y los productos registrados en la base de datos
+        productos.establecerNombrePlural( "productos" );
+        productos.establecerNombreSingular( "producto" );
+        productos.obtenerRegistros();
+        interfaz.establecerCompletadorEntrada( "EntradaNombreProductoInterno", productos.obtenerCompletador() );
+        
+        empresas.establecerNombrePlural( "empresas" );
+        empresas.establecerNombreSingular( "empresa" );
+        empresas.obtenerRegistros();
+        interfaz.establecerCompletadorEntrada( "EntradaNombreEmpresaInterno", empresas.obtenerCompletador() );
         
         // Obtiene los tickets registrados y pendientes
         obtenerTicketsRegistrados();
         
-        // Obtiene los productos registrados en la base de datos
-        obtenerProductosRegistrados();
-        
         // Manda a conectar todas las señales de las vistas
         conectarSenales();
         
-        irHacia( nullptr, (void *)"BasculaPublica" );
+        irHacia( nullptr, (void *)"IniciarSesion" );
     }
     catch( runtime_error &excepcion ){
         cerr << excepcion.what() << endl;
@@ -85,24 +83,27 @@ void obtenerTicketsRegistrados()
     database.open( "libcurlmbs.dll" );
     
     // Obtiene los tickets del día
-    string consulta = "select * from tickets where fecha = date( 'now', 'localtime' )";
+    string consulta = "select * from tickets where fecha = date( 'now', 'localtime' ) or pendiente = 1";
     database.query( consulta );
     if( rows.size() > 0 ){
         for( Row *row : rows ){
             Ticket *ticket = new Ticket();
             ticket -> establecerFolio( stoi( row -> columns.at( 0 ) ) );
             ticket -> establecerFechaRegistro( row -> columns.at( 1 ) );
-            ticket -> establecerEmpresa( buscarRegistro( stoi( row -> columns.at( 3 ) ), empresas ) );
-            ticket -> establecerProducto( buscarRegistro( stoi( row -> columns.at( 4 ) ), productos ) );
-            ticket -> establecerNumeroPlacas( row -> columns.at( 5 ) );
-            ticket -> establecerNombreConductor( row -> columns.at( 6 ) );
+            ticket -> establecerEmpresa( empresas.buscarRegistroPorClave( stoi( row -> columns.at( 2 ) ) ) );
+            ticket -> establecerProducto( productos.buscarRegistroPorClave( stoi( row -> columns.at( 3 ) ) ) );
+            ticket -> establecerNumeroPlacas( row -> columns.at( 4 ) );
+            ticket -> establecerNombreConductor( row -> columns.at( 5 ) );
+            ticket -> establecerTipoRegistro( stoi( row -> columns.at( 6 ) ) );
             ticket -> establecerHoraEntrada( row -> columns.at( 7 ) );
             ticket -> establecerHoraSalida( row -> columns.at( 8 ) );
             ticket -> establecerPesoBruto( stod( row -> columns.at( 9 ) ) );
             ticket -> establecerPesoTara( stod( row -> columns.at( 10 ) ) );
             ticket -> establecerPesoNeto( stod( row -> columns.at( 11 ) ) );
-            ticket -> establecerObservaciones( row -> columns.at( 12 ) );
-            ticket -> establecerPendiente( stoi( row -> columns.at( 13 ) ) );
+            ticket -> establecerDescuento( stod( row -> columns.at( 12 ) ) );
+            ticket -> establecerObservaciones( row -> columns.at( 13 ) );
+            ticket -> establecerEntradaManual( stoi( row -> columns.at( 14 ) ) );
+            ticket -> establecerPendiente( stoi( row -> columns.at( 15 ) ) );
             
             if( ticket -> estaPendiente() ){
                 ticketsPendientes.push_back( ticket );
@@ -118,88 +119,56 @@ void obtenerTicketsRegistrados()
     database.query( consulta );
     if( rows.size() > 0 ){
         if( rows.at( 0 ) -> columns.at( 0 ).compare( "NULL" ) == 0 ){
-            folioActual = 1;
+            folioActual = 0;
         }
         else{
             folioActual = stoi( rows.at( 0 ) -> columns.at( 0 ) ); 
         }
     }
     else{
-        folioActual = 1;
+        folioActual = 0;
     }
 }
 
-// Obtiene la lista de empresas registradas
-void obtenerEmpresasRegistradas()
-{
-    ;
-}
-
-// Obtiene la lista de productos registrados
-void obtenerProductosRegistrados()
+// 
+void agregarTicketPendiente( Ticket *ticket )
 {
     // Conecta con la base de datos
     database.open( "libcurlmbs.dll" );
     
-    // Obtiene la lista de productos registrados
-    string consulta = "select * from productos";
-    database.query( consulta );
-    if( rows.size() > 0 ){
-        for( Row *row : rows ){
-            Registro *registro = new Registro();
-            registro -> establecerClave( stoi( row -> columns.at( 0 ) ) );
-            registro -> establecerNombre( row -> columns.at( 1 ) );
+    // Consulta para el registro en la base de datos
+    stringstream consulta;
+    consulta << "insert into tickets values( " << ticket -> obtenerFolio() << ", '" << ticket -> obtenerFechaRegistro() << "', " << ticket -> obtenerEmpresa() -> obtenerClave() << ", "
+             << ticket -> obtenerProducto() -> obtenerClave() << ", '" << ticket -> obtenerNumeroPlacas() << "', '" << ticket -> obtenerNombreConductor() << "', " << ticket -> obtenerTipoRegistro() 
+             << ", '" << ticket -> obtenerHoraEntrada() << "', null, " << ticket -> obtenerPesoBruto() << ", 0, 0, " << ticket -> obtenerDescuento() 
+             << ", '" << ticket -> obtenerObservaciones() << "', " << ticket -> esEntradaManual() << ", 1 )";
             
-            productos.push_back( registro );
-        }
-    }
+    // Inserta el nuevo ticket
+    database.query( consulta.str() );
+    ticketsPendientes.push_back( ticket );
     
-    // Obtiene la clave actual de productos registrados
-    consulta = "select max( clave_producto ) from productos";
-    database.query( consulta );
-    if( rows.size() > 0 ){
-        if( rows.at( 0 ) -> columns.at( 0 ).compare( "NULL" ) == 0 ){
-            claveProductoActual = 1;
-        }
-        else{
-            claveProductoActual = stoi( rows.at( 0 ) -> columns.at( 0 ) ); 
-        }
-    }
-    else{
-        claveProductoActual = 1;
-    }
-    
-    listaProductos = gtk_list_store_new( 1, G_TYPE_STRING );
-    GtkTreeIter iterador;
-    for( Registro *reg : productos ){
-        gtk_list_store_append( listaProductos, &iterador );
-        gtk_list_store_set( listaProductos, &iterador, 0, reg -> obtenerNombre().c_str(), -1 );
-    }
-    
-    // Cierra la conexión
+    // Cierra la conexion
     database.close();
 }
 
-// Busca el registro por clave
-Registro *buscarRegistro( unsigned int clave, list< Registro * > &registros )
+// Busca el ticket por folio
+Ticket *buscarTicketPorFolio( unsigned int folio )
 {
-    // Recorre la lista de productos
-    for( list< Registro * >::iterator iterador = registros.begin(); iterador != registros.end(); iterador++ ){
-        if( (*iterador) -> obtenerClave() == clave ){
-            return (*iterador);
+    for( list< Ticket * >::iterator ticket = ticketsPendientes.begin(); ticket != ticketsPendientes.end(); ticket++ ){
+        if( (*ticket) -> obtenerFolio() == folio ){
+            return (*ticket);
         }
     }
     
     return nullptr;
 }
 
-// Busca el producto por nombre
-Registro *buscarRegistro( string nombre, list< Registro * > &registros )
+// Busca el ticket por el número de placa
+Ticket *buscarTicketPorNumeroPlaca( std::string numeroPlacas )
 {
-    // Recorre la lista de productos
-    for( list< Registro * >::iterator iterador = registros.begin(); iterador != registros.end(); iterador++ ){
-        if( nombre.compare( (*iterador) -> obtenerNombre() ) == 0 ){
-            return (*iterador);
+    for( list< Ticket * >::iterator ticket = ticketsPendientes.begin(); ticket != ticketsPendientes.end(); ticket++ ){
+        if( numeroPlacas.compare( (*ticket) -> obtenerNumeroPlacas() ) == 0 ){
+            return (*ticket);
         }
     }
     
@@ -238,20 +207,31 @@ void conectarSenales()
     // Vista Inicio
     interfaz.conectarSenal( "BotonBascula", "clicked", G_CALLBACK( irHacia ), (void *)"Bascula" );
     
-    // Báscula pública
-    interfaz.conectarSenal( "BotonBasculaPublicaNuevo", "clicked", G_CALLBACK( basculaPublicaNuevo ), nullptr );
+    // Vista bascula
+    interfaz.conectarSenal( "BotonBasculaInterna", "clicked", G_CALLBACK( vistaBasculaInterna ), nullptr );
+    
+    // Vista báscula
+    interfaz.conectarSenal( "EntradaSeguimiento", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.conectarSenal( "BotonBasculaRegresar", "clicked", G_CALLBACK( irHacia ), (void*)"Bascula" );
     
     // Nuevo para ticket interno
+    interfaz.establecerBotonEtiqueta( "EnlaceRegresarInterno", "Regresar" );
+    interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( irHacia ), (void *)"Tickets" );
     interfaz.conectarSenal( "EntradaNombreEmpresaInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
     interfaz.conectarSenal( "EntradaNombreProductoInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
     interfaz.conectarSenal( "EntradaNombreConductorInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
     interfaz.conectarSenal( "EntradaNumeroPlacasInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
-    interfaz.establecerBotonEtiqueta( "EnlaceRegresarInterno", "Regresar" );
-    interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( irHacia ), (void *)"BasculaPublica" );
-    //interfaz.conectarSenal( "BotonLeerPesoBrutoInterno", G_CALLBACK( irHacia ), (v ), 
+    interfaz.conectarSenal( "NoDescuentoInterno", "toggled", G_CALLBACK( habilitarDescuento ), nullptr );
+    interfaz.conectarSenal( "RegistraEntrada", "toggled", G_CALLBACK( seleccionarTipoRegistro ), nullptr );
+    interfaz.conectarSenal( "BotonLeerPesoTaraInterno", "clicked", G_CALLBACK( abrirLectorBascula ), (void *)LECTOR_PESO_TARA );
+    interfaz.conectarSenal( "BotonPendienteInterno", "clicked", G_CALLBACK( registrarTicket ), nullptr );
 
     // Vista de registro de peso
-    interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( gtk_widget_hide ), nullptr );
+    interfaz.conectarSenal( "BotonCancelarLectura", "clicked", G_CALLBACK( cerrarLectorBascula ), nullptr );
+    interfaz.conectarSenal( "VentanaLectorPeso", "destroy", G_CALLBACK( cerrarLectorBascula ), nullptr );
+    
+    // Ventana que contiene un mensaje
+    interfaz.conectarSenal( "BotonAceptar", "clicked", G_CALLBACK( aceptar ), nullptr );
 }
 
 // Obtiene la hora en un formato válido para la base de datos
@@ -278,7 +258,7 @@ string obtenerFecha()
     
     // Construye la fecha en el formato de la base de datos
     stringstream fecha;
-    fecha << setfill( '0' ) << setw( 4 ) << (tiempo.tm_year + 1900) << "-" << setw( 2 ) << tiempo.tm_mon << "-" << setw( 2 ) << tiempo.tm_mday << setfill( ' ' );
+    fecha << setfill( '0' ) << setw( 4 ) << (tiempo.tm_year + 1900) << "-" << setw( 2 ) << (tiempo.tm_mon + 1) << "-" << setw( 2 ) << tiempo.tm_mday << setfill( ' ' );
     
     // Devuelve la fecha
     return fecha.str();

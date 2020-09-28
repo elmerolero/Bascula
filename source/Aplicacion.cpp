@@ -1,5 +1,4 @@
 #include "Aplicacion.h"
-#include "Database.h"
 #include <gtk/gtk.h>
 #include <stdexcept>
 #include <iostream>
@@ -8,11 +7,10 @@
 #include "Widget.h"
 #include "Funciones.h"
 #include "Vistas.h"
-#include <array>
+#include "LectorBascula.h"
+#include "GestorRegistros.h"
+#include "Sesion.h"
 using namespace std;
-
-// Base de datos
-Database database;
 
 // Interfaz principal 
 Widget interfaz;
@@ -22,18 +20,6 @@ void irHacia( GtkWidget *widget, gpointer ptr )
 {
 	mostrarVista( (char *)ptr );
 }
-
-// Completador a usar
-GtkEntryCompletion * completador;
-
-// Lista de tickets registrados del día en curso
-unsigned int folioActual;
-std::list< Ticket * > ticketsPendientes;
-std::list< Ticket * > ticketsRegistrados;
-
-//
-ContenedorRegistros productos;
-ContenedorRegistros empresas;
 
 // Inicializa la aplicacion
 void iniciar()
@@ -47,6 +33,8 @@ void iniciar()
         g_timeout_add( 1000, G_SOURCE_FUNC( actualizarTiempo ), nullptr );
         
         // Establece los parámetros correspondientes con cada vista
+        interfaz.establecerBotonEtiqueta( "EnlaceCuenta", "Cuenta" );
+        interfaz.establecerBotonEtiqueta( "EnlaceRegresarCuenta", "Regresar" );
         interfaz.establecerBotonEtiqueta( "EnlaceRegistrarUsuarioRegresar", "¡Ya tengo un usuario!" );
         interfaz.establecerBotonEtiqueta( "EnlaceRecuperarContrasena", "No recuerdo mi constraseña" );
         interfaz.establecerBotonEtiqueta( "EnlaceRegistrarNuevoUsuario", "Crear un nuevo usuario" );
@@ -64,7 +52,8 @@ void iniciar()
         interfaz.establecerCompletadorEntrada( "EntradaNombreEmpresaInterno", empresas.obtenerCompletador() );
         
         // Obtiene los tickets registrados y pendientes
-        obtenerTicketsRegistrados();
+        obtenerFolioActual();
+        obtenerRegistrosInternosPendientes();
         
         // Manda a conectar todas las señales de las vistas
         conectarSenales();
@@ -76,112 +65,13 @@ void iniciar()
     }
 }
 
-// Obtiene los tickets registrados del día y el folio actual
-void obtenerTicketsRegistrados()
-{
-    // Conecta con la base de datos
-    database.open( "libcurlmbs.dll" );
-    
-    // Obtiene los tickets del día
-    string consulta = "select * from tickets where fecha = date( 'now', 'localtime' ) or pendiente = 1";
-    database.query( consulta );
-    if( rows.size() > 0 ){
-        for( Row *row : rows ){
-            Ticket *ticket = new Ticket();
-            ticket -> establecerFolio( stoi( row -> columns.at( 0 ) ) );
-            ticket -> establecerFechaRegistro( row -> columns.at( 1 ) );
-            ticket -> establecerEmpresa( empresas.buscarRegistroPorClave( stoi( row -> columns.at( 2 ) ) ) );
-            ticket -> establecerProducto( productos.buscarRegistroPorClave( stoi( row -> columns.at( 3 ) ) ) );
-            ticket -> establecerNumeroPlacas( row -> columns.at( 4 ) );
-            ticket -> establecerNombreConductor( row -> columns.at( 5 ) );
-            ticket -> establecerTipoRegistro( stoi( row -> columns.at( 6 ) ) );
-            ticket -> establecerHoraEntrada( row -> columns.at( 7 ) );
-            ticket -> establecerHoraSalida( row -> columns.at( 8 ) );
-            ticket -> establecerPesoBruto( stod( row -> columns.at( 9 ) ) );
-            ticket -> establecerPesoTara( stod( row -> columns.at( 10 ) ) );
-            ticket -> establecerPesoNeto( stod( row -> columns.at( 11 ) ) );
-            ticket -> establecerDescuento( stod( row -> columns.at( 12 ) ) );
-            ticket -> establecerObservaciones( row -> columns.at( 13 ) );
-            ticket -> establecerEntradaManual( stoi( row -> columns.at( 14 ) ) );
-            ticket -> establecerPendiente( stoi( row -> columns.at( 15 ) ) );
-            
-            if( ticket -> estaPendiente() ){
-                ticketsPendientes.push_back( ticket );
-            }
-            else{
-                ticketsRegistrados.push_back( ticket );
-            }
-        }
-    }
-    
-    // Obtiene la clave actual de productos registrados
-    consulta = "select max( folio ) from tickets";
-    database.query( consulta );
-    if( rows.size() > 0 ){
-        if( rows.at( 0 ) -> columns.at( 0 ).compare( "NULL" ) == 0 ){
-            folioActual = 0;
-        }
-        else{
-            folioActual = stoi( rows.at( 0 ) -> columns.at( 0 ) ); 
-        }
-    }
-    else{
-        folioActual = 0;
-    }
-}
-
-// 
-void agregarTicketPendiente( Ticket *ticket )
-{
-    // Conecta con la base de datos
-    database.open( "libcurlmbs.dll" );
-    
-    // Consulta para el registro en la base de datos
-    stringstream consulta;
-    consulta << "insert into tickets values( " << ticket -> obtenerFolio() << ", '" << ticket -> obtenerFechaRegistro() << "', " << ticket -> obtenerEmpresa() -> obtenerClave() << ", "
-             << ticket -> obtenerProducto() -> obtenerClave() << ", '" << ticket -> obtenerNumeroPlacas() << "', '" << ticket -> obtenerNombreConductor() << "', " << ticket -> obtenerTipoRegistro() 
-             << ", '" << ticket -> obtenerHoraEntrada() << "', null, " << ticket -> obtenerPesoBruto() << ", 0, 0, " << ticket -> obtenerDescuento() 
-             << ", '" << ticket -> obtenerObservaciones() << "', " << ticket -> esEntradaManual() << ", 1 )";
-            
-    // Inserta el nuevo ticket
-    database.query( consulta.str() );
-    ticketsPendientes.push_back( ticket );
-    
-    // Cierra la conexion
-    database.close();
-}
-
-// Busca el ticket por folio
-Ticket *buscarTicketPorFolio( unsigned int folio )
-{
-    for( list< Ticket * >::iterator ticket = ticketsPendientes.begin(); ticket != ticketsPendientes.end(); ticket++ ){
-        if( (*ticket) -> obtenerFolio() == folio ){
-            return (*ticket);
-        }
-    }
-    
-    return nullptr;
-}
-
-// Busca el ticket por el número de placa
-Ticket *buscarTicketPorNumeroPlaca( std::string numeroPlacas )
-{
-    for( list< Ticket * >::iterator ticket = ticketsPendientes.begin(); ticket != ticketsPendientes.end(); ticket++ ){
-        if( numeroPlacas.compare( (*ticket) -> obtenerNumeroPlacas() ) == 0 ){
-            return (*ticket);
-        }
-    }
-    
-    return nullptr;
-}
-
 // Muestra la vista solicitada
 void mostrarVista( string idVista )
 {
     if( !vistaActual.empty() ){
         interfaz.ocultarElemento( vistaActual );
     }
-    
+
     vistaActual = idVista;
     interfaz.mostrarElemento( vistaActual );
 }
@@ -192,9 +82,15 @@ void conectarSenales()
     // Señales de la vista de inicio de sesion
     interfaz.conectarSenal( "EnlaceRegistrarNuevoUsuario", "activate-link", G_CALLBACK( irHacia ), (void *)"RegistrarUsuario" );
     interfaz.conectarSenal( "EnlaceRecuperarContrasena", "activate-link", G_CALLBACK( irHacia ), (void *)"RecuperarContrasena" );
-    interfaz.conectarSenal( "BotonIniciarSesion", "clicked", G_CALLBACK( irHacia ), (void *)"Inicio" );
+    interfaz.conectarSenal( "BotonIniciarSesion", "clicked", iniciarSesion, nullptr );
+    interfaz.conectarSenal( "EntradaContrasena", "activate", iniciarSesion, nullptr );
+    
+    // Barra de usuario
+    interfaz.conectarSenal( "EnlaceCuenta", "activate-link", G_CALLBACK( irHacia ), (void *)"Cuenta" );
+    interfaz.conectarSenal( "EnlaceRegresarCuenta", "activate-link", G_CALLBACK( irHacia ), (void *)"Bascula" );
     
     // Señales de la vista de registro de usuario
+    interfaz.conectarSenal( "BotonRegistrarUsuario", "clicked", G_CALLBACK( registrarUsuario ), nullptr );
     interfaz.conectarSenal( "EnlaceRegistrarUsuarioRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"IniciarSesion" );
     
     // Señales de recuperacion de contraseña
@@ -216,22 +112,31 @@ void conectarSenales()
     
     // Nuevo para ticket interno
     interfaz.establecerBotonEtiqueta( "EnlaceRegresarInterno", "Regresar" );
-    interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( irHacia ), (void *)"Tickets" );
-    interfaz.conectarSenal( "EntradaNombreEmpresaInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
-    interfaz.conectarSenal( "EntradaNombreProductoInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
-    interfaz.conectarSenal( "EntradaNombreConductorInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
     interfaz.conectarSenal( "EntradaNumeroPlacasInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.conectarSenal( "BotonCalcularDescuento", "clicked", G_CALLBACK( leerDescuento ), nullptr );
     interfaz.conectarSenal( "NoDescuentoInterno", "toggled", G_CALLBACK( habilitarDescuento ), nullptr );
     interfaz.conectarSenal( "RegistraEntrada", "toggled", G_CALLBACK( seleccionarTipoRegistro ), nullptr );
-    interfaz.conectarSenal( "BotonLeerPesoTaraInterno", "clicked", G_CALLBACK( abrirLectorBascula ), (void *)LECTOR_PESO_TARA );
-    interfaz.conectarSenal( "BotonPendienteInterno", "clicked", G_CALLBACK( registrarTicket ), nullptr );
+    interfaz.conectarSenal( "BotonLeerPesoTaraInterno", "clicked", G_CALLBACK( vistaLeerPesoTara ), nullptr);
 
     // Vista de registro de peso
-    interfaz.conectarSenal( "BotonCancelarLectura", "clicked", G_CALLBACK( cerrarLectorBascula ), nullptr );
-    interfaz.conectarSenal( "VentanaLectorPeso", "destroy", G_CALLBACK( cerrarLectorBascula ), nullptr );
+    interfaz.conectarSenal( "BotonCancelarLectura", "clicked", G_CALLBACK( lectorBasculaCerrar ), nullptr );
+    interfaz.conectarSenal( "VentanaLectorPeso", "destroy", G_CALLBACK( lectorBasculaCerrar ), nullptr );
     
     // Ventana que contiene un mensaje
     interfaz.conectarSenal( "BotonAceptar", "clicked", G_CALLBACK( aceptar ), nullptr );
+}
+
+// Abre la ventana de mensaje con el mensaje indicado
+void mostrarMensaje( string mensaje )
+{
+    interfaz.establecerTextoEtiqueta( "DialogoMensaje", mensaje );
+    interfaz.mostrarElemento( "VentanaMensaje" );
+}
+
+// Cierra la ventana de mensaje
+void aceptar( GtkWidget *widget, gpointer ptr )
+{
+	interfaz.ocultarElemento( "VentanaMensaje" );
 }
 
 // Obtiene la hora en un formato válido para la base de datos

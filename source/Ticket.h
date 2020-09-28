@@ -9,9 +9,12 @@ const int TIPO_REGISTRO_SALIDA = 1;
 class Ticket
 {
 	public:
+		// Constructor
+		Ticket();
+		
 		// Folio
-		void establecerFolio( int folio );
-		int obtenerFolio() const;
+		void establecerFolio( unsigned int folio );
+		unsigned int obtenerFolio() const;
 		
 		// Fecha de registro
 		void establecerFechaRegistro( std::string fechaRegistro );
@@ -41,11 +44,15 @@ class Ticket
 		void establecerPesoBruto( std::string pesoBrutoStr );
 		void establecerPesoBruto( double pesoBruto );
 		double obtenerPesoBruto() const;
+		void establecerPesoBrutoEstablecido( bool pesoBrutoEstablecido );
+		bool estaPesoBrutoEstablecido() const;
 		
 		// Peso tara
 		void establecerPesoTara( std::string pesoTara );
 		void establecerPesoTara( double pesoTara );
 		double obtenerPesoTara() const;
+		void establecerPesoTaraEstablecido( bool pesoTaraEstablecido );
+		bool estaPesoTaraEstablecido() const;
 		
 		// Bandera que indica si permite descuento o no
 		void permitirDescuento( bool opcionDescuento );
@@ -55,15 +62,15 @@ class Ticket
 		void establecerDescuento( std::string descuentoStr );
 		void establecerDescuento( double descuento );
 		double obtenerDescuento() const;
+		void establecerDescuentoEstablecido( bool descuentoEstablecido );
+		bool estaDescuentoEstablecido() const;
 		
 		// Peso neto
-		static double calcularPesoNeto( double pesoBruto, double pesoTara, double descuento ){
-			double diferencia = abs( pesoBruto - pesoTara );
-			return diferencia - ( ( diferencia * descuento ) / 100 );
-		}
-	
+		void calcularPesoNeto();
 		void establecerPesoNeto( double pesoNeto );
 		double obtenerPesoNeto() const;
+		void establecerPesoNetoCalculado( bool pesoNetoEstablecido );
+		bool estaPesoNetoCalculado() const;
 
 		// Permite  establecer la hora de entrada
 		void establecerHoraEntrada( std::string horaEntrada );
@@ -89,7 +96,7 @@ class Ticket
 		void imprimir() const;
 	
 	private:
-		int folio;
+		unsigned int folio;
 		std::string fechaRegistro;
 		Registro *empresa;
 		Registro *producto;
@@ -99,9 +106,13 @@ class Ticket
 		std::string horaEntrada;
 		std::string horaSalida;
 		double pesoBruto;
+		bool pesoBrutoEstablecido;
 		double pesoTara;
+		bool pesoTaraEstablecido;
 		double descuento;
+		bool descuentoEstablecido;
 		double pesoNeto;
+		bool pesoNetoCalculado;
 		std::string observaciones;
 		bool entradaManual;
 		bool pendiente;

@@ -1,10 +1,13 @@
 CC=g++
 CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3`
 LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
-OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o
+OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o LectorBascula.o GestorRegistros.o Sesion.o sha256.o
 
-../build/aplicacion:  main.cpp Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o
+../build/aplicacion:  main.cpp $(OBJS)
 	$(CC) main.cpp $(CFLAGS) -g -o ../build/aplicacion $(OBJS) $(LIBS)
+
+GestorRegistros.o: GestorRegistros.h GestorRegistros.cpp
+	$(CC) $(CFLAGS) -c GestorRegistros.h GestorRegistros.cpp
 
 Aplicacion.o:	Aplicacion.h Aplicacion.cpp
 	$(CC) $(CFLAGS) -c Aplicacion.h Aplicacion.cpp $(LIBS)
@@ -32,3 +35,12 @@ ContenedorRegistros.o: ContenedorRegistros.h ContenedorRegistros.cpp
 
 Vistas.o: Vistas.h Vistas.cpp
 	$(CC) $(CFLAGS) -c Vistas.h Vistas.cpp $(LIBS)
+	
+LectorBascula.o: LectorBascula.h LectorBascula.cpp
+	$(CC) $(CFLAGS) -c LectorBascula.h LectorBascula.cpp $(LIBS)
+	
+Sesion.o: Sesion.h Sesion.cpp
+	$(CC) $(CFLAGS) -c Sesion.h Sesion.cpp $(LIBS)
+	
+sha256.o: sha256.h sha256.cpp
+	$(CC) -c sha256.h sha256.cpp

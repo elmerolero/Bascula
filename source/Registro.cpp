@@ -37,7 +37,7 @@ void Registro::establecerNombre( string nombre )
 		throw  invalid_argument( "Error, no puede establecerse un nombre vacío a un registro." );
 	}
 	
-	if( nombre.size() > 40 || !regex_match( nombre, formato ) ){
+	if( nombre.size() > 50 || !regex_match( nombre, formato ) ){
 		throw invalid_argument( "Error, no el nombre no puede contener más de cuarenta caracteres ni símbolos especiales." );
 	}
 	

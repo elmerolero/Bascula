@@ -117,6 +117,8 @@ Registro *ContenedorRegistros::agregarNuevoRegistro( string nombre )
 	database.close();
     }
     catch( invalid_argument &ia ){
+	delete registro;
+	registro = nullptr;
 	throw invalid_argument( "Debe establecer un nombre válido para " + obtenerNombreSingular() );
     }
 	

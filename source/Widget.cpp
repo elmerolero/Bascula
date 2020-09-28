@@ -70,8 +70,10 @@ void Widget::desconectarSenal( string idElemento, guint &idSenal )
     // Obtiene el objeto indicado por la señal
     GObject *object = obtenerObjeto( idElemento );
 
-    // Desconecta la señal
-    g_signal_handler_disconnect( object, idSenal );
+    if( idSenal > 0 ){
+        // Desconecta la señal
+        g_signal_handler_disconnect( object, idSenal );
+    }
     
     // Establece el identificador en cero
     idSenal = 0;

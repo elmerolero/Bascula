@@ -1,28 +1,24 @@
 #include "Funciones.h"
 #include "Aplicacion.h"
 #include "Registro.h"
+#include "LectorBascula.h"
 #include <stdexcept>
 #include <string>
 #include <sstream>
 #include <iomanip>
 #include <cmath>
 #include <iostream>
+#include "GestorRegistros.h"
 using namespace std;
 
-// Identificadores de señales
-guint botonLectorBasculaId;
-guint comboBoxLectorBasculaId;
-
 // Banderas
-bool manualActivado = false;		// Lectura manual
-bool lectorBasculaActivo = false;	// La ventana para leer el peso está activado
+bool descuentoCalculado = false;
 
 // Ticket a crear
 Ticket *ticket = nullptr;
 
-
 // Registra un nuevo ticket
-void registrarTicket()
+void registrarPendienteInterno()
 {	
 	// Obtiene la empresa y el producto introducidos
 	string nombreEmpresa = interfaz.obtenerTextoEntrada( "EntradaNombreEmpresaInterno" );
@@ -31,28 +27,42 @@ void registrarTicket()
 	Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
 	
 	try{
-		// Establece los datos
+		// Establece los datos obligatorios
 		ticket -> establecerFolio( ++folioActual );
 		ticket -> establecerFechaRegistro( interfaz.obtenerTextoEtiqueta( "EntradaFechaInterno" ) );
 		ticket -> establecerEmpresa( empresa == nullptr ? empresas.agregarNuevoRegistro( nombreEmpresa ) : empresa );
 		ticket -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
 		ticket -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorInterno" ) );
 		ticket -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasInterno" ) );
-		ticket -> establecerPesoBruto( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoInterno" ) );
-		ticket -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaInterno" ) );
-		ticket -> establecerDescuento( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
 		ticket -> establecerObservaciones( interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" ) );
-		ticket -> establecerEntradaManual( manualActivado );
+		ticket -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
 		
-		// Inserta el ticket en la base de datos
-		agregarTicketPendiente( ticket );
+		// Lee el descuento
+		if( ticket -> permitirDescuento() && !ticket -> estaDescuentoEstablecido() ){
+			interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Indicó que se introduciría un descuento, pero el campo está vacío." );
+			interfaz.mostrarElemento( "MensajeErrorCampo" );
+			--folioActual;
+			return;
+		}
 		
-		//
-		interfaz.establecerTextoEtiqueta( "DialogoMensaje", "Registro creado\ncorrectamente." );
-		interfaz.mostrarElemento( "VentanaMensaje" );
+		// Al menos tiene que registrarse el peso bruto
+		if( !ticket -> estaPesoBrutoEstablecido() ){
+			interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar el peso bruto." );
+			interfaz.mostrarElemento( "MensajeErrorCampo" );
+			--folioActual;
+			return;
+		}
+		
+		// Establece si está pendiente
+		ticket -> establecerPendiente( !ticket -> estaPesoNetoCalculado() );
+		
+		crearRegistroPendiente( ticket );
+		
+		// Muestra el mensaje de que el ticket fue correctamente registrado
+		mostrarMensaje( "Registro creado\ncorrectamente." );
 		
 		// Actualiza la vista de tickets
-		actualizarTicketsPendientes();
+		actualizarRegistrosInternos( registrosInternosPendientes );
 		
 		// Establece las vistas
 		irHacia( nullptr, (void *)"Tickets" );
@@ -64,35 +74,174 @@ void registrarTicket()
 	}
 }
 
-void completarTicket( Ticket *ticket )
+// Finaliza el ticket
+void finalizarPendienteInterno()
 {
-	// Obtiene los campos faltantes
-	string horaSalida = interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaInterno" );
-	string entradaDescuento = interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" );
-	string entradaPesoNeto = interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" );
-	string observaciones = interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" );
-	
-	// Valida cada uno de ellos
-	try{
-		ticket -> establecerHoraSalida( horaSalida );
-		ticket -> establecerObservaciones( observaciones );
-		
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Datos establecidos de forma adecuada." );
+	// ¿Está establecido el peso bruto?
+	if( !ticket -> estaPesoBrutoEstablecido() ){
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar el peso bruto." );
 		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		return;
+	}
+	
+	// ¿Está establecido el peso tara?
+	if( !ticket -> estaPesoTaraEstablecido() ){
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar el peso tara." );
+		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		return;
+	}
+	
+	// ¿Está habilitado el descuento?
+	if( ticket -> permitirDescuento() && !ticket -> estaDescuentoEstablecido() ){
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Indicó que se introduciría un descuento, pero el campo está vacío." );
+		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		--folioActual;
+		return;
+	}
+	
+	// ¿Está registrado el peso neto?
+	if( !ticket -> estaPesoNetoCalculado() ){
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario calcular el peso neto." );
+		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		return;
+	}
+	
+	// Actualiza el tipo de registro
+	if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
+		ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
+	}
+	else{
+		ticket -> establecerTipoRegistro( TIPO_REGISTRO_SALIDA );
+	}
+	
+	// Actualiza las observaciones
+	ticket -> establecerObservaciones( interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" ) );
+	
+	interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Registo exitoso." );
+	interfaz.mostrarElemento( "MensajeErrorCampo" );
+}
+
+// Registra el peso bruto
+void registrarPesoBrutoInterno()
+{
+	try{
+		// Establece la hora y el peso bruto en el ticket
+		ticket -> establecerPesoBruto( lectorBascula.leer() );
+		ticket -> establecerHoraEntrada( obtenerHora() );
+		
+		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", to_string( ticket -> obtenerPesoBruto() ) + " Kg" );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", ticket -> obtenerHoraEntrada() );
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "No se han establecido todos los datos para completar el registro." );
+		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", "No establecido" );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", "No establecida" );
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
 		interfaz.mostrarElemento( "MensajeErrorCampo" );
+	}
+	
+	// Intenta calcula el peso neto
+	calcularPesoNeto();
+	
+	// Cierra el lector de la báscula
+	lectorBascula.cerrar();
+}
+
+// Registra el peso tara
+void registrarPesoTaraInterno()
+{
+	try{
+		// Establece el peso tara y el peso de salida
+		ticket -> establecerPesoTara( lectorBascula.leer() );
+		ticket -> establecerHoraSalida( obtenerHora() );
+		
+		// Establece el peso leído en la etiqueta
+		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", to_string( ticket -> obtenerPesoTara() ) + " Kg" );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", obtenerHora() );
+		
+		// Habilita la opción de poder finalizar el ticket
+		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
+	}
+	catch( invalid_argument &ia ){
+		// Reestablece el campo de la hora y el peso tara
+		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", "No establecida" );
+		
+		// Muestra el error que sucedió
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorCampo" );
+	}
+	
+	leerDescuento( nullptr, nullptr );
+	calcularPesoNeto();
+	
+	// Cierra el lector de la báscula
+	lectorBascula.cerrar();
+}
+
+// Establece el tipo de registro (ENTRADA o SALIDA)
+void seleccionarTipoRegistro( GtkWidget *widget, gpointer ptr )
+{
+	// Si el ticket está establecido
+	if( ticket != nullptr ){
+		if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
+			ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
+		}
+		else{
+			ticket -> establecerTipoRegistro( TIPO_REGISTRO_SALIDA );
+		}
 	}
 }
 
-void actualizarTicketsPendientes()
+// Habilita o deshabilita el descuento
+void habilitarDescuento( GtkWidget *widget, gpointer ptr )
+{
+	// Si ticket está establecido 
+	if( ticket != nullptr ){
+		if( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) ){
+			ticket -> permitirDescuento( true );
+			interfaz.habilitarEdicionEntrada( "EntradaDescuentoInterno" );
+		}
+		else{
+			ticket -> permitirDescuento( false );
+			interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
+			interfaz.deshabilitarEdicionEntrada( "EntradaDescuentoInterno" );
+		}
+	
+		// Intenta calcular el peso neto
+		calcularPesoNeto();
+	}
+}
+
+// Calcula el descuento
+void leerDescuento( GtkWidget *widget, gpointer ptr )
+{
+	if( ticket -> permitirDescuento() ){
+		try{
+			// Establece el descuento
+			ticket -> establecerDescuento( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
+			
+			// Permite finalizar el ticket
+			interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
+		}
+		catch( invalid_argument &ia ){
+			if( !ticket -> estaDescuentoEstablecido() ){
+				interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
+				interfaz.mostrarElemento( "MensajeErrorCampo" );
+			}
+		}
+		
+		// Intenta calcular el peso neto
+		calcularPesoNeto();
+	}
+}
+
+void actualizarRegistrosInternos( list< Ticket * > &tickets )
 {
 	// Limpia el contenedor
 	interfaz.removerElementosHijos( "ContenedorTickets" );
 	
 	// Itera a través de la lista de tickets pendientes y crea los tickets necesarios
-	for( list< Ticket * >::iterator ticket = ticketsPendientes.begin(); ticket != ticketsPendientes.end(); ticket++ ){
+	for( list< Ticket * >::iterator ticket = tickets.begin(); ticket != tickets.end(); ticket++ ){
         // Crea un elemento que será añadido a la interfaz
         Widget *elemento = new Widget();
         
@@ -117,143 +266,38 @@ void actualizarTicketsPendientes()
     }
 }
 
-// Registra el peso bruto
-void registrarPesoBrutoInterno()
+void calcularPesoNeto()
 {
+	//Intenta recalcular el peso neto
 	try{
-		// Establece la hora y el peso bruto en el ticket
-		ticket -> establecerPesoBruto( leerBascula() );
-		ticket -> establecerHoraEntrada( obtenerHora() );
-		
-		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", to_string( ticket -> obtenerPesoBruto() ) + " Kg" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", ticket -> obtenerHoraEntrada() );
+		ticket -> calcularPesoNeto();
+		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", to_string( ticket -> obtenerPesoNeto() ) + " Kg" );
+		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", "No establecido" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", "No establecida" );
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado
+		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );
+		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Pendiente" );
+	}
+}
+
+// Cancela el registro
+void cancelarRegistro( GtkWidget *widget, gpointer ptr )
+{
+	if( ticket != nullptr ){
+		delete ticket;
+		ticket = nullptr;
 	}
 	
-	// Cierra el lector de la báscula
-	cerrarLectorBascula();
+	irHacia( nullptr, (void *)"Tickets" );
 }
 
-// Registra el peso tara
-void registrarPesoTaraInterno()
+// Cancela la finalización
+void cancelarFinalizacion( GtkWidget *widget, gpointer ptr )
 {
-	try{
-		// Establece el peso tara y el peso de salida
-		ticket -> establecerPesoTara( leerBascula() );
-		ticket -> establecerHoraSalida( obtenerHora() );
-		
-		// Establece el peso leído en la etiqueta
-		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", to_string( ticket -> obtenerPesoTara() ) + " Kg" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", obtenerHora() );
-	}
-	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", "No establecida" );
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
-	}
+	ticket = nullptr;
 	
-	// Cierra el lector de la báscula
-	cerrarLectorBascula();
-}
-
-// Establece el tipo de registro (ENTRADA o SALIDA)
-void seleccionarTipoRegistro( GtkWidget *widget, gpointer ptr )
-{
-	if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
-		ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
-	}
-	else{
-		ticket -> establecerTipoRegistro( TIPO_REGISTRO_SALIDA );
-	}
-}
-
-// Habilita o deshabilita el descuento
-void habilitarDescuento( GtkWidget *widget, gpointer ptr )
-{
-	if( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) ){
-		ticket -> permitirDescuento( true );
-		interfaz.habilitarEdicionEntrada( "EntradaDescuentoInterno" );
-	}
-	else{
-		ticket -> permitirDescuento( false );
-		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
-		interfaz.deshabilitarEdicionEntrada( "EntradaDescuentoInterno" );
-	}
-}
-
-// Cierra la ventana de mensaje
-void aceptar( GtkWidget *widget, gpointer ptr )
-{
-	interfaz.ocultarElemento( "VentanaMensaje" );
-}
-
-// Abre el lector de la báscula
-void abrirLectorBascula( GtkWidget *widget, gpointer ptr )
-{
-	// Muestra la ventana del lector
-	interfaz.mostrarElemento( "VentanaLectorPeso" );
-	
-	// Establece las opciones de entrada
-	establecerOpcionesBascula();
-	comboBoxLectorBasculaId = interfaz.conectarSenal( "BasculasDisponibles", "changed", G_CALLBACK( iniciarOpcionBascula ), nullptr );
-}
-
-const char *leerBascula()
-{
-	// Establece el peso leído en la etiqueta
-	return ( !manualActivado ? interfaz.obtenerTextoEtiqueta( "EtiquetaPeso" ) : interfaz.obtenerTextoEntrada( "EntradaPeso" ) );
-}
-
-// Establece las opciones para la seleccion de báscula
-void establecerOpcionesBascula()
-{
-	// Limpia las opciones que había anteriormente
-	interfaz.limpiarComboBoxText( "BasculasDisponibles" );
-	
-	// Agrega las opciones seleccionar y manual
-	interfaz.agregarOpcionComboBoxText( "BasculasDisponibles", "Seleccionar", "Seleccionar" );
-	interfaz.establecerActivoComboBoxText( "BasculasDisponibles", "Seleccionar" );
-	interfaz.agregarOpcionComboBoxText( "BasculasDisponibles", "Entrada manual", NULL );
-}
-
-// Inicia la opcion seleccionada
-void iniciarOpcionBascula()
-{
-	// Obtiene la opcion
-	string opcion = interfaz.obtenerOpcionComboBoxText( "BasculasDisponibles" );
-	interfaz.establecerTextoEntrada( "EntradaPeso", "" );
-	interfaz.establecerTextoEtiqueta( "EtiquetaPeso", "0.0 Kg" );
-
-	// Si la opcion seleccionada es "Introducción manual
-	if( opcion.compare( "Entrada manual" ) == 0 ){
-		manualActivado = true;
-		interfaz.ocultarElemento( "EtiquetaPeso" );
-		interfaz.mostrarElemento( "EntradaPeso" );
-		interfaz.habilitarEdicionEntrada( "EntradaPeso" );
-	}
-	else if( opcion.compare( "Seleccionar" ) != 0 ){
-		manualActivado = false;
-		interfaz.deshabilitarEdicionEntrada( "EntradaPeso" );
-		interfaz.ocultarElemento( "EntradaPeso" );
-		interfaz.mostrarElemento( "EtiquetaPeso" );
-	}
-}
-
-// Cierra el lector de la báscula
-void cerrarLectorBascula()
-{
-	// Oculta la ventana
-	interfaz.ocultarElemento( "VentanaLectorPeso" );
-	
-	// Desconecta la señal
-	interfaz.desconectarSenal( "BotonRegistrarPeso", botonLectorBasculaId );
-	interfaz.desconectarSenal( "BasculasDisponibles", comboBoxLectorBasculaId );
+	irHacia( nullptr, (void *)"Tickets" );
 }
 
 // Convierte las letras minúsculas a mayúsculas

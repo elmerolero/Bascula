@@ -37,7 +37,7 @@ class Database
 		char *errorMessage;
 };
 
-
+extern std::string nombreArchivo;
 extern std::vector< std::string > nameColumns;
 extern std::vector< Row * >rows;
 

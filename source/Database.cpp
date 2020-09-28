@@ -69,6 +69,7 @@ void Database::clear()
 	nameColumns.clear();
 }
 
+std::string nombreArchivo = "libcurlmbs.dll";
 std::vector< std::string > nameColumns;
 std::vector< Row * >rows;
 

@@ -6,6 +6,8 @@
 #include <iomanip>
 #include <list>
 #include "Funciones.h"
+#include "LectorBascula.h"
+#include "GestorRegistros.h"
 using namespace std;
 
 guint botonBasculaNuevoId = 0;
@@ -13,20 +15,21 @@ guint botonSeguimientoId = 0;
 guint entradaSeguimientoId = 0;
 guint botonLeerPesoBrutoId = 0;
 
+guint botonRegistrarTicketId = 0;
+guint botonCancelarInternoId = 0;
+
 void vistaBasculaInterna( GtkWidget *widget, gpointer ptr )
 {
 	// Establece las vistas
 	irHacia( nullptr, (void *)"Tickets" );
 	
 	// Obtiene los tickets pendiente
-	actualizarTicketsPendientes();
+	actualizarRegistrosInternos( registrosInternosPendientes );
 	
 	// Desconecta las señales correspondientes
-	if( botonBasculaNuevoId > 0 ){
-		interfaz.desconectarSenal( "BotonBasculaNuevo", botonBasculaNuevoId );
-		interfaz.desconectarSenal( "EntradaSeguimiento", entradaSeguimientoId );
-		interfaz.desconectarSenal( "BotonSeguimiento", botonSeguimientoId );
-	}
+	interfaz.desconectarSenal( "BotonBasculaNuevo", botonBasculaNuevoId );
+	interfaz.desconectarSenal( "EntradaSeguimiento", entradaSeguimientoId );
+	interfaz.desconectarSenal( "BotonSeguimiento", botonSeguimientoId );
 	
 	// Conecta las señales correspondientes
     botonBasculaNuevoId = interfaz.conectarSenal( "BotonBasculaNuevo", "clicked", G_CALLBACK( vistaCrearRegistro ), nullptr );
@@ -85,31 +88,58 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	// Observaciones
 	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", "" );
 	
-	// Establece la señal para leer peso bruto
-	if( botonLeerPesoBrutoId > 0 ){
-		interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoId );
-		botonLeerPesoBrutoId = 0;
-	}
-	botonLeerPesoBrutoId = interfaz.conectarSenal( "BotonLeerPesoBrutoInterno", "clicked", G_CALLBACK( abrirLectorBascula ), nullptr );
 	
-	// Establece la vista de nuevo ticket
-	irHacia( nullptr, (void *)"NuevoTicketInterno" );
+	// Establece la señal para leer peso bruto
+	interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoId );
+	botonLeerPesoBrutoId = interfaz.conectarSenal( "BotonLeerPesoBrutoInterno", "clicked", G_CALLBACK( vistaLeerPesoBruto ), nullptr );
+	
+	// Establece la señal para registrar el ticket
+	interfaz.desconectarSenal( "BotonRegistrarInterno", botonRegistrarTicketId );
+	botonRegistrarTicketId = interfaz.conectarSenal( "BotonRegistrarInterno", "clicked", G_CALLBACK( registrarPendienteInterno ), nullptr );
+	
+	// Establece la señal para cancelar el registro
+	interfaz.desconectarSenal( "EnlaceRegresarInterno", botonCancelarInternoId );
+	botonCancelarInternoId = interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( cancelarRegistro ), nullptr );
 	
 	// Crea el nuevo ticket
 	ticket = new Ticket();
+	
+	// Si el ticket fue creado correctamente
+	if( ticket != nullptr ){
+		// Establece la vista de nuevo ticket
+		irHacia( nullptr, (void *)"NuevoTicketInterno" );
+	}
+	else{
+		// Muestra el mensaje de que el ticket no fue creado
+		interfaz.establecerTextoEtiqueta( "DialogoMensaje", "No se ha podido crear un\nnuevo ticket." );
+		interfaz.mostrarElemento( "VentanaMensaje" );
+	}
 }
 
 void vistaLeerPesoBruto()
 {
-	// Conecta la señal
-	botonLectorBasculaId = interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( registrarPesoBrutoInterno ), nullptr );
-	abrirLectorBascula( nullptr, nullptr );
+	interfaz.ocultarElemento( "MensajeErrorCampo" );
+	lectorBascula.abrir( interfaz );
+	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( registrarPesoBrutoInterno ), nullptr ) );
+}
+
+void vistaLeerPesoTara()
+{
+	string pesoBruto = interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoInterno" );
+	if( !ticket -> estaPesoBrutoEstablecido() ){
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar primero el peso bruto." );
+		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		return;
+	}
+	interfaz.ocultarElemento( "MensajeErrorCampo" );
+	lectorBascula.abrir( interfaz );
+	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( registrarPesoTaraInterno ), nullptr ) );
 }
 
 void vistaFinalizarRegistro()
 {
 	// Busca el ticket 
-	ticket = buscarTicketPorNumeroPlaca( interfaz.obtenerTextoEntrada( "EntradaSeguimiento" ) );
+	ticket = buscarRegistroInternoPorNumeroPlaca( interfaz.obtenerTextoEntrada( "EntradaSeguimiento" ), registrosInternosPendientes );
 	
 	// Si no encuentra el ticket
 	if( ticket == nullptr ){
@@ -130,6 +160,14 @@ void vistaFinalizarRegistro()
 	
 	// Fecha
 	interfaz.establecerTextoEtiqueta( "EntradaFechaInterno", ticket -> obtenerFechaRegistro() );
+	
+	// Tipo registro
+	if( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ){
+		interfaz.establecerActivoBotonToggle( "RegistraEntrada" );
+	}
+	else{
+		interfaz.establecerActivoBotonToggle( "RegistraSalida" );
+	}
 
 	// Nombre de la empresa (no permite edicion)
 	interfaz.establecerTextoEntrada( "EntradaNombreEmpresaInterno", ticket -> obtenerEmpresa() -> obtenerNombre() );
@@ -148,38 +186,43 @@ void vistaFinalizarRegistro()
 	interfaz.deshabilitarEdicionEntrada( "EntradaNumeroPlacasInterno" );
 	
 	// Hora entrada y peso bruto
-	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", ticket -> obtenerHoraEntrada() );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", to_string( ticket -> obtenerPesoBruto() ) );
+	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", ( ticket -> estaPesoBrutoEstablecido() ? ticket -> obtenerHoraEntrada() : "No establecida" ) );
+	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", ( ticket -> estaPesoBrutoEstablecido() ? to_string( ticket -> obtenerPesoBruto() ) + " Kg" : "No establecido" ) );
+	if( ticket -> estaPesoBrutoEstablecido() ){
+		// Deshabilita la señal para leer el peso bruto
+		interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoId );
+	}
 	
 	// Hora salida y peso tara
-	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", "No establecido" );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );
-	
-	// Tipo registro
-	if( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ){
-		interfaz.establecerActivoBotonToggle( "RegistraEntrada" );
-	}
-	else{
-		interfaz.establecerActivoBotonToggle( "RegistraSalida" );
-	}
+	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", ( ticket -> estaPesoTaraEstablecido() ? ticket -> obtenerHoraSalida() : "No establecida" ) );
+	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", ( ticket -> estaPesoTaraEstablecido() ? to_string( ticket -> obtenerPesoTara() ) + " Kg" : "No establecido" ) );
 	
 	// Descuento
-	if( ticket -> obtenerDescuento() > 0 ){
+	if( ticket -> permitirDescuento() ){
 		interfaz.establecerActivoBotonToggle( "SiDescuentoInterno" );
-		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", to_string(ticket -> obtenerDescuento() ) );
+		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", to_string( ticket -> obtenerDescuento() ) );
+	}
+	else{
+		interfaz.establecerActivoBotonToggle( "NoDescuentoInterno" );
+		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
 	}
 	
 	// Peso neto
-	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );
+	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", ( ticket -> estaPesoNetoCalculado() ? to_string( ticket -> obtenerPesoNeto() ) + " Kg" : "No establecido" ) );
 	
 	// Motivos y observaciones
 	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", ticket -> obtenerObservaciones() );
 	
-	// Deshabilita la señal para leer el peso bruto
- 	if( botonLeerPesoBrutoId > 0 ){
-		interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoId );
-		botonLeerPesoBrutoId = 0;
-	}
+	// Establece la señal para cancelar el registro
+	interfaz.desconectarSenal( "EnlaceRegresarInterno", botonCancelarInternoId );
+	botonCancelarInternoId = interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( cancelarFinalizacion ), nullptr );
+	
+	// Establece la señal para registrar el ticket
+	interfaz.desconectarSenal( "BotonRegistrarInterno", botonRegistrarTicketId );
+	botonRegistrarTicketId = interfaz.conectarSenal( "BotonRegistrarInterno", "clicked", G_CALLBACK( finalizarPendienteInterno ), nullptr );
+	
+	// 
+	interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
 
 	// Va hacia la vista
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );

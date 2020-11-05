@@ -90,6 +90,30 @@ string Usuario::obtenerApellidos() const
     return apellidos;
 }
 
+// Establece el hash del usuario a registrar
+void Usuario::establecerHash( string hash )
+{
+    this -> hash = hash;
+}
+
+// Obtiene el hash del usuario a registrar
+string Usuario::obtenerHash() const
+{
+    return hash;
+}
+
+// Establece la sal
+void Usuario::establecerSal( string sal )
+{
+    this -> sal = sal;
+}
+
+// Obtiene la sal
+std::string Usuario::obtenerSal() const
+{
+    return sal;
+}
+
 // Establece los permisos de administrador
 void Usuario::establecerAdministrador( bool permiso )
 {

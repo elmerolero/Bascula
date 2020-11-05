@@ -278,6 +278,14 @@ void Widget::limpiarComboBoxText( std::string idComboBox )
     gtk_combo_box_text_remove_all( GTK_COMBO_BOX_TEXT( objeto ) );
 }
 
+// Permite cargar una imagen desde archivo para un GtkImage
+void Widget::establecerImagen( string idImagen, string archivo )
+{
+    GObject *objeto = obtenerObjeto( idImagen.c_str() );
+    
+    gtk_image_set_from_file( GTK_IMAGE( objeto ), archivo.c_str() );
+}
+
 void Widget::removerElementosHijos( std::string idContenedor )
 {
     // Necesarios

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.36.0 -->
+<!-- Generated with glade 3.22.1 -->
 <interface>
   <requires lib="gtk+" version="3.22"/>
-  <object class="GtkBox" id="ItemProcedencia">
+  <object class="GtkBox" id="ItemRegistro">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="valign">start</property>
@@ -17,7 +17,6 @@
       <object class="GtkImage" id="ImagenEmpresa">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="pixbuf">..\images\icons\Departamento.png</property>
       </object>
       <packing>
         <property name="expand">False</property>
@@ -31,7 +30,7 @@
         <property name="can_focus">False</property>
         <property name="halign">start</property>
         <property name="hexpand">True</property>
-        <property name="label" translatable="yes">Empresa AX S.A. de C.V.</property>
+        <property name="label" translatable="yes">Nombre registro</property>
         <attributes>
           <attribute name="font-desc" value="Sans 12"/>
         </attributes>

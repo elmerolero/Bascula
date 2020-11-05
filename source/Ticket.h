@@ -92,6 +92,10 @@ class Ticket
 		void establecerEntradaManual( bool entradaManual );
 		bool esEntradaManual() const;
 		
+		// Establece el nombre del basculista
+		void establecerNombreBasculista( std::string nombre );
+		std::string obtenerNombreBasculista() const;
+		
 		// Imprime los datos del ticket
 		void imprimir() const;
 	
@@ -117,6 +121,7 @@ class Ticket
 		bool entradaManual;
 		bool pendiente;
 		bool habilitarDescuento;
+		std::string nombreBasculista;
 };
 
 #endif

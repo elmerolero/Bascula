@@ -87,6 +87,9 @@ class Widget
         // Limpia el combobox text indicado removiendo todas las opciones
         void limpiarComboBoxText( std::string idComboBox );
         
+        // Permite cargar una imagen desde archivo para un GtkImage
+        void establecerImagen( std::string idImagen, std::string archivo );
+        
         // Permite obtener el builder de un Widget
         const GtkBuilder *obtenerBuilder() const;
         

@@ -75,6 +75,14 @@ class Usuario
             return apellidosValidar;
         }
 
+        // Hash de contrasena
+        void establecerHash( std::string hash );
+        std::string obtenerHash() const;
+        
+        // Sal de contrasena
+        void establecerSal( std::string sal );
+        std::string obtenerSal() const;
+
         // Permisos de administrador
         void establecerAdministrador( bool permiso );
         bool esAdministrador() const;
@@ -98,6 +106,8 @@ class Usuario
         std::string nombreUsuario;
         std::string nombre;
         std::string apellidos;
+        std::string hash;
+        std::string sal;
         bool administrador;
 };
 

@@ -3,6 +3,7 @@
 #include <stdexcept>
 #include <cmath>
 #include <regex>
+#include <fstream>
 #include <iomanip>
 using namespace std;
 
@@ -415,8 +416,67 @@ bool Ticket::estaPendiente() const
 	return pendiente;
 }
 
+// Establece el nombre del basculista
+void Ticket::establecerNombreBasculista( std::string nombre )
+{
+	if( nombre.empty() ){
+		throw invalid_argument( "Intento de establecer un nombre de basculista vacío." );
+	}
+	
+	if( nombre.size() > 70 ){
+		throw invalid_argument( "Intento de establecer un nombre de basculista mayor a 70 caracteres." );
+	}
+	
+	this -> nombreBasculista = nombre;
+}
+
+std::string Ticket::obtenerNombreBasculista() const
+{
+	return nombreBasculista;
+}
+
 // Imprime los datos del ticket
 void Ticket::imprimir() const
 {
+	// Esta finalizado (o no está pendiente)
+	if( estaPendiente() ){
+		throw runtime_error( "Intento de impresión de un ticket que está pendiente." );
+	}
 	
+	// Archivo HTML con la información del ticket
+	ofstream pesajeInterno;
+	
+	// Se abre el archivo
+	pesajeInterno.open( "pesaje.html", ios_base::out );
+	if( !pesajeInterno ){
+		throw runtime_error( "No se pudo crear el registro de pesaje. Consulte la ayuda para conocer posibles soluciones." );
+	}
+	
+	// Datos temporales de completado
+	string nombreEmpresa = "EMPRESA S.A. DE C.V.";
+	string nombreBasculista = "Nombre del Basculista";
+	
+	// Envía el formato html con los datos incluídos
+	pesajeInterno << "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><style>*{ font-family: sans-serif; }</style></head><body><strong><p align=\"center\">" << nombreEmpresa
+				  << "</p></strong><hr><div style=\"display: flex; direction: row; justify-content: space-between;\"><p><strong>FECHA:</strong>" << obtenerFechaRegistro()
+				  << "</p><p><strong>FOLIO: </strong>" << obtenerFolio()
+				  << "</div><p align=\"center\">" << obtenerEmpresa() -> obtenerClave() << " - " << obtenerEmpresa() -> obtenerNombre()
+				  << "<p><strong>Registra: </strong>" << ( obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" )
+				  << "</p><table style=\"border: 0; text-align: left;\"><tr><th>Código</th><th>Producto</th></tr><tr><td>" << obtenerProducto() -> obtenerClave() << "</td><td>" << obtenerProducto() -> obtenerNombre()
+				  << "</td></tr></table><p><strong>Placas: </strong>" << obtenerNumeroPlacas()
+				  << "</p><p><strong>Conductor: </strong>" << obtenerNombreConductor()
+				  << "</p><table style=\"border: 0; text-align: left;\"><tr><th>Hora de entrada:</th><td>" << obtenerHoraEntrada()
+				  << "</td></tr><tr><th>Hora de salida:</th><td>" << obtenerHoraSalida()
+				  << "</td></tr></table> <br><table style=\"border: 0; text-align: left; margin-left: auto;\"><tr><th>Peso bruto:</th><td>" << obtenerPesoBruto()
+				  << "</td></tr><tr><th>Peso tara:</th><td>" << obtenerPesoTara()
+				  << "</td></tr><tr><th>Descuento:</th><td>" << obtenerDescuento()
+				  << "</td></tr></table><hr><table style=\"border: 0; text-align: left; margin-left: auto;\"><tr><th>Peso neto:</th><td>" << obtenerPesoNeto()
+				  << "</td></tr></table><hr><p><strong>Observaciones:</strong></p><p>" << obtenerObservaciones()
+				  << "<hr><p>" << ( !esEntradaManual() ? "Registro realizado por el basculista <u>" : "Este registro contiene datos de pesaje introducidos manualmente, realizado por <u> " )
+				  << obtenerNombreBasculista() << "</u></p></body></html>" << endl;
+	
+	// Cierra archivo
+	pesajeInterno.close();
+	
+	system( "chromium-browser pesaje.html" );
 }

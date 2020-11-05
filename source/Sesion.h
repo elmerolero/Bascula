@@ -4,10 +4,12 @@
 #include <string>
 
 void registrarUsuario();
+void actualizarDatosUsuario();
 void iniciarSesion();
 void mostrarUsuario();
 
 void nombreUsuarioOcupado( std::string nombreUsuario );
+void autorizarCambios();
 std::string crearSal();
 std::string crearHash( std::string contrasena, std::string sal );
 void compararContrasenas( const std::string &contrasena, const std::string &confirmacion );

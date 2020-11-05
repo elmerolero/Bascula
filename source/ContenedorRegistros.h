@@ -6,6 +6,7 @@
 #include <gtk/gtk.h>
 #include "Database.h"
 #include "Registro.h"
+#include "Widget.h"
 
 class ContenedorRegistros
 {
@@ -19,10 +20,13 @@ class ContenedorRegistros
 		void obtenerRegistros();
 		
 		Registro *agregarNuevoRegistro( std::string nombre );
+		void actualizarRegistro( Registro *registro );
+		void eliminarRegistro( Registro *registro );
 		
 		Registro *buscarRegistroPorClave( unsigned int clave );
 		Registro *buscarRegistroPorNombre( std::string nombre );
 		
+		void actualizarListaRegistros();
 		GtkEntryCompletion *obtenerCompletador() const;
 	
 	private:

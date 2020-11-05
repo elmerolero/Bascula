@@ -17,7 +17,6 @@ void LectorBascula::abrir( Widget &interfaz )
 	actualizarOpciones();
 	comboBoxLectorBasculaId = interfaz.conectarSenal( "BasculasDisponibles", "changed", G_CALLBACK( lectorBasculaIniciarOpcion ), nullptr );
 	
-	
 	establecerActivo( true );
 }
 

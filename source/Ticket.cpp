@@ -5,6 +5,7 @@
 #include <regex>
 #include <fstream>
 #include <iomanip>
+#include <Windows.h>
 using namespace std;
 
 // Constructor
@@ -478,5 +479,5 @@ void Ticket::imprimir() const
 	// Cierra archivo
 	pesajeInterno.close();
 	
-	system( "chromium-browser pesaje.html" );
+	ShellExecute(NULL, "open", "pesaje.html", NULL, NULL, SW_HIDE );
 }

@@ -13,12 +13,20 @@ extern std::string vistaActual;
 // Meses para mostrar la fecha en formato humano
 const std::array< std::string, 12 > meses{ "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
 
+// Aplicacion
+extern bool aplicacionActiva;
+
+extern int numeroMagico;
+
 // Permite mostrar la vista que se desee
 void irHacia( GtkWidget *widget, gpointer ptr );
 
 // Inicializa la aplicacion
 void iniciar();
-        
+       
+// Conecta las señales necesarias para funcionar cuando no se ha iniciado sesión
+void conectarSenalesBase();
+
 // Conecta las señales de cada una de las vistas
 void conectarSenales();
         
@@ -36,6 +44,9 @@ std::string obtenerHora();
 
 // Obtiene la fecha
 std::string obtenerFecha();
+
+// Primer inicio
+void primerInicio();
 
 // Actualiza el tiempo
 void actualizarTiempo( GtkWidget *widget, gpointer ptr );

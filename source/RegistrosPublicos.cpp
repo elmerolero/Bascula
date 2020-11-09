@@ -106,73 +106,73 @@ void publicoFinalizarPendiente()
 void publicoRegistrarPesoBruto()
 {
     try{
-	// Establece la hora y el peso bruto del ticket
-	registroPublico -> establecerPesoBruto( lectorBascula.leer() );
-	registroPublico -> establecerHoraEntrada( obtenerHora() );
-	
-	// Indica en la interfaz los datos registrados
-	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", to_string( registroPublico -> obtenerPesoBruto() ) + " Kg" );
-	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", registroPublico -> obtenerHoraEntrada() );
+    	// Cierra la báscula
+   		lectorBascula.cerrar();
+   		
+		// Establece la hora y el peso bruto del ticket
+		registroPublico -> establecerPesoBruto( lectorBascula.leer() );
+		registroPublico -> establecerHoraEntrada( obtenerHora() );
+		
+		// Indica en la interfaz los datos registrados
+		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", to_string( registroPublico -> obtenerPesoBruto() ) + " Kg" );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", registroPublico -> obtenerHoraEntrada() );
     }
     catch( invalid_argument &ia ){
-	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", "No establecido" );
-	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", "No establecida" );
-	interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
-	interfaz.mostrarElemento( "MensajeErrorCampo" );
+		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", "No establecido" );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", "No establecida" );
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorCampo" );
     }
     
     // Intenta calcular el peso neto
     publicoCalcularPesoNeto();
-    
-    // Cierra la báscula
-    lectorBascula.cerrar();
 }
 
 // Registra el peso tara
 void publicoRegistrarPesoTara()
 {
     try{
-	// Establece el peso tara y la hora de salida
-	registroPublico -> establecerPesoTara( lectorBascula.leer() );
-	registroPublico -> establecerHoraSalida( obtenerHora() );
+    	// Cierra el lector de la báscula
+    	lectorBascula.cerrar();
 	
-	// Establece el peso leído de la etiqueta
-	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", to_string( registroPublico -> obtenerPesoTara() ) + " Kg" );
-	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", obtenerHora() );
-	
-	// Habilita la opción de poder finalizar ticket
-	interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Finalizar" );
+		// Establece el peso tara y la hora de salida
+		registroPublico -> establecerPesoTara( lectorBascula.leer() );
+		registroPublico -> establecerHoraSalida( obtenerHora() );
+		
+		// Establece el peso leído de la etiqueta
+		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", to_string( registroPublico -> obtenerPesoTara() ) + " Kg" );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", obtenerHora() );
+		
+		// Habilita la opción de poder finalizar ticket
+		interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Finalizar" );
     }
     catch( invalid_argument &ia ){
-	// Reestablece el campo de la hora y el peso de entrada
-	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", "No establecido" );
-	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", "No establecida" );
-	
-	// Muestra el error sucedido
-	interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
-	interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+		// Reestablece el campo de la hora y el peso de entrada
+		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", "No establecido" );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", "No establecida" );
+		
+		// Muestra el error sucedido
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
     }
     
     // Calcula el peso neto
     publicoCalcularPesoNeto();
-	
-    // Cierra el lector de la báscula
-    lectorBascula.cerrar();
 }
 
 // Calcula el peso neto
 void publicoCalcularPesoNeto()
 {
     try{
-	registroPublico -> calcularPesoNeto();
-	
-	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", to_string( registroPublico -> obtenerPesoNeto() ) + " Kg"  );
-	interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Finalizar" );
+		registroPublico -> calcularPesoNeto();
+		
+		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", to_string( registroPublico -> obtenerPesoNeto() ) + " Kg"  );
+		interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Finalizar" );
     }
     catch( invalid_argument &ia ){
-	// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado
-	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", "No establecido" );
-	interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Pendiente" );
+		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado
+		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", "No establecido" );
+		interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Pendiente" );
     }
 }
 

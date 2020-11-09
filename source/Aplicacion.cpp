@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include <stdexcept>
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <iomanip>
 #include "Widget.h"
@@ -11,12 +12,18 @@
 #include "GestorRegistros.h"
 #include "RegistrosInternos.h"
 #include "RegistrosPublicos.h"
+#include "Database.h"
 #include "Sesion.h"
 using namespace std;
 
 // Interfaz principal 
 Widget interfaz;
 string vistaActual;
+
+// Aplicacion activa
+bool aplicacionActiva;
+
+int numeroMagico = 5;
 
 void irHacia( GtkWidget *widget, gpointer ptr )
 {
@@ -32,12 +39,10 @@ void iniciar()
         interfaz.conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_main_quit ), nullptr );
         actualizarTiempo( nullptr, nullptr );
         
-        // Establece la hora
-        g_timeout_add( 1000, G_SOURCE_FUNC( actualizarTiempo ), nullptr );
-        
         // Establece los parámetros correspondientes con cada vista
         interfaz.establecerBotonEtiqueta( "EnlaceCuenta", "Cuenta" );
         interfaz.establecerBotonEtiqueta( "EnlaceCuentaRegresar", "Regresar" );
+        interfaz.establecerBotonEtiqueta( "EnlaceConfiguracionRegresar", "Regresar" );
         interfaz.establecerBotonEtiqueta( "EnlaceTipoBasculaRegresar", "Regresar" );
         interfaz.establecerBotonEtiqueta( "EnlaceConsultarRegistrosRegresar", "Regresar" );
         interfaz.establecerBotonEtiqueta( "EnlaceConsultarRegistroRegresar", "Regresar" );
@@ -47,6 +52,9 @@ void iniciar()
         interfaz.establecerBotonEtiqueta( "EnlaceRegistrarNuevoUsuario", "Crear un nuevo usuario" );
         interfaz.establecerBotonEtiqueta( "EnlaceRecuperarContrasenaRegresar", "Volver" );
         
+        // ¿Primer inicio?
+        primerInicio();
+
         // Obtiene las empresas y los productos registrados en la base de datos
         productos.establecerNombrePlural( "productos" );
         productos.establecerNombreSingular( "producto" );
@@ -61,11 +69,16 @@ void iniciar()
         obtenerFolioActualPublico();
         obtenerRegistrosInternosPendientes();
         obtenerRegistrosPublicosPendientes();
+
+        // Establece la hora
+        g_timeout_add( 1000, G_SOURCE_FUNC( actualizarTiempo ), nullptr );
+
+        // Conecta la señales base
+        conectarSenalesBase();
         
-        // Manda a conectar todas las señales de las vistas
-        conectarSenales();
-        
-        irHacia( nullptr, (void *)"IniciarSesion" );
+        if( !esInicio ){
+            irHacia( nullptr, (void *)"IniciarSesion" );
+        }
     }
     catch( runtime_error &excepcion ){
         cerr << excepcion.what() << endl;
@@ -83,19 +96,14 @@ void mostrarVista( string idVista )
     interfaz.mostrarElemento( vistaActual );
 }
 
-// Conecta las señales de cada una de las vistas
-void conectarSenales()
+// Son necesarias para que funcione el inicio de sesión
+void conectarSenalesBase()
 {
     // Señales de la vista de inicio de sesion
     interfaz.conectarSenal( "EnlaceRegistrarNuevoUsuario", "activate-link", G_CALLBACK( irHacia ), (void *)"RegistrarUsuario" );
     interfaz.conectarSenal( "EnlaceRecuperarContrasena", "activate-link", G_CALLBACK( irHacia ), (void *)"RecuperarContrasena" );
     interfaz.conectarSenal( "BotonIniciarSesion", "clicked", iniciarSesion, nullptr );
     interfaz.conectarSenal( "EntradaContrasena", "activate", iniciarSesion, nullptr );
-    
-    // Barra de usuario
-    interfaz.conectarSenal( "EnlaceCuenta", "activate-link", G_CALLBACK( irHacia ), (void *)"Cuenta" );
-    interfaz.conectarSenal( "EnlaceCuentaRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Bascula" );
-    interfaz.conectarSenal( "BotonActualizarCuenta", "clicked", G_CALLBACK( autorizarCambios ), nullptr );
     
     // Señales de la vista de registro de usuario
     interfaz.conectarSenal( "BotonRegistrarUsuario", "clicked", G_CALLBACK( registrarUsuario ), nullptr );
@@ -107,11 +115,27 @@ void conectarSenales()
     
     // Vista ReemplazarContrasena
     interfaz.conectarSenal( "BotonCambiarContrasena", "clicked", G_CALLBACK( irHacia ), (void *)"IniciarSesion" );
-    
+
+    // Ventana que contiene un mensaje
+    interfaz.conectarSenal( "BotonAceptar", "clicked", G_CALLBACK( aceptar ), nullptr );
+}
+
+// Conecta las señales de cada una de las vistas
+void conectarSenales()
+{   
+    // Carga la configuración de la bascula
+    lectorBascula.cargarConfiguracion();
+
     // Vista Inicio
     interfaz.conectarSenal( "BotonBascula", "clicked", G_CALLBACK( irHacia ), (void *)"Bascula" );
     interfaz.conectarSenal( "BotonRegistros", "clicked", G_CALLBACK( irHacia ), (void *)"Registros" );
+    interfaz.conectarSenal( "BotonConfiguracion", "clicked", G_CALLBACK( vistaConfiguracion ), nullptr );
     
+    // Barra de usuario
+    interfaz.conectarSenal( "EnlaceCuenta", "activate-link", G_CALLBACK( irHacia ), (void *)"Cuenta" );
+    interfaz.conectarSenal( "EnlaceCuentaRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
+    interfaz.conectarSenal( "BotonActualizarCuenta", "clicked", G_CALLBACK( autorizarCambios ), nullptr );
+
     // Vista seleccion de tipo de báscula
     interfaz.conectarSenal( "EnlaceTipoBasculaRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
     interfaz.conectarSenal( "BotonBasculaPublica", "clicked", G_CALLBACK( vistaBasculaPublica ), nullptr );
@@ -127,7 +151,6 @@ void conectarSenales()
     interfaz.conectarSenal( "BotonCalcularDescuento", "clicked", G_CALLBACK( internoLeerDescuento ), nullptr );
     interfaz.conectarSenal( "NoDescuentoInterno", "toggled", G_CALLBACK( internoHabilitarDescuento ), nullptr );
     interfaz.conectarSenal( "RegistraEntrada", "toggled", G_CALLBACK( internoSeleccionarTipo ), nullptr );
-    interfaz.conectarSenal( "BotonLeerPesoTaraInterno", "clicked", G_CALLBACK( vistaLeerPesoTara ), nullptr);
 
     // Nuevo para ticket publico
     interfaz.establecerBotonEtiqueta( "EnlaceRegresarPublico", "Regresar" );
@@ -136,9 +159,6 @@ void conectarSenales()
     // Vista de registro de peso
     interfaz.conectarSenal( "BotonCancelarLectura", "clicked", G_CALLBACK( lectorBasculaCerrar ), nullptr );
     interfaz.conectarSenal( "VentanaLectorPeso", "destroy", G_CALLBACK( lectorBasculaCerrar ), nullptr );
-    
-    // Ventana que contiene un mensaje
-    interfaz.conectarSenal( "BotonAceptar", "clicked", G_CALLBACK( aceptar ), nullptr );
     
     // Vista que solicita la contrasena
     interfaz.conectarSenal( "BotonPermitirCambios", "clicked", G_CALLBACK( actualizarDatosUsuario ), nullptr );
@@ -156,6 +176,10 @@ void conectarSenales()
     interfaz.conectarSenal( "EnlaceConsultarRegistrosRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Registros" );
     interfaz.conectarSenal( "BotonNo", "clicked", G_CALLBACK( cancelarOperacion ), nullptr );
     interfaz.conectarSenal( "BotonEliminarRegistro", "clicked", G_CALLBACK( alertaEliminarRegistro ), nullptr );
+
+    // Vista de configuración
+    interfaz.conectarSenal( "EnlaceConfiguracionRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
+    interfaz.conectarSenal( "BotonGuardarConfiguracion", "clicked", G_CALLBACK( lectorBasculaActualizarOpciones ), nullptr );
 }
 
 // Abre la ventana de mensaje con el mensaje indicado
@@ -199,6 +223,34 @@ string obtenerFecha()
     
     // Devuelve la fecha
     return fecha.str();
+}
+
+void primerInicio()
+{
+    ifstream archivo;
+
+    // Intenta abrir el archivo
+    archivo.open( nombreArchivo );
+    if( archivo.is_open() ){
+        archivo.close();
+        esInicio = false;
+        return; // Regresa no hay que establecer opciones adicionales
+    }
+
+    // Es primer inicio
+    esInicio = true;
+
+    // Creamos el archivo
+    database.open( nombreArchivo );
+
+    // Creamos las tablas
+    database.query( desencriptar( databaseTables, numeroMagico ) );
+
+    // Cerramos la base de datos
+    database.close();
+
+    // Redirigimos a la página de registro
+    irHacia( nullptr, (void *)"RegistrarUsuario" );
 }
 
 // Actualiza el tiempo cada segundo

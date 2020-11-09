@@ -36,7 +36,7 @@ void registrarUsuario()
 		database.open( nombreArchivo );
 		
 		// Intenta realizar el registro
-		string consulta = "insert into usuarios values( '" + nombreUsuario + "', '" +  contrasenaFinal + "', '" + sal + "', '" + nombre + "', '" + apellidos + "', 0 )";
+		string consulta = "insert into usuarios values( '" + nombreUsuario + "', '" +  contrasenaFinal + "', '" + sal + "', '" + nombre + "', '" + apellidos + "', " + ( esInicio ? "1" : "0" ) + " )";
 		database.query( consulta );
 		
 		// Cierra la base de datos
@@ -161,9 +161,18 @@ void iniciarSesion()
 			
 			// Muestra al usuario
 			mostrarUsuario();
+
+			// Manda a conectar todas las señales de las vistas
+        	conectarSenales();
 			
 			// Redirige hacia la vista de inicio
-			irHacia( nullptr, (void *)"Inicio" );
+			if( !esInicio && cargarNombreEmpresa() ){
+				irHacia( nullptr, (void *)"Inicio" );
+			}
+			else{
+				irHacia( nullptr, (void *)"RegistrarEmpresa" );
+			}
+			
 			if( usuario.esAdministrador() ){
 				interfaz.mostrarElemento( "BotonRegistros" );
 				interfaz.mostrarElemento( "BotonUsuarios" );

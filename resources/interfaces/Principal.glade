@@ -1,83 +1,83 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Generated with glade 3.22.1 -->
+<!-- Generated with glade 3.36.0 -->
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkImage" id="ImagenBascula">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="margin_top">5</property>
-    <property name="pixbuf">../images/icons/Bascula.png</property>
+    <property name="pixbuf">..\images\icons\Bascula.png</property>
   </object>
   <object class="GtkImage" id="ImagenBasculaPublica">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Pesajes.png</property>
+    <property name="pixbuf">..\images\icons\Pesajes.png</property>
   </object>
   <object class="GtkImage" id="ImagenEmpresas">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Empresas.png</property>
+    <property name="pixbuf">..\images\icons\Empresas.png</property>
   </object>
   <object class="GtkImage" id="ImagenEmpresas1">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Vehiculos.png</property>
+    <property name="pixbuf">..\images\icons\Vehiculos.png</property>
   </object>
   <object class="GtkImage" id="ImagenNuevo">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Nuevo.png</property>
+    <property name="pixbuf">..\images\icons\Nuevo.png</property>
   </object>
   <object class="GtkImage" id="ImagenNuevo1">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Nuevo.png</property>
+    <property name="pixbuf">..\images\icons\Nuevo.png</property>
   </object>
   <object class="GtkImage" id="ImagenNuevo2">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Nuevo.png</property>
+    <property name="pixbuf">..\images\icons\Nuevo.png</property>
   </object>
   <object class="GtkImage" id="ImagenProductos">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Producto.png</property>
+    <property name="pixbuf">..\images\icons\Producto.png</property>
   </object>
   <object class="GtkImage" id="ImagenRegistroEditar1">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Editar.png</property>
+    <property name="pixbuf">..\images\icons\Editar.png</property>
   </object>
   <object class="GtkImage" id="ImagenRegistroEliminar1">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Eliminar.png</property>
+    <property name="pixbuf">..\images\icons\Eliminar.png</property>
   </object>
   <object class="GtkImage" id="ImagenRegistros">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
     <property name="margin_top">5</property>
-    <property name="pixbuf">../images/icons/Registro.png</property>
+    <property name="pixbuf">..\images\icons\Registro.png</property>
   </object>
   <object class="GtkImage" id="ImagenTicketsDia">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/RegistroPeso.png</property>
+    <property name="pixbuf">..\images\icons\RegistroPeso.png</property>
   </object>
   <object class="GtkImage" id="ImagenUsoInterno">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Abierto.png</property>
+    <property name="pixbuf">..\images\icons\Abierto.png</property>
   </object>
   <object class="GtkImage" id="ImagenUsuarios">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Usuario.png</property>
+    <property name="pixbuf">..\images\icons\Usuario.png</property>
   </object>
   <object class="GtkImage" id="ImagenUsuarios1">
     <property name="visible">True</property>
     <property name="can_focus">False</property>
-    <property name="pixbuf">../images/icons/Configuracion.png</property>
+    <property name="pixbuf">..\images\icons\Configuracion.png</property>
   </object>
   <object class="GtkWindow" id="VentanaPrincipal">
     <property name="visible">True</property>
@@ -87,14 +87,11 @@
     <property name="default_width">800</property>
     <property name="default_height">550</property>
     <child>
-      <placeholder/>
-    </child>
-    <child>
       <object class="GtkGrid" id="GridPrincipal">
         <property name="visible">True</property>
         <property name="can_focus">False</property>
-        <property name="margin_left">10</property>
-        <property name="margin_right">10</property>
+        <property name="margin_start">10</property>
+        <property name="margin_end">10</property>
         <property name="margin_top">10</property>
         <property name="margin_bottom">10</property>
         <child>
@@ -190,7 +187,7 @@ Apellidos</property>
                     <property name="halign">center</property>
                     <property name="margin_top">5</property>
                     <property name="margin_bottom">5</property>
-                    <property name="pixbuf">../images/users/default.png</property>
+                    <property name="pixbuf">..\images\users\default.png</property>
                   </object>
                   <packing>
                     <property name="left_attach">1</property>
@@ -1481,7 +1478,6 @@ aquí para reestablecer tu contraseña.</property>
                             <property name="editable">False</property>
                             <property name="max_length">5</property>
                             <property name="width_chars">9</property>
-                            <property name="xalign">2.2351741291171123e-10</property>
                             <property name="placeholder_text" translatable="yes">Porcentaje</property>
                           </object>
                           <packing>
@@ -2455,7 +2451,7 @@ Interno</property>
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
                     <property name="valign">center</property>
-                    <property name="pixbuf">../images/icons/Usuario.png</property>
+                    <property name="pixbuf">..\images\icons\Usuario.png</property>
                   </object>
                   <packing>
                     <property name="left_attach">0</property>
@@ -3932,7 +3928,536 @@ Interno</property>
             <property name="top_attach">11</property>
           </packing>
         </child>
+        <child>
+          <object class="GtkGrid" id="Configuracion">
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="halign">start</property>
+                <property name="label" translatable="yes">Seleccione el ajuste más conveniente:</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans 13"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="NombreEmpresa4">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="halign">start</property>
+                <property name="label" translatable="yes">Nombre de la Empresa S. A. de C. V.</property>
+                <attributes>
+                  <attribute name="font-desc" value="Sans Bold 12"/>
+                </attributes>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="valign">center</property>
+                <property name="hexpand">True</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkLabel" id="TituloConfiguracion">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="margin_top">5</property>
+                    <property name="label" translatable="yes">Configuración</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Standard Symbols L 18"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLinkButton" id="EnlaceConfiguracionRegresar">
+                    <property name="label" translatable="yes">button</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="halign">center</property>
+                    <property name="relief">none</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="margin_start">10</property>
+                    <property name="margin_end">10</property>
+                    <property name="margin_top">10</property>
+                    <property name="margin_bottom">10</property>
+                    <property name="hexpand">True</property>
+                    <property name="orientation">vertical</property>
+                    <property name="spacing">5</property>
+                    <child>
+                      <object class="GtkLabel" id="MensajeErrorConfiguracion">
+                        <property name="name">MensajeError</property>
+                        <property name="can_focus">False</property>
+                        <property name="margin_top">3</property>
+                        <property name="margin_bottom">3</property>
+                        <property name="label" translatable="yes">Error</property>
+                        <attributes>
+                          <attribute name="foreground" value="#efef29292929"/>
+                        </attributes>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">start</property>
+                        <property name="margin_top">10</property>
+                        <property name="label" translatable="yes">Configuración de línea</property>
+                        <attributes>
+                          <attribute name="font-desc" value="Sans Bold 10"/>
+                        </attributes>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="spacing">5</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">Velocidad (baud):</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkComboBoxText" id="OpcionesBaudrate">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">end</property>
+                            <property name="active">6</property>
+                            <property name="active_id">CBR_9600</property>
+                            <items>
+                              <item id="CBR_110" translatable="yes">110 bps</item>
+                              <item id="CBR_300" translatable="yes">300 bps</item>
+                              <item id="CBR_600" translatable="yes">600 bps</item>
+                              <item id="CBR_1200" translatable="yes">1200 bps</item>
+                              <item id="CBR_2400" translatable="yes">2400 bps</item>
+                              <item id="CBR_4800" translatable="yes">4800 bps</item>
+                              <item id="CBR_9600" translatable="yes">9600 bps</item>
+                              <item id="CBR_14400" translatable="yes">14400 bps</item>
+                              <item id="CBR_19200" translatable="yes">19200 bps</item>
+                              <item id="CBR_38400" translatable="yes">38400 bps</item>
+                              <item id="CBR_57600" translatable="yes">57600 bps</item>
+                              <item id="CBR_115200" translatable="yes">115200 bps</item>
+                              <item id="CBR_128000" translatable="yes">128000 bps</item>
+                              <item id="CBR_260000" translatable="yes">256000 bps</item>
+                            </items>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="hexpand">True</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">Bits de datos:</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="OpcionesBitsDatos">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="halign">end</property>
+                            <property name="width_chars">14</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">3</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="hexpand">True</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">Bits de stop:</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="OpcionesBitsStop">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="halign">end</property>
+                            <property name="width_chars">14</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">4</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="hexpand">True</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">Paridad:</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkComboBoxText" id="OpcionesParidad">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="active">0</property>
+                            <property name="active_id">None</property>
+                            <items>
+                              <item id="None" translatable="yes">Ninguno</item>
+                              <item id="Par" translatable="yes">Par</item>
+                              <item id="Impar" translatable="yes">Impar</item>
+                              <item id="Marca" translatable="yes">Marca</item>
+                              <item id="Espacio" translatable="yes">Espacio</item>
+                            </items>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">5</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="hexpand">True</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">Ignorar bytes:</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkEntry" id="OpcionesBytesIgnorados">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="halign">end</property>
+                            <property name="width_chars">14</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">6</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="BotonGuardarConfiguracion">
+                        <property name="label" translatable="yes">Guardar</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="vexpand">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">7</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">3</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">15</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkGrid" id="RegistrarEmpresa">
+            <property name="can_focus">False</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="valign">center</property>
+                <property name="hexpand">True</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkLabel" id="TituloConfiguracion1">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="margin_top">5</property>
+                    <property name="label" translatable="yes">¿Cómo se llama su organización?</property>
+                    <attributes>
+                      <attribute name="font-desc" value="Standard Symbols L 18"/>
+                    </attributes>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkLinkButton" id="EnlaceConfiguracionRegresar1">
+                    <property name="label" translatable="yes">button</property>
+                    <property name="visible">True</property>
+                    <property name="can_focus">True</property>
+                    <property name="receives_default">True</property>
+                    <property name="halign">center</property>
+                    <property name="relief">none</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="halign">center</property>
+                <property name="hexpand">True</property>
+                <property name="label" translatable="yes">Introduzca el nombre de su empresa, esto le permitirá
+al programa identificarla y poder establecer su nombre en los registros.</property>
+                <property name="justify">center</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can_focus">False</property>
+                <property name="vexpand">True</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can_focus">False</property>
+                    <property name="halign">center</property>
+                    <property name="valign">center</property>
+                    <property name="vexpand">True</property>
+                    <property name="orientation">vertical</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="visible">True</property>
+                        <property name="can_focus">False</property>
+                        <property name="halign">center</property>
+                        <property name="label" translatable="yes">Nombre de la empresa:</property>
+                        <property name="justify">center</property>
+                        <attributes>
+                          <attribute name="font-desc" value="Sans 13"/>
+                        </attributes>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkEntry" id="EntradaNombreEmpresaPropia">
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="max_length">50</property>
+                        <property name="width_chars">30</property>
+                        <property name="placeholder_text" translatable="yes">Nombre S.A. de C.V.</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="BotonRegistrarEmpresaPropia">
+                        <property name="label" translatable="yes">Registrar</property>
+                        <property name="visible">True</property>
+                        <property name="can_focus">True</property>
+                        <property name="receives_default">True</property>
+                        <property name="halign">center</property>
+                        <property name="valign">center</property>
+                        <property name="margin_top">20</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">2</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">2</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="left_attach">0</property>
+            <property name="top_attach">16</property>
+          </packing>
+        </child>
       </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
     </child>
   </object>
   <object class="GtkWindow" id="VentanaEntradaContrasena">
@@ -3943,9 +4468,6 @@ Interno</property>
     <property name="default_width">400</property>
     <property name="default_height">250</property>
     <property name="deletable">False</property>
-    <child>
-      <placeholder/>
-    </child>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
@@ -4037,6 +4559,9 @@ Interno</property>
         </child>
       </object>
     </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
   </object>
   <object class="GtkWindow" id="VentanaLectorPeso">
     <property name="can_focus">False</property>
@@ -4046,10 +4571,6 @@ Interno</property>
     <property name="default_width">400</property>
     <property name="default_height">250</property>
     <property name="deletable">False</property>
-    <property name="gravity">center</property>
-    <child>
-      <placeholder/>
-    </child>
     <child>
       <object class="GtkGrid" id="LeerBascula">
         <property name="visible">True</property>
@@ -4245,6 +4766,9 @@ Interno</property>
         </child>
       </object>
     </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
   </object>
   <object class="GtkWindow" id="VentanaMensaje">
     <property name="can_focus">False</property>
@@ -4256,9 +4780,6 @@ Interno</property>
     <property name="default_height">250</property>
     <property name="type_hint">dialog</property>
     <property name="deletable">False</property>
-    <child>
-      <placeholder/>
-    </child>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
@@ -4295,6 +4816,9 @@ Interno</property>
         </child>
       </object>
     </child>
+    <child type="titlebar">
+      <placeholder/>
+    </child>
   </object>
   <object class="GtkWindow" id="VentanaSiNo">
     <property name="can_focus">False</property>
@@ -4306,9 +4830,6 @@ Interno</property>
     <property name="default_height">250</property>
     <property name="type_hint">dialog</property>
     <property name="deletable">False</property>
-    <child>
-      <placeholder/>
-    </child>
     <child>
       <object class="GtkBox">
         <property name="visible">True</property>
@@ -4372,6 +4893,9 @@ Interno</property>
           </packing>
         </child>
       </object>
+    </child>
+    <child type="titlebar">
+      <placeholder/>
     </child>
   </object>
 </interface>

@@ -84,6 +84,7 @@ class TicketPublico
 		void establecerEntradaManual( bool entradaManual );
 		bool esEntradaManual() const;
 	
+		void imprimir() const;
 	private:
 		unsigned int folio;
 		std::string fechaRegistro;

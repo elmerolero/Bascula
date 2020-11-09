@@ -133,6 +133,9 @@ void internoFinalizarPendiente()
 void internoRegistrarPesoBruto()
 {
 	try{
+		// Cierra el lector de la báscula
+		lectorBascula.cerrar();
+
 		// Establece la hora y el peso bruto en el ticket
 		ticket -> establecerPesoBruto( lectorBascula.leer() );
 		ticket -> establecerHoraEntrada( obtenerHora() );
@@ -149,15 +152,15 @@ void internoRegistrarPesoBruto()
 	
 	// Intenta calcula el peso neto
 	internoCalcularPesoNeto();
-	
-	// Cierra el lector de la báscula
-	lectorBascula.cerrar();
 }
 
 // Registra el peso tara
 void internoRegistrarPesoTara()
 {
 	try{
+		// Cierra el lector de la báscula
+		lectorBascula.cerrar();
+
 		// Establece el peso tara y el peso de salida
 		ticket -> establecerPesoTara( lectorBascula.leer() );
 		ticket -> establecerHoraSalida( obtenerHora() );
@@ -165,7 +168,7 @@ void internoRegistrarPesoTara()
 		// Establece el peso leído en la etiqueta
 		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", to_string( ticket -> obtenerPesoTara() ) + " Kg" );
 		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", obtenerHora() );
-		
+
 		// Habilita la opción de poder finalizar el ticket
 		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
 	}
@@ -181,9 +184,6 @@ void internoRegistrarPesoTara()
 	
 	internoLeerDescuento();
 	internoCalcularPesoNeto();
-	
-	// Cierra el lector de la báscula
-	lectorBascula.cerrar();
 }
 
 // Calcula el peso neto

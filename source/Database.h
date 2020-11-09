@@ -40,6 +40,7 @@ class Database
 extern std::string nombreArchivo;
 extern std::vector< std::string > nameColumns;
 extern std::vector< Row * >rows;
+extern std::string databaseTables;
 
 // Called when a query is made
 int buildResults( void * notUsed, int numberColums, char **columns, char **columnNames );

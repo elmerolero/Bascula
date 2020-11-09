@@ -26,6 +26,9 @@ std::list< TicketPublico * > registrosPublicosConsultados;
 ContenedorRegistros productos;
 ContenedorRegistros empresas;
 
+// Primer inicio
+bool esInicio;
+
 // Obtiene el folio actual en el que se encuentra el registro
 void obtenerFolioActual()
 {
@@ -216,7 +219,7 @@ void finalizarRegistroPublico( TicketPublico *registroPublico )
 	database.query( consulta.str() );
 	
 	// Imprime el ticket
-	//ticket -> imprimir();
+	registroPublico -> imprimir();
 	
 	// Remueve el ticket de los registros pendientes
 	registrosPublicosPendientes.remove( registroPublico );
@@ -253,21 +256,54 @@ void crearRegistroPublicoPendiente( TicketPublico *registroPublico )
 	    
     // Inserta el nuevo ticket
     try{
-	// database.query( consulta.str() );
-	cout << consulta.str() << endl;
-	if( registroPublico -> estaPendiente() ){
-	    registrosPublicosPendientes.push_back( registroPublico );
-	}
-	/*else{
-	    ticket -> imprimir();
-	}*/
+	   database.query( consulta.str() );
+    	if( registroPublico -> estaPendiente() ){
+    	    registrosPublicosPendientes.push_back( registroPublico );
+    	}
+    	else{
+    	    registroPublico -> imprimir();
+    	}
     }
     catch( runtime_error &re ){
-	cerr << re.what() << endl;
+    	cerr << re.what() << endl;
     }
     
     // Cierra la conexion
     database.close();
+}
+
+void registrarNombreEmpresa( std::string nombre )
+{
+    // Archivo HTML con la información del ticket
+    ofstream archivo;
+    
+    // Se abre el archivo
+    archivo.open( "empresa.dat", ios_base::out );
+    if( !archivo ){
+        throw runtime_error( "Error" );
+    }
+
+    archivo << nombre << endl;
+
+    archivo.close();
+}
+
+bool cargarNombreEmpresa( std::string nombre )
+{
+    ifstream archivo;
+
+    // Intenta abrir el archivo
+    archivo.open( "empresa.dat" );
+    if( !archivo.is_open() ){
+        return false; // Regresa no hay que establecer opciones adicionales
+    }
+
+    // Lee el nombre de la empresa
+    archivo >> cargarNombreEmpresa;
+
+    archivo.close();
+
+    return true;
 }
 
 // Busca el registro por folio en la lista de registros internos dada

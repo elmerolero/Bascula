@@ -15,8 +15,11 @@ using namespace std;
 guint botonBasculaNuevoId = 0;
 guint botonSeguimientoId = 0;
 guint entradaSeguimientoId = 0;
-guint botonLeerPesoBrutoId = 0;
-guint botonLeerPesoTaraId = 0;
+
+guint botonLeerPesoBrutoInternoId = 0;
+guint botonLeerPesoTaraInternoId = 0;
+guint botonLeerPesoBrutoPublicoId = 0;
+guint botonLeerPesoTaraPublicoId = 0;
 
 guint botonRegistrarTicketId = 0;
 guint botonCancelarInternoId = 0;
@@ -221,6 +224,30 @@ void vistaRegistroEditar( GtkWidget *widget, gpointer ptr )
 	interfaz.mostrarElemento( "ControlesEdicionRegistro" );
 }
 
+void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
+{
+	// Oculta el mensaje de error
+	interfaz.ocultarElemento( "MensajeErrorConfiguracion" );
+
+	// Establece el baudrate establecido
+	interfaz.establecerActivoComboBoxText( "OpcionesBaudrate", "CBR_" + to_string( lectorBascula.obtenerBaudRate() ) );
+
+	// Establece los bits de datos
+	interfaz.establecerTextoEntrada( "OpcionesBitsDatos", to_string( lectorBascula.obtenerByteSize() ) );
+
+	// Establece los bits de stop
+	interfaz.establecerTextoEntrada( "OpcionesBitsStop", to_string( lectorBascula.obtenerStopBits() ) );
+
+	// Establecer parity
+	interfaz.establecerActivoComboBoxText( "OpcionesParidad", parityOptions[ lectorBascula.obtenerParity() ] );
+
+	// Bits a ignorar
+	interfaz.establecerTextoEntrada( "OpcionesBytesIgnorados", to_string( lectorBascula.obtenerBytesIgnorados() ) );
+
+	// Se dirige a la vista
+	irHacia( nullptr, (void *)"Configuracion" );
+}
+
 void vistaBasculaPublica( GtkWidget *widget, gpointer ptr )
 {
 	// Establece las vistas
@@ -304,12 +331,12 @@ void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
 	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoPublico", productos.obtenerCompletador() );
 	
 	// Establece la señal para leer peso bruto
-	interfaz.desconectarSenal( "BotonLeerPesoBrutoPublico", botonLeerPesoBrutoId );
-	botonLeerPesoBrutoId = interfaz.conectarSenal( "BotonLeerPesoBrutoPublico", "clicked", G_CALLBACK( vistaLeerPesoBrutoPublico ), nullptr );
+	interfaz.desconectarSenal( "BotonLeerPesoBrutoPublico", botonLeerPesoBrutoPublicoId );
+	botonLeerPesoBrutoPublicoId = interfaz.conectarSenal( "BotonLeerPesoBrutoPublico", "clicked", G_CALLBACK( vistaLeerPesoBrutoPublico ), nullptr );
 	
 	// Establece la señar para leer el peso tara
-	interfaz.desconectarSenal( "BotonLeerPesoTaraPublico", botonLeerPesoTaraId );
-	botonLeerPesoTaraId = interfaz.conectarSenal( "BotonLeerPesoTaraPublico", "clicked", G_CALLBACK( vistaLeerPesoTaraPublico ), nullptr );
+	interfaz.desconectarSenal( "BotonLeerPesoTaraPublico", botonLeerPesoTaraPublicoId );
+	botonLeerPesoTaraPublicoId = interfaz.conectarSenal( "BotonLeerPesoTaraPublico", "clicked", G_CALLBACK( vistaLeerPesoTaraPublico ), nullptr );
 	
 	// Establece la señal para registrar el ticket
 	interfaz.desconectarSenal( "BotonRegistrarPublico", botonRegistrarPublicoId );
@@ -383,7 +410,7 @@ void vistaFinalizarRegistroPublico()
 	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", ( registroPublico -> estaPesoBrutoEstablecido() ? to_string( registroPublico -> obtenerPesoBruto() ) + " Kg" : "No establecido" ) );
 	if( registroPublico -> estaPesoBrutoEstablecido() ){
 		// Deshabilita la señal para leer el peso bruto
-		interfaz.desconectarSenal( "BotonLeerPesoBrutoPublico", botonLeerPesoBrutoId );
+		interfaz.desconectarSenal( "BotonLeerPesoBrutoPublico", botonLeerPesoBrutoPublicoId );
 	}
 	
 	// Hora salida y peso tara
@@ -396,10 +423,10 @@ void vistaFinalizarRegistroPublico()
 	// Establece la señal para cancelar el registro
 	interfaz.desconectarSenal( "EnlaceRegresarPublico", botonCancelarPublicoId );
 	botonCancelarPublicoId = interfaz.conectarSenal( "EnlaceRegresarPublico", "activate-link", G_CALLBACK( publicoCancelarFinalizacion ), nullptr );
-	
-	// Establece la señar para leer el peso tara
-	interfaz.desconectarSenal( "BotonLeerPesoTaraPublico", botonLeerPesoTaraId );
-	botonLeerPesoTaraId = interfaz.conectarSenal( "BotonLeerPesoTaraPublico", "clicked", G_CALLBACK( vistaLeerPesoTaraPublico ), nullptr );
+
+	// Señal leer el peso tara
+	interfaz.desconectarSenal( "BotonLeerPesoTaraPublico", botonLeerPesoTaraPublicoId );
+	botonLeerPesoTaraPublicoId = interfaz.conectarSenal( "BotonLeerPesoTaraPublico", "clicked", G_CALLBACK( vistaLeerPesoTaraPublico ), nullptr );
 	
 	// Establece la señal para registrar el ticket
 	interfaz.desconectarSenal( "BotonRegistrarPublico", botonRegistrarPublicoId );
@@ -472,10 +499,14 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoPublico", NULL );
 	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoInterno", productos.obtenerCompletador() );
 	
-	// Establece la señal para leer peso bruto
-	interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoId );
-	botonLeerPesoBrutoId = interfaz.conectarSenal( "BotonLeerPesoBrutoInterno", "clicked", G_CALLBACK( vistaLeerPesoBruto ), nullptr );
+	// Señal peso bruto
+	interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoInternoId );
+	botonLeerPesoBrutoInternoId = interfaz.conectarSenal( "BotonLeerPesoBrutoInterno", "clicked", G_CALLBACK( vistaLeerPesoBruto ), nullptr );
 	
+	// Señal peso tara
+	interfaz.desconectarSenal( "BotonLeerPesoTaraInterno", botonLeerPesoTaraInternoId );
+	botonLeerPesoTaraInternoId = interfaz.conectarSenal( "BotonLeerPesoTaraInterno", "clicked", G_CALLBACK( vistaLeerPesoTara ), nullptr);
+
 	// Establece la señal para registrar el ticket
 	interfaz.desconectarSenal( "BotonRegistrarInterno", botonRegistrarTicketId );
 	botonRegistrarTicketId = interfaz.conectarSenal( "BotonRegistrarInterno", "clicked", G_CALLBACK( internoRegistrarPendiente ), nullptr );
@@ -573,7 +604,7 @@ void vistaFinalizarRegistro()
 	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", ( ticket -> estaPesoBrutoEstablecido() ? to_string( ticket -> obtenerPesoBruto() ) + " Kg" : "No establecido" ) );
 	if( ticket -> estaPesoBrutoEstablecido() ){
 		// Deshabilita la señal para leer el peso bruto
-		interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoId );
+		interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoInternoId );
 	}
 	
 	// Hora salida y peso tara
@@ -595,12 +626,16 @@ void vistaFinalizarRegistro()
 	
 	// Motivos y observaciones
 	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", ticket -> obtenerObservaciones() );
+
+	// Señal leer peso tara
+	interfaz.desconectarSenal( "BotonLeerPesoTaraInterno", botonLeerPesoTaraInternoId );
+	botonLeerPesoTaraInternoId = interfaz.conectarSenal( "BotonLeerPesoTaraInterno", "clicked", G_CALLBACK( vistaLeerPesoTara ), nullptr);
 	
-	// Establece la señal para cancelar el registro
+	// Boton cancelar
 	interfaz.desconectarSenal( "EnlaceRegresarInterno", botonCancelarInternoId );
 	botonCancelarInternoId = interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( internoCancelarFinalizacion ), nullptr );
 	
-	// Establece la señal para registrar el ticket
+	// Boton registrar
 	interfaz.desconectarSenal( "BotonRegistrarInterno", botonRegistrarTicketId );
 	botonRegistrarTicketId = interfaz.conectarSenal( "BotonRegistrarInterno", "clicked", G_CALLBACK( internoFinalizarPendiente ), nullptr );
 	

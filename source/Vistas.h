@@ -25,6 +25,7 @@ void vistaRegistrosProductos( GtkWidget *widget, gpointer ptr );
 void vistaRegistroProducto( GtkWidget *widget, gpointer ptr );
 void vistaRegistro( Registro *registro );
 void vistaRegistroEditar( GtkWidget *widget, gpointer ptr );
+void vistaConfiguracion( GtkWidget *widget, gpointer ptr );
 void vistaBasculaPublica( GtkWidget *widget, gpointer ptr );
 void vistaBasculaInterna( GtkWidget *widget, gpointer ptr );
 void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr );

@@ -176,3 +176,31 @@ void convertirMayusculas( GtkEditable *editable, const gchar *text, gint length,
 
 	g_free (result);
 }
+
+// Encripta la cadena dado un número
+string encriptar( string texto, int numero )
+{
+	// Entrada
+	string str = texto;
+
+	// Proceso
+	for( char& c : str ){
+		c = c + numero;
+	}
+
+	return str;
+}
+
+// Desencripta la cadena dado un número
+string desencriptar( string texto, int numero )
+{
+	// Entrada
+	string str = texto;
+
+	// Proceso
+	for( char& c : str ){
+		c = c - numero;
+	}
+
+	return str;
+}

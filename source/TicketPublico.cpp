@@ -1,6 +1,9 @@
 #include "TicketPublico.h"
 #include <stdexcept>
+#include <fstream>
+#include <iomanip>
 #include <regex>
+#include <Windows.h>
 using namespace std;
 
 // Constructor
@@ -318,4 +321,49 @@ void TicketPublico::establecerEntradaManual( bool entradaManual )
 bool TicketPublico::esEntradaManual() const
 {
 	return entradaManual;
+}
+
+// Imprime los datos del ticket
+void TicketPublico::imprimir() const
+{
+	// Esta finalizado (o no está pendiente)
+	if( estaPendiente() ){
+		throw runtime_error( "Intento de impresión de un ticket que está pendiente." );
+	}
+	
+	// Archivo HTML con la información del ticket
+	ofstream pesajePublico;
+	
+	// Se abre el archivo
+	pesajePublico.open( "pesaje.html", ios_base::out );
+	if( !pesajePublico ){
+		throw runtime_error( "No se pudo crear el registro de pesaje. Consulte la ayuda para conocer posibles soluciones." );
+	}
+
+	string nombreEmpresa = "Nombre de la empresa S.A. de C.V.";
+	
+	// Envía el formato html con los datos incluídos
+	pesajePublico << "<!DOCTYPE html><html><head><title></title>Registro No. " << obtenerFolio() << "<style>*{ font-family: sans-serif; margin: 5px; }"
+ 					 "</style></head><body><p align='center'><strong>" << nombreEmpresa << "</strong></p><hr><p align='center'><strong>SERVICIO DE BÁSC"
+ 					 "ULA PUBLICA</strong></p><div style='display: flex; direction: row; justify-content: space-between; margin: 0;'><p><strong>Fecha:</strong>" 
+ 					 << obtenerFechaRegistro() << "</p><p><strong>Folio: </strong>" << setfill( '0' )<< setw( 7 ) << obtenerFolio() << "</p></div>" << setfill( ' ' ) <<
+					 "<p align='center'><strong>Datos de pesaje</strong></p><div style='display: flex; direction: row; justify-content: space-between; margin: 0;'>"
+					 "<div style='margin: 0;'><table style='border: 0; text-align: left;'><tr><th>Placas: </th><td>"
+					 << obtenerNumeroPlacas() << "</td></tr><tr><th>Conductor:</th><td>"
+					 << obtenerNombreConductor() << "</td></tr><tr><th>Producto: </th><td>"
+					 << obtenerProducto() -> obtenerNombre() << "</td></tr><tr><th>Viaje: </th><td>" 
+					 << (obtenerTipoViaje() == VIAJE_LOCAL ? "Local" : "Foráneo" ) << "</td></tr></table></div><div style='margin: 0;'>"
+					 "<table style='border: 0; text-align: left;'><tr><th>Peso bruto: </th><td>"
+					 << obtenerPesoBruto() << "</td><th>Hora entrada: </th><td>"
+					 << obtenerHoraEntrada() << "</td></tr><tr><th>Peso tara: </th><td>"
+					 << obtenerPesoTara() << "</td><th>Hora salida: </th><td>"
+					 << obtenerHoraSalida() << "</td></tr></table><hr><table style='border: 0; text-align: left;'>"
+					 "<tr style='border-top: black 1px solid;'><th>Peso neto:</th><td>"
+					 << obtenerPesoNeto() <<"</td></tr></table></div></div><hr><p>Registro realizado por el basculista <u>"
+					 << obtenerNombreBasculista() << "</u></p></body></html>" << endl;
+	
+	// Cierra archivo
+	pesajePublico.close();
+	
+	ShellExecute(NULL, "open", "pesaje.html", NULL, NULL, SW_HIDE );
 }

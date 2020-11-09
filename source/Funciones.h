@@ -3,6 +3,7 @@
 
 #include <gtk/gtk.h>
 #include <list>
+#include <string>
 #include "Ticket.h"
 
 extern Registro *registro;
@@ -17,5 +18,7 @@ void alertaEliminarRegistro();
 void cancelarOperacion();
 void registroCancelarEdicion( GtkWidget *widget, gpointer ptr );
 void convertirMayusculas( GtkEditable *editable, const gchar *text, gint length, gint *position, gpointer data );
+std::string encriptar( std::string cadena, int numero );
+std::string desencriptar( std::string cadena, int numero );
 
 #endif

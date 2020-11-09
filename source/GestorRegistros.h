@@ -29,6 +29,12 @@ extern std::list< TicketPublico * > registrosPublicosConsultados;
 extern ContenedorRegistros productos;
 extern ContenedorRegistros empresas;
 
+// Primer inicio
+extern bool esInicio;
+
+// Nombre de la empresa
+extern std::string nombreEmpresa;
+
 // Obtiene el contador de los folios
 void obtenerFolioActual();
 void obtenerFolioActualPublico();
@@ -43,6 +49,10 @@ void crearRegistroPendiente( Ticket *ticket );
 // finaliza un registro
 void finalizarRegistro( Ticket *ticket );
 void finalizarRegistroPublico( TicketPublico *registroPublico );
+
+// Realiza operaciones con el nombre de la empresa
+void registrarNombreEmpresa( std::string nombre );
+bool cargarNombreEmpresa();
 
 // Crea un registro publico pendiente
 void crearRegistroPublicoPendiente( TicketPublico *registroPublico );

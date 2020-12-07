@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <list>
 #include "Funciones.h"
+#include "Sesion.h"
 #include "LectorBascula.h"
 #include "GestorRegistros.h"
 #include "RegistrosInternos.h"
@@ -38,6 +39,32 @@ guint botonConsultarNuevoRegistroId = 0;
 guint botonGuardarNuevoRegistroId = 0;
 guint botonCancelarNuevoRegistroId = 0;
 guint botonSiId = 0;
+
+guint enlaceRegistrosPesajeRegresarId = 0;
+guint botonRegistrosPesajeSeleccionarDiaId = 0;
+guint botonRegistrosPesajeObtenerInformeId = 0;
+guint entradaRegistrosPesajeFolioId = 0;
+guint botonRegistrosPesajeConsultarRegistroId = 0;
+
+guint botonConsultarDiaId = 0;
+guint botonObtenerRegistrosRangoId = 0;
+guint botonObtenerRegistrosId = 0;
+guint enlaceRegistrosPesajeRegresarConsultaId = 0;
+guint enlaceRegistrosPesajeRegresarInformeId = 0;
+
+guint imprimirRegistroInternoId = 0;
+guint eliminarRegistroInternoId = 0;
+
+guint entradaConsultarUsuarioId = 0;
+guint botonConsultarUsuarioId = 0;
+guint enlaceConsultarUsuariosRegresarId = 0;
+guint enlaceConsultarUsuarioRegresarId = 0;
+guint botonObtenerCodigoRecuperacionId = 0;
+guint botonEliminarUsuarioId = 0;
+guint usuarioAdministradorId = 0;
+
+guint botonCambiarContrasenaId = 0;
+guint entradaReemplazarConfirmacionId = 0;
 
 void vistaCuenta( GtkWidget *widget, gpointer ptr )
 {
@@ -254,7 +281,7 @@ void vistaBasculaPublica( GtkWidget *widget, gpointer ptr )
 	irHacia( nullptr, (void *)"Tickets" );
 	
 	// Obtiene los tickets pendiente
-	publicoActualizarRegistros( registrosPublicosPendientes );
+	publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
 	
 	// Desconecta las señales correspondientes
 	interfaz.desconectarSenal( "BotonBasculaNuevo", botonBasculaNuevoId );
@@ -273,7 +300,7 @@ void vistaBasculaInterna( GtkWidget *widget, gpointer ptr )
 	irHacia( nullptr, (void *)"Tickets" );
 	
 	// Obtiene los tickets pendiente
-	internoActualizarRegistros( registrosInternosPendientes );
+	internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
 	
 	// Desconecta las señales correspondientes
 	interfaz.desconectarSenal( "BotonBasculaNuevo", botonBasculaNuevoId );
@@ -664,4 +691,364 @@ void vistaLeerPesoTaraPublico()
 	interfaz.ocultarElemento( "MensajeErrorCampoPublico" );
 	lectorBascula.abrir( interfaz );
 	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( publicoRegistrarPesoTara ), nullptr ) );
+}
+
+void vistaConsultarPesajesInternos()
+{
+	// Muestra los registros del día
+	internoObtenerPorFecha( registrosInternosConsultados, obtenerFecha() );
+	internoActualizarRegistros( registrosInternosConsultados, "ContenedorRegistrosPesaje" );
+
+	// Establece la fecha del ticket que se está consultando
+	interfaz.establecerTextoEtiqueta( "TicketsRegistrados", "Registros del día " + obtenerFecha() + ":"  );
+
+	// Establece el número de tickets
+	interfaz.establecerTextoEtiqueta( "TicketsContados", to_string( registrosInternosConsultados.size() ) + " registros"  );
+
+	// Señal de retorno consultar pesajes internos
+	interfaz.desconectarSenal( "EnlaceRegistrosPesajeRegresar", enlaceRegistrosPesajeRegresarId );
+	enlaceRegistrosPesajeRegresarId = interfaz.conectarSenal( "EnlaceRegistrosPesajeRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Registros" );
+
+	// Señal de retorno consultar dia
+	interfaz.desconectarSenal( "EnlaceRegistrosPesajeRegresarConsulta", enlaceRegistrosPesajeRegresarConsultaId );
+	enlaceRegistrosPesajeRegresarConsultaId = interfaz.conectarSenal( "EnlaceRegistrosPesajeRegresarConsulta", "activate-link", G_CALLBACK( irHacia ), (void *)"Pesajes" );
+
+	// Señal del boton seleccionar día
+	interfaz.desconectarSenal( "BotonRegistrosPesajeSeleccionarDia", botonRegistrosPesajeSeleccionarDiaId );
+	botonRegistrosPesajeSeleccionarDiaId = interfaz.conectarSenal( "BotonRegistrosPesajeSeleccionarDia", "clicked", G_CALLBACK( irHacia ), ( void *)"ConsultarDia" );
+
+	// Señal del boton informe
+	interfaz.desconectarSenal( "BotonRegistrosPesajeObtenerInforme", botonRegistrosPesajeObtenerInformeId );
+	botonRegistrosPesajeObtenerInformeId = interfaz.conectarSenal( "BotonRegistrosPesajeObtenerInforme", "clicked", G_CALLBACK( internoGenerarInforme ), nullptr );
+
+	// Señal de obtener registros
+	interfaz.desconectarSenal( "BotonObtenerRegistros", botonObtenerRegistrosId );
+	botonObtenerRegistrosId = interfaz.conectarSenal( "BotonObtenerRegistros", "clicked", G_CALLBACK( irHacia ), (void *)"ObtenerRegistros" );
+
+	// Señal de selección de ticket (entrada)
+	interfaz.desconectarSenal( "EntradaRegistrosPesajeFolio", entradaRegistrosPesajeFolioId );
+	entradaRegistrosPesajeFolioId = interfaz.conectarSenal( "EntradaRegistrosPesajeFolio", "activate", G_CALLBACK( vistaConsultarRegistroInterno ), nullptr );
+
+	// Señal de selección de ticket (boton)
+	interfaz.desconectarSenal( "BotonRegistrosPesajeConsultarRegistro", botonRegistrosPesajeConsultarRegistroId );
+	botonRegistrosPesajeConsultarRegistroId = interfaz.conectarSenal( "BotonRegistrosPesajeConsultarRegistro", "clicked", G_CALLBACK( vistaConsultarRegistroInterno ), nullptr );
+
+	// Señal de retorno vista generar informe
+	interfaz.desconectarSenal( "EnlaceRegistrosPesajeRegresarInforme", enlaceRegistrosPesajeRegresarInformeId );
+	enlaceRegistrosPesajeRegresarInformeId = interfaz.conectarSenal( "EnlaceRegistrosPesajeRegresarInforme", "activate-link", G_CALLBACK( irHacia ), (void *)"Pesajes" );
+
+	// Boton de seleccion dia
+	interfaz.desconectarSenal( "BotonConsultarDia", botonConsultarDiaId );
+	botonConsultarDiaId = interfaz.conectarSenal( "BotonConsultarDia", "clicked", G_CALLBACK( internoSeleccionarDia ), nullptr );
+
+	// Boton de generación de informe
+	interfaz.desconectarSenal( "BotonObtenerRegistrosRango", botonObtenerRegistrosRangoId );
+	botonObtenerRegistrosRangoId = interfaz.conectarSenal( "BotonObtenerRegistrosRango", "clicked", G_CALLBACK( internoObtenerRegistrosRango ), nullptr );
+
+	// Redirige hacia la vista
+	irHacia( nullptr, (void *)"Pesajes" );
+}
+
+void vistaConsultarPesajesPublicos()
+{
+	// Muestra los registros del día
+	publicoObtenerPorFecha( registrosPublicosConsultados, obtenerFecha() );
+	publicoActualizarRegistros( registrosPublicosConsultados, "ContenedorRegistrosPesaje" );
+
+	// Establece la fecha del ticket que se está consultando
+	interfaz.establecerTextoEtiqueta( "TicketsRegistrados", "Registros del día " + obtenerFecha() + ":"  );
+
+	// Establece el número de tickets
+	interfaz.establecerTextoEtiqueta( "TicketsContados", to_string( registrosPublicosConsultados.size() ) + " registros"  );
+
+	// Señal de retorno consultar pesajes internos
+	interfaz.desconectarSenal( "EnlaceRegistrosPesajeRegresar", enlaceRegistrosPesajeRegresarId );
+	enlaceRegistrosPesajeRegresarId = interfaz.conectarSenal( "EnlaceRegistrosPesajeRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Registros" );
+
+	// Señal de retorno consultar dia
+	interfaz.desconectarSenal( "EnlaceRegistrosPesajeRegresarConsulta", enlaceRegistrosPesajeRegresarConsultaId );
+	enlaceRegistrosPesajeRegresarConsultaId = interfaz.conectarSenal( "EnlaceRegistrosPesajeRegresarConsulta", "activate-link", G_CALLBACK( irHacia ), (void *)"Pesajes" );
+
+	// Señal del boton seleccionar día
+	interfaz.desconectarSenal( "BotonRegistrosPesajeSeleccionarDia", botonRegistrosPesajeSeleccionarDiaId );
+	botonRegistrosPesajeSeleccionarDiaId = interfaz.conectarSenal( "BotonRegistrosPesajeSeleccionarDia", "clicked", G_CALLBACK( irHacia ), ( void *)"ConsultarDia" );
+
+	// Señal del boton informe
+	interfaz.desconectarSenal( "BotonRegistrosPesajeObtenerInforme", botonRegistrosPesajeObtenerInformeId );
+	botonRegistrosPesajeObtenerInformeId = interfaz.conectarSenal( "BotonRegistrosPesajeObtenerInforme", "clicked", G_CALLBACK( publicoGenerarInforme ), nullptr );
+
+	// Señal de obtener registros
+	interfaz.desconectarSenal( "BotonObtenerRegistros", botonObtenerRegistrosId );
+	botonObtenerRegistrosId = interfaz.conectarSenal( "BotonObtenerRegistros", "clicked", G_CALLBACK( irHacia ), (void *)"ObtenerRegistros" );	
+
+	// Señal de selección de ticket (entrada)
+	interfaz.desconectarSenal( "EntradaRegistrosPesajeFolio", entradaRegistrosPesajeFolioId );
+	entradaRegistrosPesajeFolioId = interfaz.conectarSenal( "EntradaRegistrosPesajeFolio", "activate", G_CALLBACK( vistaConsultarRegistroPublico ), nullptr );
+
+	// Señal de selección de ticket (boton)
+	interfaz.desconectarSenal( "BotonRegistrosPesajeConsultarRegistro", botonRegistrosPesajeConsultarRegistroId );
+	botonRegistrosPesajeConsultarRegistroId = interfaz.conectarSenal( "BotonRegistrosPesajeConsultarRegistro", "clicked", G_CALLBACK( vistaConsultarRegistroPublico ), nullptr );
+
+	// Señal de retorno vista generar informe
+	interfaz.desconectarSenal( "EnlaceRegistrosPesajeRegresarInforme", enlaceRegistrosPesajeRegresarInformeId );
+	enlaceRegistrosPesajeRegresarInformeId = interfaz.conectarSenal( "EnlaceRegistrosPesajeRegresarInforme", "activate-link", G_CALLBACK( irHacia ), (void *)"Pesajes" );
+
+	// Boton de seleccion dia
+	interfaz.desconectarSenal( "BotonConsultarDia", botonConsultarDiaId );
+	botonConsultarDiaId = interfaz.conectarSenal( "BotonConsultarDia", "clicked", G_CALLBACK( publicoSeleccionarDia ), nullptr );
+
+	// Boton de generación de informe
+	interfaz.desconectarSenal( "BotonObtenerRegistrosRango", botonObtenerRegistrosRangoId );
+	botonObtenerRegistrosRangoId = interfaz.conectarSenal( "BotonObtenerRegistrosRango", "clicked", G_CALLBACK( publicoObtenerRegistrosRango ), nullptr );
+
+	// Redirige hacia la vista
+	irHacia( nullptr, (void *)"Pesajes" );
+}
+
+void vistaConsultarRegistroInterno()
+{
+	// Obtiene el ticket que se desea consultar
+	try{
+		ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaRegistrosPesajeFolio" ) ), registrosInternosConsultados );
+	}
+	catch( invalid_argument &ia ){
+		mostrarMensaje( "Introduzca un folio válido." );
+		return;
+	}
+
+	// Si el ticket no es encontrado
+	if( ticket == nullptr ){
+		mostrarMensaje( "Registro no encontrado." );
+		return;
+	}
+
+	// Folio
+	interfaz.establecerTextoEtiqueta( "FolioInterno", to_string( ticket -> obtenerFolio() ) );
+
+	// Fecha
+	interfaz.establecerTextoEtiqueta( "FechaInterno", ticket -> obtenerFechaRegistro() );
+
+	// Empresa
+	interfaz.establecerTextoEntrada( "NombreEmpresaInterno", ticket -> obtenerEmpresa() -> obtenerNombre() );
+
+	// Producto
+	interfaz.establecerTextoEntrada( "NombreProductoInterno", ticket -> obtenerProducto() -> obtenerNombre() );
+
+	// Nombre del conductor
+	interfaz.establecerTextoEntrada( "NombreConductorInterno", ticket -> obtenerNombreConductor() );
+
+	// Número de placas
+	interfaz.establecerTextoEntrada( "NumeroPlacasInterno", ticket -> obtenerNumeroPlacas() );
+
+	// Hora entrada
+	interfaz.establecerTextoEtiqueta( "HoraEntradaInterno", ticket -> obtenerHoraEntrada() );
+
+	// Peso bruto
+	interfaz.establecerTextoEtiqueta( "PesoBrutoInterno", to_string( ticket -> obtenerPesoBruto() ) );
+
+	// Hora salida
+	interfaz.establecerTextoEtiqueta( "HoraSalidaInterno", ticket -> obtenerHoraSalida() );
+
+	// Peso tara
+	interfaz.establecerTextoEtiqueta( "PesoTaraInterno", to_string( ticket -> obtenerPesoTara() ) ) ;
+
+
+	// Descuento (permiso)
+	interfaz.establecerTextoEntrada( "PermitirDescuentoInterno", ( ticket -> permitirDescuento() ? "Sí" : "No" ) );
+
+	// Descuento
+	interfaz.establecerTextoEntrada( "DescuentoInterno", ( ticket -> permitirDescuento() ? to_string( ticket -> obtenerDescuento() ) : "" ) );
+
+	// Tipo de registro
+	interfaz.establecerTextoEntrada( "TipoRegistroInterno", ( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" ) );
+
+	// Peso neto
+	interfaz.establecerTextoEtiqueta( "PesoNetoInterno", to_string( ticket -> obtenerPesoNeto() ) );
+
+	// Observaciones
+	interfaz.establecerTextoEntrada( "ObservacionesInterno", ticket -> obtenerObservaciones() );
+
+	// Señal de boton si
+	interfaz.desconectarSenal( "BotonSi", botonSiId );
+	botonSiId = interfaz.conectarSenal( "BotonSi", "clicked", G_CALLBACK( internoEliminarSeleccionado ), nullptr );
+
+	// Señal boton imprimir interno
+	interfaz.desconectarSenal( "ImprimirRegistroInterno", imprimirRegistroInternoId );
+	imprimirRegistroInternoId = interfaz.conectarSenal( "ImprimirRegistroInterno", "clicked", G_CALLBACK( internoImprimirSeleccionado ), nullptr );
+
+	// Señal boton de eliminar registro interno seleccionado
+	interfaz.desconectarSenal( "EliminarRegistroInterno", eliminarRegistroInternoId );
+	eliminarRegistroInternoId = interfaz.conectarSenal( "EliminarRegistroInterno", "clicked", G_CALLBACK( internoAlertaEliminar ), nullptr );
+
+	// Redirige a la vista
+	irHacia( nullptr, (void *)"RegistroInterno" );
+}
+
+void vistaConsultarRegistroPublico()
+{
+	// Obtiene el ticket que se desea consultar
+	try{
+		registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaRegistrosPesajeFolio" ) ), registrosPublicosConsultados );
+	}
+	catch( invalid_argument &ia ){
+		mostrarMensaje( "Introduzca un folio válido." );
+		return;
+	}
+
+	// Si el ticket no es encontrado
+	if( registroPublico == nullptr ){
+		mostrarMensaje( "Registro no encontrado." );
+		return;
+	}
+
+	// Folio
+	interfaz.establecerTextoEtiqueta( "FolioPublico", to_string( registroPublico -> obtenerFolio() ) );
+
+	// Fecha
+	interfaz.establecerTextoEtiqueta( "FechaPublico", registroPublico -> obtenerFechaRegistro() );
+
+	// Producto
+	interfaz.establecerTextoEntrada( "NombreProductoPublico", registroPublico -> obtenerProducto() -> obtenerNombre() );
+
+	// Nombre del conductor
+	interfaz.establecerTextoEntrada( "NombreConductorPublico", registroPublico -> obtenerNombreConductor() );
+
+	// Número de placas
+	interfaz.establecerTextoEntrada( "NumeroPlacasPublico", registroPublico -> obtenerNumeroPlacas() );
+
+	// Hora entrada
+	interfaz.establecerTextoEtiqueta( "HoraEntradaPublico", registroPublico -> obtenerHoraEntrada() );
+
+	// Peso bruto
+	interfaz.establecerTextoEtiqueta( "PesoBrutoPublico", to_string( registroPublico -> obtenerPesoBruto() ) );
+
+	// Hora salida
+	interfaz.establecerTextoEtiqueta( "HoraSalidaPublico", registroPublico -> obtenerHoraSalida() );
+
+	// Peso tara
+	interfaz.establecerTextoEtiqueta( "PesoTaraPublico", to_string( registroPublico -> obtenerPesoTara() ) ) ;
+
+	// Tipo de registro
+	interfaz.establecerTextoEntrada( "TipoViajePublico", ( registroPublico -> obtenerTipoViaje() == VIAJE_LOCAL ? "Local" : "Foráneo" ) );
+
+	// Peso neto
+	interfaz.establecerTextoEtiqueta( "PesoNetoPublico", to_string( registroPublico -> obtenerPesoNeto() ) );
+
+	// Señal boton de eliminar registro interno seleccionado
+	interfaz.desconectarSenal( "EliminarRegistroInterno", eliminarRegistroInternoId );
+	eliminarRegistroInternoId = interfaz.conectarSenal( "EliminarRegistroInterno", "clicked", G_CALLBACK( internoAlertaEliminar ), nullptr );
+
+	// Señal de boton si
+	interfaz.desconectarSenal( "BotonSi", botonSiId );
+	botonSiId = interfaz.conectarSenal( "BotonSi", "clicked", G_CALLBACK( publicoEliminarSeleccionado ), nullptr );
+
+	// Señal boton imprimir interno
+	interfaz.desconectarSenal( "ImprimirRegistroPublico", imprimirRegistroInternoId );
+	imprimirRegistroInternoId = interfaz.conectarSenal( "ImprimirRegistroPublico", "clicked", G_CALLBACK( publicoImprimirSeleccionado ), nullptr );
+
+	// Redirige a la vista
+	irHacia( nullptr, (void *)"RegistroPublico" );
+}
+
+void vistaConsultarUsuarios()
+{
+	// 
+	obtenerUsuariosRegistrados();
+
+	//
+	actualizarRegistrosUsuarios( registrosUsuarios, "ContenedorUsuarios" );
+
+	// 
+	interfaz.desconectarSenal( "EntradaConsultarUsuarios", entradaConsultarUsuarioId );
+	entradaConsultarUsuarioId = interfaz.conectarSenal( "EntradaConsultarUsuario", "activate", G_CALLBACK( vistaConsultarUsuario ), nullptr );
+
+	//
+	interfaz.desconectarSenal( "BotonConsultarUsuarios", botonConsultarUsuarioId );
+	botonConsultarUsuarioId = interfaz.conectarSenal( "BotonConsultarUsuario", "clicked", G_CALLBACK( vistaConsultarUsuario ), nullptr );
+
+	//
+	interfaz.desconectarSenal( "EnlaceConsultarUsuariosRegresar", enlaceConsultarUsuariosRegresarId );
+	enlaceConsultarUsuariosRegresarId = interfaz.conectarSenal( "EnlaceConsultarUsuariosRegresar", "activate-link", G_CALLBACK( regresarInicio ), nullptr );
+
+	irHacia( nullptr, (void *)"ConsultarUsuarios" );
+}
+
+void regresarInicio()
+{
+	// No se puede consultar a ningún usurio que hubiera sido consultado
+	usuarioConsultado = nullptr;
+
+	// No se puede acceder a la lista de usuarios registrados fuera de esa vista
+	limpiarUsuariosRegistrados( registrosUsuarios );
+
+	// Regresa a la vista de inicio
+	irHacia( nullptr, (void *)"Inicio" );
+}
+
+void vistaConsultarUsuario()
+{
+	usuarioConsultado = buscarUsuarioPorNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaConsultarUsuario" ), registrosUsuarios );
+	if( usuarioConsultado == nullptr ){
+		mostrarMensaje( "El usuario que se desea consultar no fue encontrado." );
+		return;
+	}
+
+	// Nombre
+	interfaz.establecerTextoEntrada( "NombreConsultado", usuarioConsultado -> obtenerNombre() );
+
+	// Apellidos
+	interfaz.establecerTextoEntrada( "ApellidosConsultado", usuarioConsultado -> obtenerApellidos() );
+
+	// Nombre de usuario
+	interfaz.establecerTextoEntrada( "NombreUsuarioConsultado", usuarioConsultado -> obtenerNombreUsuario() );
+
+	// Administrador
+	if( usuarioConsultado -> esAdministrador() ){
+		interfaz.establecerActivoBotonToggle( "UsuarioAdministrador" );
+	}
+
+	// Señal Check button
+	interfaz.desconectarSenal( "UsuarioAdministrador", usuarioAdministradorId  );
+	usuarioAdministradorId = interfaz.conectarSenal( "UsuarioAdministrador", "toggled", G_CALLBACK( actualizarEstadoAdministrador ), nullptr );
+
+	//Señal Eliminar usuarios	
+	interfaz.desconectarSenal( "BotonEliminarUsuario", botonEliminarUsuarioId );
+	botonEliminarUsuarioId = interfaz.conectarSenal( "BotonEliminarUsuario", "clicked", G_CALLBACK( alerta ), (void *)"¿Estás seguro que deseas eliminar este usuartio?" );
+
+	// Señal Recuperar contraseña
+	interfaz.desconectarSenal( "BotonObtenerCodigoRecuperacion", botonObtenerCodigoRecuperacionId );	
+	botonObtenerCodigoRecuperacionId = interfaz.conectarSenal( "BotonObtenerCodigoRecuperacion", "clicked", G_CALLBACK( generarCodigoRecuperacion ), nullptr );
+
+	// Boton si si decide eliminar
+	interfaz.desconectarSenal( "BotonSi", botonSiId );
+	botonSiId = interfaz.conectarSenal( "BotonSi", "clicked", G_CALLBACK( eliminarUsuario ), nullptr );
+
+	// Señal regresar
+	interfaz.desconectarSenal( "EnlaceConsultarUsuarioRegresar", enlaceConsultarUsuarioRegresarId );
+	enlaceConsultarUsuarioRegresarId = interfaz.conectarSenal( "EnlaceConsultarUsuarioRegresar", "activate-link", G_CALLBACK( regresarUsuarios ), nullptr );
+
+	irHacia( nullptr, (void *)"InformacionUsuario" );
+}
+
+void regresarUsuarios()
+{
+	// No se puede acceder a la información del usuario fuera de esa vista
+	usuarioConsultado = nullptr;
+
+	// Regresa a la vista de inicio
+	irHacia( nullptr, (void *)"ConsultarUsuarios" );
+}
+
+void vistaReemplazarContrasena()
+{
+	// Boton de registrar
+	interfaz.desconectarSenal( "BotonCambiarContrasena", botonCambiarContrasenaId );
+	botonCambiarContrasenaId = interfaz.conectarSenal( "BotonCambiarContrasena", "clicked", G_CALLBACK( cambiarContrasenaUsuario ), nullptr );
+
+	// Boton de confirmacion
+	interfaz.desconectarSenal( "EntradaReemplazarConfirmacion", entradaReemplazarConfirmacionId );
+	entradaReemplazarConfirmacionId = interfaz.conectarSenal( "EntradaReemplazarConfirmacion", "activate", G_CALLBACK( cambiarContrasenaUsuario ), nullptr );
+
+	// Redirige hacia la vista
+	irHacia( nullptr, (void *)"ReemplazarContrasena" );
 }

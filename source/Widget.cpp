@@ -278,6 +278,26 @@ void Widget::limpiarComboBoxText( std::string idComboBox )
     gtk_combo_box_text_remove_all( GTK_COMBO_BOX_TEXT( objeto ) );
 }
 
+// Establece la fecha en el calendario
+void Widget::establecerFechaCalendario( std::string idCalendario, unsigned int dia, unsigned int mes, unsigned int anio )
+{
+    GObject *objeto = obtenerObjeto( idCalendario );
+
+    // Establece el día y el mes
+    gtk_calendar_select_day( GTK_CALENDAR( objeto ), dia );
+    gtk_calendar_select_month( GTK_CALENDAR( objeto ), mes, anio );
+}
+
+// Obtiene la fecha de la entrada de calendario dada
+void Widget::obtenerFechaCalendario( std::string idCalendario, unsigned int *dia, unsigned int *mes, unsigned int *anio )
+{
+    // Obtiene el calendario
+    GObject *objeto = obtenerObjeto( idCalendario );
+
+    // Se asegura que el objeto exista
+    gtk_calendar_get_date( GTK_CALENDAR( objeto ), anio, mes, dia );
+}
+
 // Permite cargar una imagen desde archivo para un GtkImage
 void Widget::establecerImagen( string idImagen, string archivo )
 {

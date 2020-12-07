@@ -21,6 +21,13 @@ void publicoCalcularPesoNeto();
 void publicoSeleccionarTipo();
 void publicoCancelarRegistro();
 void publicoCancelarFinalizacion();
-void publicoActualizarRegistros( std::list< TicketPublico * > &ticketsPublicos );
- 
+void publicoObtenerPorFecha( std::list <TicketPublico *> &registros, std::string fecha );
+void publicoActualizarRegistros( std::list< TicketPublico * > &ticketsPublicos, std::string idContenedor );
+void publicoSeleccionarDia();
+void publicoAlertaEliminar();
+void publicoEliminarSeleccionado();
+void publicoImprimirSeleccionado(); 
+void publicoGenerarInforme();
+void publicoObtenerRegistrosRango();
+
 #endif

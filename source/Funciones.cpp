@@ -177,6 +177,22 @@ void convertirMayusculas( GtkEditable *editable, const gchar *text, gint length,
 	g_free (result);
 }
 
+// Registra el nombre de la empresa
+void registrarEmpresa()
+{
+	string nombreEmpresa = interfaz.obtenerTextoEntrada( "EntradaNombreEmpresaPropia" );
+
+	try{
+		registrarNombreEmpresa( nombreEmpresa );
+		cargarNombreEmpresa();
+		irHacia( nullptr, (void *)"Inicio" );
+	}
+	catch( invalid_argument &ia ){
+		interfaz.establecerTextoEtiqueta( "MensajeErrorRegistrarNombreEmpresa", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorRegistrarNombreEmpresa" );
+	}
+}
+
 // Encripta la cadena dado un número
 string encriptar( string texto, int numero )
 {

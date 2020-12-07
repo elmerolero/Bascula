@@ -97,7 +97,7 @@ class Ticket
 		std::string obtenerNombreBasculista() const;
 		
 		// Imprime los datos del ticket
-		void imprimir() const;
+		void imprimir( std::string nombreEmpresa ) const;
 	
 	private:
 		unsigned int folio;

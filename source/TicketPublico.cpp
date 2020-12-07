@@ -324,7 +324,7 @@ bool TicketPublico::esEntradaManual() const
 }
 
 // Imprime los datos del ticket
-void TicketPublico::imprimir() const
+void TicketPublico::imprimir( string nombreEmpresa ) const
 {
 	// Esta finalizado (o no está pendiente)
 	if( estaPendiente() ){
@@ -335,12 +335,10 @@ void TicketPublico::imprimir() const
 	ofstream pesajePublico;
 	
 	// Se abre el archivo
-	pesajePublico.open( "pesaje.html", ios_base::out );
+	pesajePublico.open( "../resources/data/pesaje.html", ios_base::out );
 	if( !pesajePublico ){
 		throw runtime_error( "No se pudo crear el registro de pesaje. Consulte la ayuda para conocer posibles soluciones." );
 	}
-
-	string nombreEmpresa = "Nombre de la empresa S.A. de C.V.";
 	
 	// Envía el formato html con los datos incluídos
 	pesajePublico << "<!DOCTYPE html><html><head><title></title>Registro No. " << obtenerFolio() << "<style>*{ font-family: sans-serif; margin: 5px; }"
@@ -365,5 +363,5 @@ void TicketPublico::imprimir() const
 	// Cierra archivo
 	pesajePublico.close();
 	
-	ShellExecute(NULL, "open", "pesaje.html", NULL, NULL, SW_HIDE );
+	ShellExecute(NULL, "open", "..\\resources\\data\\pesaje.html", NULL, NULL, SW_HIDE );
 }

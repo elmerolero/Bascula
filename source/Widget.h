@@ -86,6 +86,12 @@ class Widget
         
         // Limpia el combobox text indicado removiendo todas las opciones
         void limpiarComboBoxText( std::string idComboBox );
+
+        // Selecciona una fecha en el calendario
+        void establecerFechaCalendario( std::string idCalendario, unsigned int dia, unsigned int mes, unsigned int anio );
+
+        // Obtiene la fecha seleccionada en el calendario
+        void obtenerFechaCalendario( std::string idCalendario, unsigned int *dia, unsigned int *mes, unsigned int *anio );
         
         // Permite cargar una imagen desde archivo para un GtkImage
         void establecerImagen( std::string idImagen, std::string archivo );

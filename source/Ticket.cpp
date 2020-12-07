@@ -437,7 +437,7 @@ std::string Ticket::obtenerNombreBasculista() const
 }
 
 // Imprime los datos del ticket
-void Ticket::imprimir() const
+void Ticket::imprimir( std::string nombreEmpresa ) const
 {
 	// Esta finalizado (o no está pendiente)
 	if( estaPendiente() ){
@@ -448,13 +448,12 @@ void Ticket::imprimir() const
 	ofstream pesajeInterno;
 	
 	// Se abre el archivo
-	pesajeInterno.open( "pesaje.html", ios_base::out );
+	pesajeInterno.open( "../resources/data/pesaje.html", ios_base::out );
 	if( !pesajeInterno ){
 		throw runtime_error( "No se pudo crear el registro de pesaje. Consulte la ayuda para conocer posibles soluciones." );
 	}
 	
 	// Datos temporales de completado
-	string nombreEmpresa = "EMPRESA S.A. DE C.V.";
 	string nombreBasculista = "Nombre del Basculista";
 	
 	// Envía el formato html con los datos incluídos
@@ -479,5 +478,5 @@ void Ticket::imprimir() const
 	// Cierra archivo
 	pesajeInterno.close();
 	
-	ShellExecute(NULL, "open", "pesaje.html", NULL, NULL, SW_HIDE );
+	ShellExecute(NULL, "open", "..\\resources\\data\\pesaje.html", NULL, NULL, SW_HIDE );
 }

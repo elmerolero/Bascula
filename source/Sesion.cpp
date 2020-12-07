@@ -9,10 +9,13 @@
 #include "Vistas.h"
 using namespace std;
 
+string nombreUsuario;
+string codigoRecuperacion;
+
 void registrarUsuario()
 {
 	// Conecta con la base de datos
-	database.open( "libcurlmbs.dll" );
+	database.open( nombreArchivo );
 
 	try{
 		// Obtiene los datos del formulario
@@ -99,7 +102,7 @@ void actualizarDatosUsuario()
 		}
 		
 		// Actualiza la información en la base de datos
-		database.open( "libcurlmbs.dll" );
+		database.open( nombreArchivo );
 		string consulta = "update usuarios set nombre = '" + nombre + "', apellidos = '" + apellidos + "', nombre_usuario = '" + nombreUsuario + "', contrasena = '" + contrasenaFinal + "', sal = '" + sal + "' where nombre_usuario = '" + usuario.obtenerNombreUsuario() + "' limit 1;";
 		database.query( consulta );
 		database.close();
@@ -128,7 +131,7 @@ void actualizarDatosUsuario()
 void iniciarSesion()
 {
 	// Conecta con la base de datos
-	database.open( "libcurlmbs.dll" );
+	database.open( nombreArchivo );
 		
 	try{
 		// Establece el nombre de usuario
@@ -161,13 +164,11 @@ void iniciarSesion()
 			
 			// Muestra al usuario
 			mostrarUsuario();
-
-			// Manda a conectar todas las señales de las vistas
-        	conectarSenales();
 			
 			// Redirige hacia la vista de inicio
 			if( !esInicio && cargarNombreEmpresa() ){
 				irHacia( nullptr, (void *)"Inicio" );
+				actualizarNombreEmpresa();
 			}
 			else{
 				irHacia( nullptr, (void *)"RegistrarEmpresa" );
@@ -176,7 +177,15 @@ void iniciarSesion()
 			if( usuario.esAdministrador() ){
 				interfaz.mostrarElemento( "BotonRegistros" );
 				interfaz.mostrarElemento( "BotonUsuarios" );
+				conectarSenalesAdministrador();
 			}
+			else{
+				interfaz.ocultarElemento( "BotonRegistros" );
+				interfaz.ocultarElemento( "BotonUsuarios" );
+			}
+
+			// Manda a conectar todas las señales de las vistas
+        	conectarSenales();
 		}
 		else{
 			interfaz.establecerTextoEtiqueta( "MensajeErrorIniciarSesion", "El usuario " + nombreUsuario + " no está registrado." );
@@ -242,11 +251,11 @@ string crearHash( std::string contrasena, std::string sal )
 	return hashTool( contrasena + sal );
 }
 
-void compararContrasenas( const string &contrasena, const string &confirmacion )
+void compararContrasenas( const string &contrasena, const string &contrasena2 )
 {
 	// Realiza la comparativa de las contraseñas y lanza una excepción si no son iguales
-	if( contrasena.compare( confirmacion ) != 0 ){
-		throw invalid_argument( "Las contraseñas introducidas no coinciden." );
+	if( contrasena.compare( contrasena2 ) != 0 ){
+		throw invalid_argument( "Los códigos introducidos no coinciden." );
 	}
 }
 
@@ -259,5 +268,41 @@ void verificarContrasena( string contrasena, string sal, string hash )
 	// Realiza la comparativa del hash creado con la del hash que se encuentra en la base de datos
 	if( inputHash.compare( hash ) != 0 ){
 		throw invalid_argument( "La contraseña introducida es incorrecta." );
+	}
+}
+
+void cambiarContrasenaUsuario()
+{
+	try{
+		// Obtiene los campos introducidos
+		string contrasena = usuario.validarContrasena( interfaz.obtenerTextoEntrada( "EntradaReemplazarContrasena" ) );
+		string confirmacion = interfaz.obtenerTextoEntrada( "EntradaReemplazarConfirmacion" );
+
+		// Compara las contraseñas
+		compararContrasenas( contrasena, confirmacion );
+	
+		// Crea la contrasena que se insertará dentro de la base de datos
+		string sal = crearSal();
+		string contrasenaFinal = crearHash( contrasena, sal );
+
+		// Actualiza los datos de sal, de la nueva contraseña y elimina el código de recuperación
+		database.open( nombreArchivo );
+		database.query( "update usuarios set contrasena = '" + contrasenaFinal + "', sal = '" + sal + "' where nombre_usuario = '" + nombreUsuario + "';"  );
+		database.query( "delete from codigos_recuperacion where codigo = '" + codigoRecuperacion + "';");
+		database.close();
+
+		// Limpia el nombre de usuario
+		nombreUsuario.clear();
+		codigoRecuperacion.clear();
+
+		// Indica que la contraseña fue reiniciada exitosamente
+		mostrarMensaje( "Cambio de contraseña exitoso." );
+
+		// Redirige al inicio de sesión
+		irHacia( nullptr, (void *)"IniciarSesion" );
+	}
+	catch( invalid_argument &ia ){
+		interfaz.establecerTextoEtiqueta( "MensajeErrorReemplazarContrasena", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorReemplazarContrasena" );
 	}
 }

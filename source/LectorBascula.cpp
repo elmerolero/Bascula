@@ -126,7 +126,7 @@ void LectorBascula::cargarConfiguracion()
 	ifstream archivoConfig;
 
 	// Intenta abrir el archivo
-	archivoConfig.open( "config.dat" );
+	archivoConfig.open( "../resources/data/config.dat" );
 	if( !archivoConfig.is_open() ){
 		return;	// No hace nada, se conserva la configuración por defecto
 	}
@@ -478,7 +478,7 @@ void lectorBasculaActualizarOpciones()
 		ofstream archivoConfig;
 	
 		// Se abre el archivo
-		archivoConfig.open( "config.dat", ios_base::out );
+		archivoConfig.open( "../resources/data/config.dat", ios_base::out );
 		if( !archivoConfig ){
 			throw runtime_error( "No se pudo crear el archivo de configuración." );
 		}

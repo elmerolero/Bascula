@@ -20,8 +20,15 @@ void internoCalcularPesoNeto();
 void internoHabilitarDescuento();
 void internoLeerDescuento();
 void internoSeleccionarTipo();
-void internoActualizarRegistros( std::list< Ticket * > &tickets );
+void internoActualizarRegistros( std::list< Ticket * > &tickets, std::string idContenedor );
+void internoObtenerPorFecha( std::list <Ticket *> &registros, std::string fecha );
 void internoCancelarRegistro();
 void internoCancelarFinalizacion();
+void internoImprimirSeleccionado();
+void internoAlertaEliminar();
+void internoEliminarSeleccionado();
+void internoSeleccionarDia();
+void internoObtenerRegistrosRango();
+void internoGenerarInforme();
 
 #endif

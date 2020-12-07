@@ -36,5 +36,17 @@ void vistaFinalizarRegistro();
 void vistaFinalizarRegistroPublico();
 void vistaLeerPesoBrutoPublico();
 void vistaLeerPesoTaraPublico();
+void vistaConsultarPesajesInternos();
+void vistaConsultarPesajesPublicos();
+void vistaSeleccionarDia();
+void vistaObtenerInforme();
+void vistaConsultarRegistroInterno();
+void vistaConsultarRegistroPublico();
+void vistaConsultarUsuarios();
+void vistaConsultarUsuario();
+void vistaReemplazarContrasena();
+
+void regresarInicio();
+void regresarUsuarios();
 
 #endif

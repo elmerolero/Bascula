@@ -15,6 +15,7 @@ void actualizarProducto( GtkWidget *widget, gpointer ptr );
 void eliminarProducto( GtkWidget * widget, gpointer ptr );
 void eliminarEmpresa( GtkWidget *widget, gpointer ptr );
 void alertaEliminarRegistro();
+void registrarEmpresa();
 void cancelarOperacion();
 void registroCancelarEdicion( GtkWidget *widget, gpointer ptr );
 void convertirMayusculas( GtkEditable *editable, const gchar *text, gint length, gint *position, gpointer data );

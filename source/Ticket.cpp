@@ -262,9 +262,9 @@ void Ticket::establecerDescuento( string descuentoStr )
 		establecerDescuento( descuento );
  	}
 	catch( invalid_argument &ia ){
+		establecerDescuentoEstablecido( false );
 		string what = ia.what();
 		if( what.compare( "stod" ) == 0 ){
-			establecerDescuentoEstablecido( false );
 			throw invalid_argument( "El descuento introducido no es válido." );
 		}
 		
@@ -285,7 +285,7 @@ void Ticket::establecerDescuento( double descuento )
 
 double Ticket::obtenerDescuento() const
 {
-	return permitirDescuento() ? descuento : 0;
+	return descuento;
 }
 
 // Indica que el precio bruto se hubiera establecido adecuadamente
@@ -314,6 +314,7 @@ void Ticket::calcularPesoNeto()
 	}
 	
 	double diferencia = abs( obtenerPesoBruto() - obtenerPesoTara() );
+	double descuento = obtenerDescuento();
 	establecerPesoNeto( diferencia - ( ( diferencia * descuento ) / 100 ) );
 }
 

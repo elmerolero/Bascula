@@ -234,7 +234,7 @@ void TicketPublico::calcularPesoNeto()
 
 void TicketPublico::establecerPesoNeto( double pesoNeto )
 {
-	if( pesoBruto < 0 ){
+	if( !estaPesoBrutoEstablecido() || !estaPesoTaraEstablecido() ){
 		establecerPesoNetoEstablecido( false );
 		throw invalid_argument( "El peso neto debe ser un valor absoluto positivo." );
 	}

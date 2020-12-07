@@ -53,7 +53,6 @@ void iniciar()
         
         // Obtiene los tickets registrados y pendientes
         obtenerFolioActual();
-        cout << "Llego aqui" << endl;
         obtenerRegistrosInternosPendientes();
         obtenerRegistrosPublicosPendientes();
 

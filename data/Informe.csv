@@ -1,0 +1,30 @@
+Básculas BISA SA. de C.V.
+Reportes de pesajes
+Fecha:,2020-11-11
+Entradas
+Proveedor:,DISTRIBUIDORA VALCON S.A. DE C.V.
+Codigo, Producto, Total peso bruto, Total peso tara, Peso neto
+7, JICAMA, 5000, 3000, 2000
+8, PAPAYA, 20000, 8000, 12000
+23, Aluminio, 30000, 15000, 15000
+
+Proveedor:,FRUTAS Y VERDURAS LUPITA S.A.
+Codigo, Producto, Total peso bruto, Total peso tara, Peso neto
+7, JICAMA, 34000, 15000, 19000
+10, JITOMATE, 20000, 15000, 4475
+27, Calabaza, 25000, 20135, 4865
+28, GUAYABA, 10000, 3000, 6300
+
+Salidas
+Proveedor:,FRUTAS Y VERDURAS LUPITA S.A.
+Codigo, Producto, Total peso bruto, Total peso tara, Peso neto
+7, JICAMA, 38000, 20000, 17250
+
+Totales,
+Codigo, Producto, Entrada, Salida, Neto
+23, Aluminio, 15000, 0, 15000
+27, Calabaza, 4865, 0, 4865
+28, GUAYABA, 6300, 0, 6300
+7, JICAMA, 21000, 17250, 3750
+10, JITOMATE, 4475, 0, 4475
+8, PAPAYA, 12000, 0, 12000

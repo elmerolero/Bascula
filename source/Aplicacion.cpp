@@ -52,7 +52,8 @@ void iniciar()
         empresas.obtenerRegistros();
         
         // Obtiene los tickets registrados y pendientes
-        obtenerFolioActual();
+        obtenerFolioActualInterno();
+        obtenerFolioActualPublico();
         obtenerRegistrosInternosPendientes();
         obtenerRegistrosPublicosPendientes();
 
@@ -115,7 +116,7 @@ void conectarSenales()
     interfaz.conectarSenal( "BotonConfiguracion", "clicked", G_CALLBACK( vistaConfiguracion ), nullptr );
     
     // Barra de usuario
-    interfaz.conectarSenal( "EnlaceCuenta", "activate-link", G_CALLBACK( irHacia ), (void *)"Cuenta" );
+    interfaz.conectarSenal( "EnlaceCuenta", "activate-link", G_CALLBACK( vistaCuenta ), nullptr );
     interfaz.conectarSenal( "EnlaceCuentaRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
     interfaz.conectarSenal( "BotonActualizarCuenta", "clicked", G_CALLBACK( autorizarCambios ), nullptr );
 

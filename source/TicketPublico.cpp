@@ -50,11 +50,6 @@ void TicketPublico::establecerNumeroPlacas( std::string numeroPlacas )
 	// Regex para validar el número económico
 	regex formato( "[A-Z0-9Ñ]*" );
 	
-	// Obliga a que se introduzca un número de placas
-	if( numeroPlacas.empty() ){
-		throw invalid_argument( "No se ha introducido un número de placas." );
-	}
-	
 	// Verifica el formato de lo introducido
 	if( numeroPlacas.size() > 7 || !regex_match( numeroPlacas, formato ) ){
 		throw invalid_argument( "No se pudo establecer el número de placas.\nSolo admite letras, números y contiene 7 caracteres." );

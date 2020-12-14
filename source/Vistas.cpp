@@ -389,8 +389,15 @@ void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
 
 void vistaFinalizarRegistroPublico()
 {
-	// Busca el ticket 
-	registroPublico = buscarRegistroPublicoPorNumeroPlaca( interfaz.obtenerTextoEntrada( "EntradaSeguimiento" ), registrosPublicosPendientes );
+	// Busca el ticket
+	// Busca el ticket
+	try{
+		registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaSeguimiento" ) ), registrosPublicosPendientes );
+	}
+	catch( invalid_argument &ia ){
+		mostrarMensaje( "Introduzca un folio válido." );
+		return;
+	} 
 	
 	// Si no encuentra el ticket
 	if( registroPublico == nullptr ){
@@ -579,8 +586,14 @@ void vistaLeerPesoTara()
 
 void vistaFinalizarRegistro()
 {
-	// Busca el ticket 
-	ticket = buscarRegistroInternoPorNumeroPlaca( interfaz.obtenerTextoEntrada( "EntradaSeguimiento" ), registrosInternosPendientes );
+	// Busca el ticket
+	try{
+		ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaSeguimiento" ) ), registrosInternosPendientes );
+	}
+	catch( invalid_argument &ia ){
+		mostrarMensaje( "Introduzca un folio válido." );
+		return;
+	} 
 	
 	// Si no encuentra el ticket
 	if( ticket == nullptr ){

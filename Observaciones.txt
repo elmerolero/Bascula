@@ -3,7 +3,6 @@ Numero de placa vacío
 Identificar registros pendientes por folio
 No imprimio;
 Agregar de autoriza
-Cambiar proveedor por cliente al seleccionar salidas
 3 Copias de uso interno (imprimirlas en la misma hoja.
 Juan Carlos Cleofas Calleros
 JuanCaJC23

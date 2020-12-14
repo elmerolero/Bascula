@@ -103,7 +103,7 @@ void actualizarDatosUsuario()
 		
 		// Actualiza la información en la base de datos
 		database.open( nombreArchivo );
-		string consulta = "update usuarios set nombre = '" + nombre + "', apellidos = '" + apellidos + "', nombre_usuario = '" + nombreUsuario + "', contrasena = '" + contrasenaFinal + "', sal = '" + sal + "' where nombre_usuario = '" + usuario.obtenerNombreUsuario() + "' limit 1;";
+		string consulta = "update usuarios set nombre = '" + nombre + "', apellidos = '" + apellidos + "', nombre_usuario = '" + nombreUsuario + "', contrasena = '" + contrasenaFinal + "', sal = '" + sal + "' where nombre_usuario = '" + usuario.obtenerNombreUsuario() + "';";
 		database.query( consulta );
 		database.close();
 		

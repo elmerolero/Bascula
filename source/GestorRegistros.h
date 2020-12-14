@@ -42,7 +42,7 @@ extern bool esInicio;
 extern std::string nombreEmpresa;
 
 // Obtiene el contador de los folios
-void obtenerFolioActual();
+void obtenerFolioActualInterno();
 void obtenerFolioActualPublico();
 
 // Obtiene los tickets 

@@ -45,29 +45,45 @@ bool esInicio;
 string nombreEmpresa;
 
 // Obtiene el folio actual en el que se encuentra el registro
-void obtenerFolioActual()
+void obtenerFolioActualInterno()
 {
     // Conecta con la base de datos
     database.open( nombreArchivo );
     
     // Obtiene la clave actual de productos registrados
-    string consulta = "select max( folio ) from registros_internos union select max( folio ) from registros_publicos;";
+    string consulta = "select max( folio ) from registros_internos;";
     database.query( consulta );
-    if( rows.size() > 1 ){
+    if( rows.size() > 0 ){
         // Obtiene el valor máximo en formato string
         string maxStr = rows.at( 0 ) -> columns.at( 0 );
         
         // Lo traduce a entero si el string no contiene la cadena "NULL"
         folioActual = ( maxStr.compare( "NULL" ) != 0 ? stoi( maxStr ) : 0 );
+    }
+    else{
+        folioActual = 0;
+    }
+    
+    database.close();
+}
 
+// Obtiene el folio actual en el que se encuentra el registro
+void obtenerFolioActualPublico()
+{
+    // Conecta con la base de datos
+    database.open( nombreArchivo );
+    
+    // Obtiene la clave actual de productos registrados
+    string consulta = "select max( folio ) from registros_publicos;";
+    database.query( consulta );
+    if( rows.size() > 0 ){
         // Obtiene el valor máximo en formato string
-        maxStr = rows.at( 1 ) -> columns.at( 0 );
+        string maxStr = rows.at( 0 ) -> columns.at( 0 );
         
         // Lo traduce a entero si el string no contiene la cadena "NULL"
         folioActualPublico = ( maxStr.compare( "NULL" ) != 0 ? stoi( maxStr ) : 0 );
     }
     else{
-        folioActual = 0;
         folioActualPublico = 0;
     }
     

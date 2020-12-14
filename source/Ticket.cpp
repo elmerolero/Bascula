@@ -95,11 +95,6 @@ void Ticket::establecerNumeroPlacas( std::string numeroPlacas )
 	// Regex para validar el número económico
 	regex formato( "[A-Z0-9Ñ]*" );
 	
-	// Obliga a que se introduzca un número de placas
-	if( numeroPlacas.empty() ){
-		throw invalid_argument( "No se ha introducido un número de placas." );
-	}
-	
 	// Verifica el formato de lo introducido
 	if( numeroPlacas.size() > 7 || !regex_match( numeroPlacas, formato ) ){
 		throw invalid_argument( "No se pudo establecer el número de placas.\nSolo admite letras, números y contiene 7 caracteres." );
@@ -159,7 +154,7 @@ void Ticket::establecerPesoBruto( string pesoBrutoStr )
 void Ticket::establecerPesoBruto( double pesoBruto )
 {
 	// Debe ser un número positivo
-	if( pesoBruto < 0 ){
+	if( pesoBruto < 0.f ){
 		establecerPesoBrutoEstablecido( false );
 		throw invalid_argument( "El peso bruto introducido no es válido, inténtalo de nuevo." );
 	}
@@ -239,7 +234,7 @@ bool Ticket::estaPesoTaraEstablecido() const
 void Ticket::permitirDescuento( bool opcion )
 {
 	// Establece el descuento a ceros
-	establecerDescuento( 0 );
+	establecerDescuento( 0.f );
 	
 	// Establece que no ha sido establecido el descuento
 	establecerDescuentoEstablecido( false );
@@ -257,7 +252,7 @@ bool Ticket::permitirDescuento() const
 void Ticket::establecerDescuento( string descuentoStr )
 {
 	try{
-		double descuento = permitirDescuento() ? stod( descuentoStr ) : 0;
+		double descuento = stod( descuentoStr );
 		
 		establecerDescuento( descuento );
  	}

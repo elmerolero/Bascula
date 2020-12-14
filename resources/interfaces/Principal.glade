@@ -390,7 +390,7 @@ Apellidos</property>
                             </child>
                             <child>
                               <object class="GtkLinkButton" id="EnlaceRegistrarNuevoUsuario">
-                                <property name="label" translatable="yes">Crea nuevo usuario</property>
+                                <property name="label" translatable="yes">Crear un nuevo usuario</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">True</property>
                                 <property name="receives_default">True</property>
@@ -1202,7 +1202,7 @@ aquí para reestablecer tu contraseña.</property>
                                 <property name="visible">True</property>
                                 <property name="can_focus">False</property>
                                 <child>
-                                  <object class="GtkLabel" id="TituloCampo">
+                                  <object class="GtkLabel" id="EtiquetaEmpresa">
                                     <property name="visible">True</property>
                                     <property name="can_focus">False</property>
                                     <property name="halign">start</property>

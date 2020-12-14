@@ -253,9 +253,11 @@ void internoSeleccionarTipo()
 	if( ticket != nullptr ){
 		if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
 			ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
+			interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Proveedor:      " );
 		}
 		else{
 			ticket -> establecerTipoRegistro( TIPO_REGISTRO_SALIDA );
+			interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Cliente:         " );
 		}
 	}
 }

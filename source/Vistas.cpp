@@ -271,6 +271,9 @@ void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
 	// Bits a ignorar
 	interfaz.establecerTextoEntrada( "OpcionesBytesIgnorados", to_string( lectorBascula.obtenerBytesIgnorados() ) );
 
+	// Numero copias
+	interfaz.establecerTextoEntrada( "OpcionesImpresionCopias", to_string( numeroCopias ) );
+
 	// Se dirige a la vista
 	irHacia( nullptr, (void *)"Configuracion" );
 }
@@ -295,10 +298,7 @@ void vistaBasculaPublica( GtkWidget *widget, gpointer ptr )
 }
 
 void vistaBasculaInterna( GtkWidget *widget, gpointer ptr )
-{
-	// Establece las vistas
-	irHacia( nullptr, (void *)"Tickets" );
-	
+{	
 	// Obtiene los tickets pendiente
 	internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
 	
@@ -311,6 +311,9 @@ void vistaBasculaInterna( GtkWidget *widget, gpointer ptr )
     botonBasculaNuevoId = interfaz.conectarSenal( "BotonBasculaNuevo", "clicked", G_CALLBACK( vistaCrearRegistro ), nullptr );
     entradaSeguimientoId = interfaz.conectarSenal( "EntradaSeguimiento", "activate", G_CALLBACK( vistaFinalizarRegistro ), nullptr );
     botonSeguimientoId = interfaz.conectarSenal( "BotonSeguimiento", "clicked", G_CALLBACK( vistaFinalizarRegistro ), nullptr );
+
+    // Establece las vistas
+	irHacia( nullptr, (void *)"Tickets" );
 }
 
 void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
@@ -373,18 +376,8 @@ void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
 	interfaz.desconectarSenal( "EnlaceRegresarPublico", botonCancelarPublicoId );
 	botonCancelarPublicoId = interfaz.conectarSenal( "EnlaceRegresarPublico", "activate-link", G_CALLBACK( publicoCancelarRegistro ), nullptr );
 	
-	// Crea el nuevo ticket
-	registroPublico = new TicketPublico();
-	
-	// Si el ticket fue creado correctamente
-	if( registroPublico != nullptr ){
-		// Establece la vista de nuevo ticket
-		irHacia( nullptr, (void *)"NuevoTicketPublico" );
-	}
-	else{
-		// Muestra el mensaje de que el ticket no fue creado
-		mostrarMensaje( "No se pudo crear el registro." );
-	}
+	// Establece la vista de nuevo ticket
+	irHacia( nullptr, (void *)"NuevoTicketPublico" );
 }
 
 void vistaFinalizarRegistroPublico()
@@ -417,7 +410,7 @@ void vistaFinalizarRegistroPublico()
 	interfaz.establecerTextoEtiqueta( "EntradaFolioPublico", entrada.str() );
 	
 	// Fecha
-	interfaz.establecerTextoEtiqueta( "EntradaFechaPublico", registroPublico -> obtenerFechaRegistro() );
+	interfaz.establecerTextoEtiqueta( "EntradaFechaPublico", registroPublico -> obtenerFecha() );
 	
 	// Tipo registro
 	if( registroPublico -> obtenerTipoViaje() == VIAJE_LOCAL ){
@@ -549,19 +542,11 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	interfaz.desconectarSenal( "EnlaceRegresarInterno", botonCancelarInternoId );
 	botonCancelarInternoId = interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( internoCancelarRegistro ), nullptr );
 	
-	// Crea el nuevo ticket
-	ticket = new Ticket();
-	
-	// Si el ticket fue creado correctamente
-	if( ticket != nullptr ){
-		// Establece la vista de nuevo ticket
-		irHacia( nullptr, (void *)"NuevoTicketInterno" );
-	}
-	else{
-		// Muestra el mensaje de que el ticket no fue creado
-		interfaz.establecerTextoEtiqueta( "DialogoMensaje", "No se ha podido crear un\nnuevo ticket." );
-		interfaz.mostrarElemento( "VentanaMensaje" );
-	}
+	// Es un ticket pendiente hasta que no se demuestre lo contrario
+	pendiente = true;
+
+	// Establece la vista de nuevo ticket
+	irHacia( nullptr, (void *)"NuevoTicketInterno" );
 }
 
 void vistaLeerPesoBruto()
@@ -573,12 +558,6 @@ void vistaLeerPesoBruto()
 
 void vistaLeerPesoTara()
 {
-	string pesoBruto = interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoInterno" );
-	if( !ticket -> estaPesoBrutoEstablecido() ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar primero el peso bruto." );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
-		return;
-	}
 	interfaz.ocultarElemento( "MensajeErrorCampo" );
 	lectorBascula.abrir( interfaz );
 	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( internoRegistrarPesoTara ), nullptr ) );
@@ -613,7 +592,7 @@ void vistaFinalizarRegistro()
 	interfaz.establecerTextoEtiqueta( "EntradaFolioInterno", entrada.str() );
 	
 	// Fecha
-	interfaz.establecerTextoEtiqueta( "EntradaFechaInterno", ticket -> obtenerFechaRegistro() );
+	interfaz.establecerTextoEtiqueta( "EntradaFechaInterno", ticket -> obtenerFecha() );
 	
 	// Tipo registro
 	if( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ){
@@ -641,7 +620,7 @@ void vistaFinalizarRegistro()
 	
 	// Hora entrada y peso bruto
 	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", ( ticket -> estaPesoBrutoEstablecido() ? ticket -> obtenerHoraEntrada() : "No establecida" ) );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", ( ticket -> estaPesoBrutoEstablecido() ? to_string( ticket -> obtenerPesoBruto() ) + " Kg" : "No establecido" ) );
+	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", ( ticket -> estaPesoBrutoEstablecido() ? pesoString( ticket -> obtenerPesoBruto(), 2 ) : "No establecido" ) );
 	if( ticket -> estaPesoBrutoEstablecido() ){
 		// Deshabilita la señal para leer el peso bruto
 		interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoInternoId );
@@ -649,7 +628,7 @@ void vistaFinalizarRegistro()
 	
 	// Hora salida y peso tara
 	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", ( ticket -> estaPesoTaraEstablecido() ? ticket -> obtenerHoraSalida() : "No establecida" ) );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", ( ticket -> estaPesoTaraEstablecido() ? to_string( ticket -> obtenerPesoTara() ) + " Kg" : "No establecido" ) );
+	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", ( ticket -> estaPesoTaraEstablecido() ? pesoString( ticket -> obtenerPesoTara(), 2 ) : "No establecido" ) );
 	
 	// Descuento
 	if( ticket -> permitirDescuento() ){
@@ -660,10 +639,7 @@ void vistaFinalizarRegistro()
 		interfaz.establecerActivoBotonToggle( "NoDescuentoInterno" );
 		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
 	}
-	
-	// Peso neto
-	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", ( ticket -> estaPesoNetoCalculado() ? to_string( ticket -> obtenerPesoNeto() ) + " Kg" : "No establecido" ) );
-	
+		
 	// Motivos y observaciones
 	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", ticket -> obtenerObservaciones() );
 
@@ -839,7 +815,7 @@ void vistaConsultarRegistroInterno()
 	interfaz.establecerTextoEtiqueta( "FolioInterno", to_string( ticket -> obtenerFolio() ) );
 
 	// Fecha
-	interfaz.establecerTextoEtiqueta( "FechaInterno", ticket -> obtenerFechaRegistro() );
+	interfaz.establecerTextoEtiqueta( "FechaInterno", ticket -> obtenerFecha() );
 
 	// Empresa
 	interfaz.establecerTextoEntrada( "NombreEmpresaInterno", ticket -> obtenerEmpresa() -> obtenerNombre() );
@@ -918,7 +894,7 @@ void vistaConsultarRegistroPublico()
 	interfaz.establecerTextoEtiqueta( "FolioPublico", to_string( registroPublico -> obtenerFolio() ) );
 
 	// Fecha
-	interfaz.establecerTextoEtiqueta( "FechaPublico", registroPublico -> obtenerFechaRegistro() );
+	interfaz.establecerTextoEtiqueta( "FechaPublico", registroPublico -> obtenerFecha() );
 
 	// Producto
 	interfaz.establecerTextoEntrada( "NombreProductoPublico", registroPublico -> obtenerProducto() -> obtenerNombre() );

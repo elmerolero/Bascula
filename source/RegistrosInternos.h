@@ -11,12 +11,14 @@
 
 // Ticket a crear
 extern Ticket *ticket;
+extern bool pendiente;
 
 void internoRegistrarPendiente();
 void internoFinalizarPendiente();
 void internoRegistrarPesoBruto();
 void internoRegistrarPesoTara();
-void internoCalcularPesoNeto();
+void internoActualizarPesoNeto();
+double internoCalcularPesoNeto( double pesoBruto, double pesoTara, double descuento );
 void internoHabilitarDescuento();
 void internoLeerDescuento();
 void internoSeleccionarTipo();

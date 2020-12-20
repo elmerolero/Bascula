@@ -10,8 +10,8 @@ using namespace std;
 
 // Constructor
 Ticket::Ticket():
-	folio( 0 ), empresa( nullptr ), producto( nullptr ), tipoRegistro( TIPO_REGISTRO_ENTRADA ), pesoBruto( 0 ), pesoBrutoEstablecido( false ), pesoTara( 0 ), pesoTaraEstablecido( false ), pesoNeto( 0 ), pesoNetoCalculado( false ),
-	entradaManual( false ), pendiente( true ), habilitarDescuento( false )
+	folio( 0 ), empresa( nullptr ), producto( nullptr ), tipoRegistro( TIPO_REGISTRO_ENTRADA ), pesoBruto( 0 ), pesoBrutoEstablecido( false ), pesoTara( 0 ), pesoTaraEstablecido( false ), 
+	descuento( 0 ), habilitarDescuento( 0 ), descuentoEstablecido( 0 ), pesoNeto( 0 ), pesoNetoCalculado( false ), entradaManual( false ), pendiente( true )
 {
 	// Nada que hacer aquí
 }
@@ -33,7 +33,7 @@ unsigned int Ticket::obtenerFolio() const
 }
 
 // Establece la fecha de registro
-void Ticket::establecerFechaRegistro( string fechaRegistro )
+void Ticket::establecerFecha( string fechaRegistro )
 {
 	if( fechaRegistro.size() > 10 ){
 		throw invalid_argument( "Se ha intentado establecer una fecha no adecuada." );
@@ -43,7 +43,7 @@ void Ticket::establecerFechaRegistro( string fechaRegistro )
 }
 
 // Obtiene la fecha de registro
-std::string Ticket::obtenerFechaRegistro() const
+std::string Ticket::obtenerFecha() const
 {
 	return fechaRegistro;
 }
@@ -142,12 +142,7 @@ void Ticket::establecerPesoBruto( string pesoBrutoStr )
 		establecerPesoBruto( pesoBruto );
 	}
 	catch( invalid_argument &ia ){
-		string what = ia.what();
-		if( what.compare( "stod" ) == 0 ){
-			establecerPesoBrutoEstablecido( false );
-			throw invalid_argument( "El peso bruto introducido no es válido." );
-		}
-		throw invalid_argument( ia.what() );
+		throw invalid_argument( "El peso bruto introducido no es válido." );
 	}
 }
 
@@ -155,13 +150,11 @@ void Ticket::establecerPesoBruto( double pesoBruto )
 {
 	// Debe ser un número positivo
 	if( pesoBruto < 0.f ){
-		establecerPesoBrutoEstablecido( false );
-		throw invalid_argument( "El peso bruto introducido no es válido, inténtalo de nuevo." );
+		throw invalid_argument( "El peso bruto introducido no es válido, inténtelo de nuevo." );
 	}
 
 	// Establece el peso bruto
 	this -> pesoBruto = pesoBruto;
-	establecerPesoBrutoEstablecido( true );
 }
 
 // Obtiene el peso bruto del ticket
@@ -181,36 +174,26 @@ bool Ticket::estaPesoBrutoEstablecido() const
 	return pesoBrutoEstablecido;
 }
 
-// Establece el peso tara del ticket
+// Establece el peso tara del ticket a partir de un string
 void Ticket::establecerPesoTara( std::string pesoTaraStr )
 {
 	try{
-		// Convierte el string en un double
+		// Convierte el string en un double y lo establece
 		double pesoTara = stod( pesoTaraStr );
-		
-		// Establece el número convertido
 		establecerPesoTara( pesoTara );
 	}
 	catch( invalid_argument &ia ){
-		string what = ia.what();
-		if( what.compare( "stod" ) == 0 ){
-			establecerPesoTaraEstablecido( false );
-			throw invalid_argument( "El peso tara que se intenta registrar no es válido." );
-		}
-		
-		throw invalid_argument( ia.what() );
+		throw invalid_argument( "El peso tara que se intenta registrar no es válido. Inténtelo de nuevo." );
 	}
 }
 
 void Ticket::establecerPesoTara( double pesoTara )
 {
 	if( pesoBruto < 0 ){
-		establecerPesoTaraEstablecido( false );
-		throw invalid_argument( "El peso tara que se intenta registrar no es válido." );
+		throw invalid_argument( "El peso tara que se intenta registrar no es válido. Inténtelo de nuevo." );
 	}
 
 	this -> pesoTara = pesoTara;
-	establecerPesoTaraEstablecido( true );
 }
 
 // Obtiene el peso tara del ticket
@@ -230,15 +213,41 @@ bool Ticket::estaPesoTaraEstablecido() const
 	return pesoTaraEstablecido;
 }
 
+// Descuento desde string
+void Ticket::establecerDescuento( string descuentoStr )
+{
+	if( descuentoStr.empty() ){
+		throw invalid_argument( "Indicó que se introduciría un descuento, pero el campo está vacío." );
+	}
+
+	try{
+		double descuento = stod( descuentoStr );
+		establecerDescuento( descuento );
+ 	}
+	catch( invalid_argument &ia ){
+		throw invalid_argument( "El descuento introducido no es válido." );
+	}
+}
+
+// Establece el descuento
+void Ticket::establecerDescuento( double descuento )
+{
+	if( descuento < 0 ){
+		throw invalid_argument( "El descuento introducido no es válido." );
+	}
+	
+	this -> descuento = descuento;
+}
+
+// Obtien el descuento
+double Ticket::obtenerDescuento() const
+{
+	return descuento;
+}
+
 // Bandera que decide si calcular con descuento o no
 void Ticket::permitirDescuento( bool opcion )
 {
-	// Establece el descuento a ceros
-	establecerDescuento( 0.f );
-	
-	// Establece que no ha sido establecido el descuento
-	establecerDescuentoEstablecido( false );
-	
 	// Deshabilita la opcion
 	this -> habilitarDescuento = opcion;
 }
@@ -248,42 +257,7 @@ bool Ticket::permitirDescuento() const
 	return habilitarDescuento;
 }
 
-// Descuento
-void Ticket::establecerDescuento( string descuentoStr )
-{
-	try{
-		double descuento = stod( descuentoStr );
-		
-		establecerDescuento( descuento );
- 	}
-	catch( invalid_argument &ia ){
-		establecerDescuentoEstablecido( false );
-		string what = ia.what();
-		if( what.compare( "stod" ) == 0 ){
-			throw invalid_argument( "El descuento introducido no es válido." );
-		}
-		
-		throw invalid_argument( ia.what() );
-	}
-}
-
-void Ticket::establecerDescuento( double descuento )
-{
-	if( descuento < 0 || descuento > 100 ){
-		establecerDescuentoEstablecido( false );
-		throw invalid_argument( "Un descuento debe ser un número positivo no mayor a cien." );
-	}
-	
-	this -> descuento = descuento;
-	establecerDescuentoEstablecido( true );
-}
-
-double Ticket::obtenerDescuento() const
-{
-	return descuento;
-}
-
-// Indica que el precio bruto se hubiera establecido adecuadamente
+// Indica que el precio descuento se estableció adecuadamente
 void Ticket::establecerDescuentoEstablecido( bool descuentoEstablecido )
 {
 	this -> descuentoEstablecido = descuentoEstablecido;
@@ -294,34 +268,26 @@ bool Ticket::estaDescuentoEstablecido() const
 	return descuentoEstablecido;
 }
 
-// Establece el peso neto del ticket
-void Ticket::calcularPesoNeto()
+// Establece el descuento a partir de un string dado
+void Ticket::establecerPesoNeto( string pesoNetoStr )
 {
-	// ¿Se establecieron correctamente los campos necesarios para calcular el peso neto?
-	if( !estaPesoBrutoEstablecido() || !estaPesoTaraEstablecido() ){
-		establecerPesoNetoCalculado( false );
-		throw invalid_argument( "No se han establecido los campos necesarios para calcular el peso neto." );
+	try{
+		double pesoNeto = stod( pesoNetoStr );
+		establecerPesoNeto( pesoNeto );
 	}
-	
-	if( permitirDescuento() && !estaDescuentoEstablecido() ){
-		establecerPesoNetoCalculado( false );
-		throw invalid_argument( "El descuento está habilitado, pero no se ha establecido ningún descuento." );
+	catch( invalid_argument &ia ){
+		throw invalid_argument( "El peso neto introducido no es válido." );
 	}
-	
-	double diferencia = abs( obtenerPesoBruto() - obtenerPesoTara() );
-	double descuento = obtenerDescuento();
-	establecerPesoNeto( diferencia - ( ( diferencia * descuento ) / 100 ) );
 }
 
+// Establece el peso neto
 void Ticket::establecerPesoNeto( double pesoNeto )
 {
-	if( pesoBruto < 0 ){
-		establecerPesoNetoCalculado( false );
+	if( pesoNeto < 0 ){
 		throw invalid_argument( "El peso neto debe ser un valor absoluto positivo." );
 	}
 
 	this -> pesoNeto = pesoNeto;
-	establecerPesoNetoCalculado( true );
 }
 
 // Obtiene el peso bruto del ticket
@@ -331,12 +297,12 @@ double Ticket::obtenerPesoNeto() const
 }
 
 // Indica que el peso neto se hubiera establecido adecuadamente
-void Ticket::establecerPesoNetoCalculado( bool pesoNetoCalculado )
+void Ticket::establecerPesoNetoEstablecido( bool pesoNetoCalculado )
 {
 	this -> pesoNetoCalculado = pesoNetoCalculado;
 }
 
-bool Ticket::estaPesoNetoCalculado() const
+bool Ticket::estaPesoNetoEstablecido() const
 {
 	return pesoNetoCalculado;
 }
@@ -376,7 +342,7 @@ std::string Ticket::obtenerHoraSalida() const
 // Establece las observaciones indicadas
 void Ticket::establecerObservaciones( string observaciones )
 {
-	regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ\\s.]*" );
+	regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ,\\s.]*" );
 	if( observaciones.size() > 500 || !regex_match( observaciones, formato ) ){
 		throw invalid_argument( "Se están dando observaciones, no válidas." );
 	}
@@ -433,7 +399,7 @@ std::string Ticket::obtenerNombreBasculista() const
 }
 
 // Imprime los datos del ticket
-void Ticket::imprimir( std::string nombreEmpresa ) const
+void Ticket::imprimir( std::string nombreEmpresa, unsigned int numeroCopias ) const
 {
 	// Esta finalizado (o no está pendiente)
 	if( estaPendiente() ){
@@ -452,24 +418,38 @@ void Ticket::imprimir( std::string nombreEmpresa ) const
 	// Datos temporales de completado
 	string nombreBasculista = "Nombre del Basculista";
 	
-	// Envía el formato html con los datos incluídos
-	pesajeInterno << "<!DOCTYPE html><html><head><meta charset=\"utf-8\"><style>*{ font-family: sans-serif; }</style></head><body><strong><p align=\"center\">" << nombreEmpresa
-				  << "</p></strong><hr><div style=\"display: flex; direction: row; justify-content: space-between;\"><p><strong>FECHA:</strong>" << obtenerFechaRegistro()
-				  << "</p><p><strong>FOLIO: </strong>" << obtenerFolio()
-				  << "</div><p align=\"center\">" << obtenerEmpresa() -> obtenerClave() << " - " << obtenerEmpresa() -> obtenerNombre()
-				  << "<p><strong>Registra: </strong>" << ( obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" )
-				  << "</p><table style=\"border: 0; text-align: left;\"><tr><th>Código</th><th>Producto</th></tr><tr><td>" << obtenerProducto() -> obtenerClave() << "</td><td>" << obtenerProducto() -> obtenerNombre()
-				  << "</td></tr></table><p><strong>Placas: </strong>" << obtenerNumeroPlacas()
-				  << "</p><p><strong>Conductor: </strong>" << obtenerNombreConductor()
-				  << "</p><table style=\"border: 0; text-align: left;\"><tr><th>Hora de entrada:</th><td>" << obtenerHoraEntrada()
-				  << "</td></tr><tr><th>Hora de salida:</th><td>" << obtenerHoraSalida()
-				  << "</td></tr></table> <br><table style=\"border: 0; text-align: left; margin-left: auto;\"><tr><th>Peso bruto:</th><td>" << obtenerPesoBruto()
-				  << "</td></tr><tr><th>Peso tara:</th><td>" << obtenerPesoTara()
-				  << "</td></tr><tr><th>Descuento:</th><td>" << obtenerDescuento()
-				  << "</td></tr></table><hr><table style=\"border: 0; text-align: left; margin-left: auto;\"><tr><th>Peso neto:</th><td>" << obtenerPesoNeto()
-				  << "</td></tr></table><hr><p><strong>Observaciones:</strong></p><p>" << obtenerObservaciones()
-				  << "<hr><p>" << ( !esEntradaManual() ? "Registro realizado por el basculista <u>" : "Este registro contiene datos de pesaje introducidos manualmente, realizado por <u> " )
-				  << obtenerNombreBasculista() << "</u></p></body></html>" << endl;
+	// Registra el encabezado 
+	pesajeInterno << "<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{font-family: sans-serif; font-size: 15px; "
+			         "margin: 1px; }</style></head><body>";
+
+	// Incrusta en el documento el numero de copias deseadas
+	for( size_t contador = 0; contador < numeroCopias; ++contador ){
+		pesajeInterno << "<div><strong><p align='center'>" << nombreEmpresa
+					  << "</p></strong><hr><div style='display: flex; direction: row; justify-content: space-between;''><p>"
+					  << "<strong>FECHA:</strong>" << obtenerFecha() << "</p><p align='center'>"
+					  << obtenerEmpresa() -> obtenerClave() << " - " << obtenerEmpresa() -> obtenerNombre()
+					  << "</p><p><strong>FOLIO: </strong>" << obtenerFolio() << "</p></div>"
+					  << "<div style='display: flex; justify-content: space-between;'><div style='width: 50%;'>"
+					  << "<table style='border: 0; text-align: left;'><tr><th>Registra: </th><td>"
+					  << ( obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" )
+					  << "</td></tr><tr><th>Producto: </th><td>" << obtenerProducto() -> obtenerClave() << " - " << obtenerProducto() -> obtenerNombre()
+					  << "</td></tr><tr><th>Placas: </th><td>" << obtenerNumeroPlacas()
+					  << "</td></tr><tr><th>Conductor: </th><td>" << obtenerNombreConductor()
+					  << "</td></tr></table></div><div style='display: flex; align-items: space-between;'>"
+					  << "<table style='border: 0; text-align: left;'><tr><th>Hora entrada:</th><td>"
+					  << obtenerHoraEntrada() << "</td></tr><tr><th>Hora salida:</th><td>"
+					  << obtenerHoraSalida() << "</td></tr></table><table style='border: 0; text-align: left; margin-left: auto;'>"
+					  << "<tr><th>Peso bruto:</th><td>" << obtenerPesoBruto() << "</td></tr><tr><th>Peso tara:</th><td>"
+					  << obtenerPesoTara() << "</td></tr><tr><th>Descuento:</th><td>" << obtenerDescuento()
+					  << "</td></tr></table></div></div><hr><table style='border: 0; text-align: left; margin-left: auto;'>"
+					  << "<tr><th>Peso neto:</th><td>" << obtenerPesoNeto() << "</td></tr></table><hr><p><strong>"
+					  << "Observaciones:<br></strong></p><p>" << obtenerObservaciones() << "</p><hr><p>"
+					  << ( esEntradaManual() ? "El pesaje en alguno de los campos fue introducido de manera manual. " : "" )
+					  << "Registro realizado por el basculista <u>" << obtenerNombreBasculista() << "</u></p></div><br><hr>" << endl;
+	}
+
+	// Establece el pié de página del documento
+	pesajeInterno << "</body></html>" << endl;
 	
 	// Cierra archivo
 	pesajeInterno.close();

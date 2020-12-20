@@ -18,8 +18,8 @@ class TicketPublico
 		unsigned int obtenerFolio() const;
 		
 		// Fecha de registro
-		void establecerFechaRegistro( std::string fechaRegistro );
-		std::string obtenerFechaRegistro() const;
+		void establecerFecha( std::string fechaRegistro );
+		std::string obtenerFecha() const;
 		
 		// Numero de placas
 		void establecerNumeroPlacas( std::string numeroPlacas );

@@ -1,5 +1,6 @@
 #include "GestorRegistros.h"
 #include "Aplicacion.h"
+#include "LectorBascula.h"
 #include "Sesion.h"
 #include "Vistas.h"
 #include "sha256.h"
@@ -41,8 +42,11 @@ ContenedorRegistros empresas;
 // Primer inicio
 bool esInicio;
 
-//
+// Nombre de la empresa
 string nombreEmpresa;
+
+// Numero de copias a imprimir en el ticket
+unsigned int numeroCopias;
 
 // Obtiene el folio actual en el que se encuentra el registro
 void obtenerFolioActualInterno()
@@ -196,28 +200,28 @@ void crearRegistroPendiente( Ticket *ticket )
     
     // Consulta para el registro en la base de datos
     stringstream consulta;
-    consulta << "insert into registros_internos values( " << ticket -> obtenerFolio() << ", '" << ticket -> obtenerFechaRegistro() << "', " << ticket -> obtenerTipoRegistro() << " ," 
+    consulta << "insert into registros_internos values( " << ticket -> obtenerFolio() << ", '" << ticket -> obtenerFecha() << "', " << ticket -> obtenerTipoRegistro() << " ," 
              << ticket -> obtenerEmpresa() -> obtenerClave() << ", " << ticket -> obtenerProducto() -> obtenerClave() << ", '" << ticket -> obtenerNumeroPlacas() << "', '" 
              << ticket -> obtenerNombreConductor() << "', " << ( ticket -> estaPesoBrutoEstablecido() ? "'" + ticket -> obtenerHoraEntrada() + "'" : "null" ) << ", "
              << ( ticket -> estaPesoTaraEstablecido() ? "'" + ticket -> obtenerHoraSalida() + "'" : "null" ) << ", "
              << ( ticket -> estaPesoBrutoEstablecido() ? ticket -> obtenerPesoBruto() : 0 ) << ", " << ticket -> estaPesoBrutoEstablecido() << ", " 
              << ( ticket -> estaPesoTaraEstablecido() ? ticket -> obtenerPesoTara() : 0 ) << ", " << ticket -> estaPesoTaraEstablecido() << ", "
              << ( ticket -> estaDescuentoEstablecido() ? ticket -> obtenerDescuento() : 0 ) << ", " << ticket -> estaDescuentoEstablecido() << ", " << ticket -> permitirDescuento() << ", "
-             << ( ticket -> estaPesoNetoCalculado() ? ticket -> obtenerPesoNeto() : 0 ) << ", " << ticket -> estaPesoNetoCalculado() << ", '"
+             << ( ticket -> estaPesoNetoEstablecido() ? ticket -> obtenerPesoNeto() : 0 ) << ", " << ticket -> estaPesoNetoEstablecido() << ", '"
              << ticket -> obtenerObservaciones() << "', " << ticket -> esEntradaManual() << ", " << ticket -> estaPendiente() << ", '" << ticket -> obtenerNombreBasculista() << "' )";
             
     // Inserta el nuevo ticket
     try{
-	database.query( consulta.str() );
-	if( ticket -> estaPendiente() ){
-	    registrosInternosPendientes.push_back( ticket );
-	}
-	else{
-	    ticket -> imprimir( nombreEmpresa );
-	}
+	   database.query( consulta.str() );
+	   if( ticket -> estaPendiente() ){
+	        registrosInternosPendientes.push_back( ticket );
+	   }
+	   else{
+	       ticket -> imprimir( nombreEmpresa, numeroCopias );
+	   }
     }
     catch( runtime_error &re ){
-	cerr << re.what() << endl;
+	   cerr << re.what() << endl;
     }
     
     // Cierra la conexion
@@ -234,7 +238,7 @@ void finalizarRegistro( Ticket *ticket )
     consulta << "update registros_internos set peso_tara = " << ticket -> obtenerPesoTara() << ", tara_establecido = " << ticket -> estaPesoTaraEstablecido() 
 	     << ", hora_salida = '" << ticket -> obtenerHoraSalida() << "', pendiente = 0"
 	     << ", descuento = " << ( ticket -> estaDescuentoEstablecido() ? ticket -> obtenerDescuento() : 0 ) << ", descuento_establecido = " << ticket -> estaDescuentoEstablecido() 
-	     << ", descuento_permitido = " << ticket -> permitirDescuento() << ", peso_neto = " << ticket -> obtenerPesoNeto() << ", neto_establecido = " << ticket -> estaPesoNetoCalculado()
+	     << ", descuento_permitido = " << ticket -> permitirDescuento() << ", peso_neto = " << ticket -> obtenerPesoNeto() << ", neto_establecido = " << ticket -> estaPesoNetoEstablecido()
 	     << ", tipo_registro = " << ticket -> obtenerTipoRegistro() << ", observaciones = '" << ticket -> obtenerObservaciones() << "' where folio = " << ticket  -> obtenerFolio();
 	    
     try{
@@ -242,7 +246,7 @@ void finalizarRegistro( Ticket *ticket )
 	database.query( consulta.str() );
 	
 	// Imprime el ticket
-	ticket -> imprimir( nombreEmpresa );
+	ticket -> imprimir( nombreEmpresa, numeroCopias );
 	
 	// Remueve el ticket de los registros pendientes
 	registrosInternosPendientes.remove( ticket );
@@ -300,7 +304,7 @@ void crearRegistroPublicoPendiente( TicketPublico *registroPublico )
     
     // Consulta para el registro en la base de datos
     stringstream consulta;
-    consulta << "insert into registros_publicos values( " << registroPublico -> obtenerFolio() << ", '" << registroPublico -> obtenerFechaRegistro() << "', " << registroPublico -> obtenerTipoViaje() << ", " 
+    consulta << "insert into registros_publicos values( " << registroPublico -> obtenerFolio() << ", '" << registroPublico -> obtenerFecha() << "', " << registroPublico -> obtenerTipoViaje() << ", " 
              << registroPublico -> obtenerProducto() -> obtenerClave() << ", '" << registroPublico -> obtenerNumeroPlacas() << "', '" 
              << registroPublico -> obtenerNombreConductor() << "', " << ( registroPublico -> estaPesoBrutoEstablecido() ? "'" + registroPublico -> obtenerHoraEntrada() + "'" : "null" ) << ", "
              << ( registroPublico -> estaPesoTaraEstablecido() ? "'" + registroPublico -> obtenerHoraSalida() + "'" : "null" ) << ", "
@@ -378,6 +382,68 @@ bool cargarNombreEmpresa()
     archivo.close();
 
     return true;
+}
+
+void cargarOpcionesImpresion()
+{
+    ifstream archivo;
+
+    // Intenta abrir el archivo
+    archivo.open( "../resources/data/impresion.dat" );
+    if( !archivo.is_open() ){
+        numeroCopias = 1;
+        return;
+    }
+
+    // Lee el numero de copias
+    archivo >> numeroCopias;
+
+    archivo.close();
+}
+
+void actualizarOpcionesImpresion()
+{
+    // Numero copias
+    unsigned int numeroDeCopias;
+
+    try{
+        numeroDeCopias = stoi( interfaz.obtenerTextoEntrada( "OpcionesImpresionCopias" ) );
+    }
+    catch( invalid_argument &ia ){
+        throw invalid_argument( "Numero de copias no válido." );
+    }
+
+    // Establece el número de copias
+    numeroCopias = numeroDeCopias;
+
+    // Archivo de configuración de impresión
+    ofstream archivoConfig;
+
+    // Se abre el archivo
+    archivoConfig.open( "../resources/data/impresion.dat", ios_base::out );
+    if( !archivoConfig ){
+        throw runtime_error( "No se pudieron guardar los opciones de impresion." );
+    }
+
+    archivoConfig << (int)numeroCopias << endl;
+
+    archivoConfig.close();
+}
+
+// Guarda la configuración registrada
+void guardarConfiguracion()
+{
+    try{
+        actualizarOpcionesImpresion();
+        lectorBasculaActualizarOpciones();
+    }
+    catch( exception &ia ){
+        interfaz.establecerTextoEtiqueta( "MensajeErrorConfiguracion", ia.what() );
+        interfaz.mostrarElemento( "MensajeErrorConfiguracion" );
+    }
+
+    mostrarMensaje( "Configuración actualizada." );
+    irHacia( nullptr, (void *)"Inicio" );
 }
 
 // Limpia la lista de tickets dada
@@ -662,7 +728,7 @@ void establecerRegistroInternoDesdeRenglon( Ticket *registroInterno, Row *row )
 
     // Se establece los datos del registro interno
     registroInterno -> establecerFolio( static_cast< unsigned int >( stoi( row -> columns.at( 0 ) ) ) );
-    registroInterno -> establecerFechaRegistro( row -> columns.at( 1 ) );
+    registroInterno -> establecerFecha( row -> columns.at( 1 ) );
     registroInterno -> establecerTipoRegistro( stoi( row -> columns.at( 2 ) ) );
     registroInterno -> establecerEmpresa( empresas.buscarRegistroPorClave( stoi( row -> columns.at( 3 ) ) ) );
     registroInterno -> establecerProducto( productos.buscarRegistroPorClave( stoi( row -> columns.at( 4 ) ) ) );
@@ -677,8 +743,8 @@ void establecerRegistroInternoDesdeRenglon( Ticket *registroInterno, Row *row )
     registroInterno -> permitirDescuento( stoi( row -> columns.at( 15 ) ) );
     registroInterno -> establecerDescuento( row -> columns.at( 13 ) );
     registroInterno -> establecerDescuentoEstablecido( stoi( row -> columns.at( 14 ) ) );
-    registroInterno -> establecerPesoNeto( stod( row -> columns.at( 16 ) ) );
-    registroInterno -> establecerPesoNetoCalculado( stoi( row -> columns.at( 17 ) ) );
+    registroInterno -> establecerPesoNeto( row -> columns.at( 16 ) );
+    registroInterno -> establecerPesoNetoEstablecido( stoi( row -> columns.at( 17 ) ) );
     registroInterno -> establecerObservaciones( row -> columns.at( 18 ) );
     registroInterno -> establecerEntradaManual( stoi( row -> columns.at( 19 ) ) );
     registroInterno -> establecerPendiente( stoi( row -> columns.at( 20 ) ) );
@@ -695,7 +761,7 @@ void establecerRegistroPublicoDesdeRenglon( TicketPublico *registroPublico, Row 
     
     // Se establece los datos del registro interno
     registroPublico -> establecerFolio( static_cast< unsigned int >( stoi( row -> columns.at( 0 ) ) ) );
-    registroPublico -> establecerFechaRegistro( row -> columns.at( 1 ) );
+    registroPublico -> establecerFecha( row -> columns.at( 1 ) );
     registroPublico -> establecerTipoViaje( stoi( row -> columns.at( 2 ) ) );
     registroPublico -> establecerProducto( productos.buscarRegistroPorClave( stoi( row -> columns.at( 3 ) ) ) );
     registroPublico -> establecerNumeroPlacas( row -> columns.at( 4 ) );

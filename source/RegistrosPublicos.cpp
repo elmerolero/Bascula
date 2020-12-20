@@ -19,7 +19,7 @@ void publicoRegistrarPendiente()
     
     try{
 	registroPublico -> establecerFolio( ++folioActualPublico );
-	registroPublico -> establecerFechaRegistro( interfaz.obtenerTextoEtiqueta( "EntradaFechaPublico" ) );
+	registroPublico -> establecerFecha( interfaz.obtenerTextoEtiqueta( "EntradaFechaPublico" ) );
 	registroPublico -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
 	registroPublico -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorPublico" ) );
 	registroPublico -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasPublico" ) );
@@ -106,23 +106,19 @@ void publicoFinalizarPendiente()
 // Registra el peso bruto
 void publicoRegistrarPesoBruto()
 {
-    try{
-    	// Cierra la báscula
-   		lectorBascula.cerrar();
-   		
-		// Establece la hora y el peso bruto del ticket
-		registroPublico -> establecerPesoBruto( lectorBascula.leer() );
-		registroPublico -> establecerHoraEntrada( obtenerHora() );
+    // Cierra la báscula
+   	lectorBascula.cerrar();
 		
-		// Indica en la interfaz los datos registrados
-		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", to_string( registroPublico -> obtenerPesoBruto() ) + " Kg" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", registroPublico -> obtenerHoraEntrada() );
+	// Indica en la interfaz los datos registrados
+	try{
+		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", lectorBascula.leer() );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", obtenerHora() );
     }
     catch( invalid_argument &ia ){
+    	interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorCampo" );
 		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", "No establecido" );
 		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", "No establecida" );
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
     }
     
     // Intenta calcular el peso neto
@@ -132,29 +128,25 @@ void publicoRegistrarPesoBruto()
 // Registra el peso tara
 void publicoRegistrarPesoTara()
 {
+	// Cierra el lector de la báscula
+    lectorBascula.cerrar();
+    
     try{
-    	// Cierra el lector de la báscula
-    	lectorBascula.cerrar();
-	
-		// Establece el peso tara y la hora de salida
-		registroPublico -> establecerPesoTara( lectorBascula.leer() );
-		registroPublico -> establecerHoraSalida( obtenerHora() );
-		
 		// Establece el peso leído de la etiqueta
-		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", to_string( registroPublico -> obtenerPesoTara() ) + " Kg" );
+		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", lectorBascula.leer() );
 		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", obtenerHora() );
 		
 		// Habilita la opción de poder finalizar ticket
 		interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Finalizar" );
     }
     catch( invalid_argument &ia ){
+    	// Muestra el error sucedido
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+		
 		// Reestablece el campo de la hora y el peso de entrada
 		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", "No establecido" );
 		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", "No establecida" );
-		
-		// Muestra el error sucedido
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
     }
     
     // Calcula el peso neto
@@ -340,7 +332,7 @@ void publicoActualizarRegistros( list< TicketPublico * > &ticketsPublicos, std::
 		try{
 		    elemento -> cargarWidget( "../resources/interfaces/ElementoTicketPublico.glade" );
 		    elemento -> establecerTextoEtiqueta( "ItemEntradaFolioInterno", clave.str() );
-		    elemento -> establecerTextoEtiqueta( "ItemEntradaFechaInterno", (*ticket) -> obtenerFechaRegistro() );
+		    elemento -> establecerTextoEtiqueta( "ItemEntradaFechaInterno", (*ticket) -> obtenerFecha() );
 		    elemento -> establecerTextoEtiqueta( "ItemEntradaProductoInterno", (*ticket) -> obtenerProducto() -> obtenerNombre() );
 		    elemento -> establecerTextoEtiqueta( "ItemEntradaPlacaInterno", (*ticket) -> obtenerNumeroPlacas() );
 		    interfaz.insertarElementoAGrid( elemento, "Ticket", idContenedor, 0, (*ticket) -> obtenerFolio(), 1, 1 );

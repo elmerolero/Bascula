@@ -154,7 +154,7 @@ void ContenedorRegistros::actualizarRegistro( Registro * registro )
 	// Conecta a la base de datos
 	database.open( nombreArchivo );
 	stringstream consulta;
-	consulta << "update " << obtenerNombrePlural() << " set nombre_" << obtenerNombreSingular() << " = '" << nuevoNombre << "' where clave_" << obtenerNombreSingular() << " = " << registro -> obtenerClave() << " limit 1;";
+	consulta << "update " << obtenerNombrePlural() << " set nombre_" << obtenerNombreSingular() << " = '" << nuevoNombre << "' where clave_" << obtenerNombreSingular() << " = " << registro -> obtenerClave() << ";";
 	database.query( consulta.str() );
 	database.close();
     }
@@ -178,7 +178,7 @@ void ContenedorRegistros::eliminarRegistro( Registro *registro )
     consulta << "delete from registros_internos where clave_" << obtenerNombreSingular() << " = " << registro -> obtenerClave() << ";";
     
     // Elimina el registro de la base de datos
-    consulta << "delete from " << obtenerNombrePlural() << " where clave_" << obtenerNombreSingular() << " = " << registro -> obtenerClave() << " limit 1;";
+    consulta << "delete from " << obtenerNombrePlural() << " where clave_" << obtenerNombreSingular() << " = " << registro -> obtenerClave() << ";";
     database.query( consulta.str() );
     
     // Elimina de la lista el registro dado

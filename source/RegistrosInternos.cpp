@@ -2,6 +2,7 @@
 #include "GestorRegistros.h"
 #include "LectorBascula.h"
 #include "Aplicacion.h"
+#include "Funciones.h"
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
@@ -10,54 +11,104 @@ using namespace std;
 
 // Ticket a crear
 Ticket *ticket = nullptr;
+bool pendiente = true;
 
-// Registra un nuevo ticket
+
+Ticket *crearRegistroInterno()
+{
+	// Crea el nuevo ticket
+	Ticket *ticket = new Ticket();
+	if( ticket == nullptr ){
+		throw runtime_error( "Hubo un error al crear el ticket." );
+	}
+
+	return ticket;
+}
+
 void internoRegistrarPendiente()
-{	
-	// Obtiene la empresa y el producto introducidos
-	string nombreEmpresa = interfaz.obtenerTextoEntrada( "EntradaNombreEmpresaInterno" );
-	Registro *empresa = empresas.buscarRegistroPorNombre( nombreEmpresa );
-	string nombreProducto = interfaz.obtenerTextoEntrada( "EntradaNombreProductoInterno" );
-	Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
-	
+{
+	// Ticket a crear
+	Ticket *nuevo;
+
 	try{
+		// Crea el nuevo registro
+		nuevo = crearRegistroInterno();
+
+		// Obtiene la empresa y el producto introducidos
+		string nombreEmpresa = interfaz.obtenerTextoEntrada( "EntradaNombreEmpresaInterno" );
+		Registro *empresa = empresas.buscarRegistroPorNombre( nombreEmpresa );
+		string nombreProducto = interfaz.obtenerTextoEntrada( "EntradaNombreProductoInterno" );
+		Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
+
 		// Establece los datos obligatorios
-		ticket -> establecerFolio( ++folioActual );
-		ticket -> establecerFechaRegistro( interfaz.obtenerTextoEtiqueta( "EntradaFechaInterno" ) );
-		ticket -> establecerEmpresa( empresa == nullptr ? empresas.agregarNuevoRegistro( nombreEmpresa ) : empresa );
-		ticket -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
-		ticket -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorInterno" ) );
-		ticket -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasInterno" ) );
-		ticket -> establecerObservaciones( interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" ) );
-		ticket -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
-		
+		nuevo -> establecerFolio( ++folioActual );
+		nuevo -> establecerFecha( interfaz.obtenerTextoEtiqueta( "EntradaFechaInterno" ) );
+		nuevo -> establecerEmpresa( empresa == nullptr ? empresas.agregarNuevoRegistro( nombreEmpresa ) : empresa );
+		nuevo -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
+		nuevo -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorInterno" ) );
+		nuevo -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasInterno" ) );
+		nuevo -> establecerObservaciones( interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" ) );
+		nuevo -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
+
+		// Lee el peso bruto
+		nuevo -> establecerPesoBruto( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoInterno" ) );
+		nuevo -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaInterno" ) );
+		nuevo -> establecerPesoBrutoEstablecido( true );
+
+		// Lee el peso tara
+		if( !pendiente ){
+			nuevo -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraInterno" ) );
+			nuevo -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaInterno" ) );
+			nuevo -> establecerPesoTaraEstablecido( true );
+		}
+
 		// Lee el descuento
-		if( ticket -> permitirDescuento() && !ticket -> estaDescuentoEstablecido() ){
-			interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Indicó que se introduciría un descuento, pero el campo está vacío." );
-			interfaz.mostrarElemento( "MensajeErrorCampo" );
-			--folioActual;
-			return;
+		nuevo -> permitirDescuento( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) );
+		if( nuevo -> permitirDescuento() ){
+			internoActualizarPesoNeto();
+			nuevo -> establecerDescuento( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
+			nuevo -> establecerDescuentoEstablecido( true );
 		}
-		
-		// Al menos tiene que registrarse el peso bruto
-		if( !ticket -> estaPesoBrutoEstablecido() ){
-			interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar el peso bruto." );
-			interfaz.mostrarElemento( "MensajeErrorCampo" );
-			--folioActual;
-			return;
+		else{
+			nuevo -> establecerDescuento( 0.f );
+			nuevo -> establecerDescuentoEstablecido( false );
 		}
+
+		// Intenta calcular el peso neto
+		if( nuevo -> estaPesoBrutoEstablecido() && nuevo -> estaPesoTaraEstablecido() && !pendiente ){
+			if( nuevo -> permitirDescuento() && nuevo -> estaDescuentoEstablecido() ){
+				nuevo -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" ) );
+				nuevo -> establecerPesoNetoEstablecido( true );
+			}
+			else{
+				nuevo -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" ) );
+				nuevo -> establecerPesoNetoEstablecido( true );
+			}
+		}
+		else{
+			nuevo -> establecerPesoNetoEstablecido( false );
+		}
+
+		// Registra el tipo de registro
+		if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
+			ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
+		}
+		else{
+			ticket -> establecerTipoRegistro( TIPO_REGISTRO_SALIDA );
+		}
+
+		// Nombre del basculista
+		nuevo -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
+
+		// ¿Está pendiente?
+		nuevo -> establecerPendiente( pendiente );
 		
-		// Establece si está pendiente
-		ticket -> establecerPendiente( !ticket -> estaPesoNetoCalculado() );
-		
-		// Establece el nombre del basculista que creó el registro
-		ticket -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
-		
-		crearRegistroPendiente( ticket );
-		
-		// Muestra el mensaje de que el ticket fue correctamente registrado
-		mostrarMensaje( "Registro creado\ncorrectamente." );
-		
+		// Crea el nuevo registros
+		crearRegistroPendiente( nuevo );
+
+		// Muestra el mensaje de que el nuevo registro fue creado de manera exitosa
+		mostrarMensaje( "Registro creado exitosamente" );
+
 		// Actualiza la vista de tickets
 		internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
 		
@@ -65,200 +116,217 @@ void internoRegistrarPendiente()
 		irHacia( nullptr, (void *)"Tickets" );
 	}
 	catch( invalid_argument &ia ){
+		delete nuevo;
+		nuevo = nullptr;
 		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		--folioActual;
+	}
+	catch( runtime_error re ){
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", re.what() );
 		interfaz.mostrarElemento( "MensajeErrorCampo" );
 		--folioActual;
 	}
 }
 
-// Finaliza el ticket
 void internoFinalizarPendiente()
 {
-	// ¿Está establecido el peso bruto?
-	if( !ticket -> estaPesoBrutoEstablecido() ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar el peso bruto." );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
-		return;
-	}
+	try{
+		// Registra el nuevo peso tara
+		ticket -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraInterno" ) );
+		ticket -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaInterno" ) );
+		ticket -> establecerPesoTaraEstablecido( true );
+
+		// Registra el descuento final aplicado
+		ticket -> permitirDescuento( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) );
+		if( ticket -> permitirDescuento() ){
+			internoActualizarPesoNeto();
+			ticket -> establecerDescuento( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
+			ticket -> establecerDescuentoEstablecido( true );
+		}
+		else{
+			ticket -> establecerDescuento( 0.f );
+			ticket -> establecerDescuentoEstablecido( false );
+		}
+
+		// Registra el peso neto
+		if( ticket -> estaPesoBrutoEstablecido() && ticket -> estaPesoTaraEstablecido() && !pendiente ){
+			if( ticket -> permitirDescuento() && ticket -> estaDescuentoEstablecido() ){
+				ticket -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" ) );
+				ticket -> establecerPesoNetoEstablecido( true );
+			}
+			else{
+				ticket -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" ) );
+				ticket -> establecerPesoNetoEstablecido( true );
+			}
+		}
+		else{
+			interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar todos los campos adecuadamente para establecer el peso neto." );
+			interfaz.mostrarElemento( "MensajeErrorCampo" );
+		}
+
+		// Actualiza el tipo de registro
+		if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
+			ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
+		}
+		else{
+			ticket -> establecerTipoRegistro( TIPO_REGISTRO_SALIDA );
+		}
+
+		// Actualiza las observaciones
+		ticket -> establecerObservaciones( interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" ) );
 	
-	// ¿Está establecido el peso tara?
-	if( !ticket -> estaPesoTaraEstablecido() ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar el peso tara." );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
-		return;
-	}
+		// Se asegura que no esté pendiente
+		ticket -> establecerPendiente( false );
 	
-	// ¿Está habilitado el descuento?
-	if( ticket -> permitirDescuento() && !ticket -> estaDescuentoEstablecido() ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Indicó que se introduciría un descuento, pero el campo está vacío." );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
-		--folioActual;
-		return;
-	}
+		// Finaliza el registro
+		finalizarRegistro( ticket );
 	
-	// ¿Está registrado el peso neto?
-	if( !ticket -> estaPesoNetoCalculado() ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario calcular el peso neto." );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
-		return;
-	}
-	
-	// Actualiza el tipo de registro
-	if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
-		ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
-	}
-	else{
-		ticket -> establecerTipoRegistro( TIPO_REGISTRO_SALIDA );
-	}
-	
-	// Actualiza las observaciones
-	ticket -> establecerObservaciones( interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" ) );
-	
-	// Se asegura que no esté pendiente
-	ticket -> establecerPendiente( false );
-	
-	// Finaliza el registro
-	finalizarRegistro( ticket );
-	
-	// Actualiza la vista de tickets
-	internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
+		// Actualiza la vista de Tickets
+		internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
 		
-	// Establece las vistas
-	irHacia( nullptr, (void *)"Tickets" );
+		// Establece las vistas
+		irHacia( nullptr, (void *)"Tickets" );
 	
-	// Muestra un mensaje de que fue finalizado correctamente
-	mostrarMensaje( "Registro realizado correctamente." );
+		// Muestra un mensaje de que fue finalizado correctamente
+		mostrarMensaje( "Registro finalizado correctamente.\nCreando formato de impresión." );
+	}
+	catch( invalid_argument &ia ){
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorCampo" );
+	}
 }
 
 // Registra el peso bruto
 void internoRegistrarPesoBruto()
 {
-	try{
-		// Cierra el lector de la báscula
-		lectorBascula.cerrar();
+	// Cierra el lector de la báscula
+	lectorBascula.cerrar();
 
-		// Establece la hora y el peso bruto en el ticket
-		ticket -> establecerPesoBruto( lectorBascula.leer() );
-		ticket -> establecerHoraEntrada( obtenerHora() );
-		
-		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", to_string( ticket -> obtenerPesoBruto() ) + " Kg" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", ticket -> obtenerHoraEntrada() );
+	// Establece la hora y el peso bruto en el ticket
+	try{
+		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", lectorBascula.leer() );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", obtenerHora() );
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", "No establecido" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", "No establecida" );
 		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
 		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", "No establecido" );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", "No establecida" );
 	}
-	
+
 	// Intenta calcula el peso neto
-	internoCalcularPesoNeto();
+	internoActualizarPesoNeto();
 }
 
 // Registra el peso tara
 void internoRegistrarPesoTara()
 {
-	try{
-		// Cierra el lector de la báscula
-		lectorBascula.cerrar();
-
-		// Establece el peso tara y el peso de salida
-		ticket -> establecerPesoTara( lectorBascula.leer() );
-		ticket -> establecerHoraSalida( obtenerHora() );
+	// Cierra el lector de la báscula
+	lectorBascula.cerrar();
 		
-		// Establece el peso leído en la etiqueta
-		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", to_string( ticket -> obtenerPesoTara() ) + " Kg" );
+	// Establece el peso leído en la etiqueta
+	try{
+		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", lectorBascula.leer() );
 		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", obtenerHora() );
-
-		// Habilita la opción de poder finalizar el ticket
-		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
 	}
 	catch( invalid_argument &ia ){
-		// Reestablece el campo de la hora y el peso tara
-		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", "No establecida" );
-		
-		// Muestra el error que sucedió
 		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
 		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );
+		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", "No establecida" );
 	}
-	
-	internoLeerDescuento();
-	internoCalcularPesoNeto();
+
+	internoActualizarPesoNeto();
 }
 
-// Calcula el peso neto
-void internoCalcularPesoNeto()
+double internoCalcularPesoNeto( double pesoBruto, double pesoTara, double descuento )
 {
-	//Intenta recalcular el peso neto
-	try{
-		ticket -> calcularPesoNeto();
-		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", to_string( ticket -> obtenerPesoNeto() ) + " Kg" );
-		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
-	}
-	catch( invalid_argument &ia ){
-		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado
-		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );
-		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Pendiente" );
-	}
+	return abs( pesoBruto - pesoTara ) - descuento;
 }
 
 // Habilita o deshabilita el descuento
 void internoHabilitarDescuento()
 {
 	// Si ticket está establecido 
-	if( ticket != nullptr ){
-		if( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) ){
-			ticket -> permitirDescuento( true );
-			interfaz.habilitarEdicionEntrada( "EntradaDescuentoInterno" );
-		}
-		else{
-			ticket -> permitirDescuento( false );
-			interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
-			interfaz.deshabilitarEdicionEntrada( "EntradaDescuentoInterno" );
-		}
+	if( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) ){
+		interfaz.habilitarEdicionEntrada( "EntradaDescuentoInterno" );
+	}
+	else{
+		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
+		interfaz.deshabilitarEdicionEntrada( "EntradaDescuentoInterno" );
+	}
 	
-		// Intenta calcular el peso neto
-		internoCalcularPesoNeto();
-	}
-}
-
-// Calcula el descuento
-void internoLeerDescuento()
-{
-	if( ticket -> permitirDescuento() ){
-		try{
-			// Establece el descuento
-			ticket -> establecerDescuento( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
-			
-			// Permite finalizar el ticket
-			interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
-		}
-		catch( invalid_argument &ia ){
-			if( !ticket -> estaDescuentoEstablecido() ){
-				interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
-				interfaz.mostrarElemento( "MensajeErrorCampo" );
-			}
-		}
-		
-		// Intenta calcular el peso neto
-		internoCalcularPesoNeto();
-	}
+	// Intenta calcular el peso neto
+	internoActualizarPesoNeto();
 }
 
 // Establece el tipo de registro (ENTRADA o SALIDA)
 void internoSeleccionarTipo()
 {
 	// Si el ticket está establecido
-	if( ticket != nullptr ){
-		if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
-			ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
-			interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Proveedor:      " );
+	if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
+		interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Proveedor:      " );
+	}
+	else{
+		interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Cliente:           " );
+	}
+}
+
+// Calcula el peso neto
+void internoActualizarPesoNeto()
+{
+	// Variables
+	double pesoBruto;
+	double pesoTara;
+	double descuento;
+	bool completo = true;
+
+	// Intenta convertir el peso bruto leído
+	try{
+		pesoBruto = stod( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoInterno" ) );
+	}
+	catch( invalid_argument &ia ){
+		completo = false;
+	}
+
+	try{
+		pesoTara = stod( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraInterno" ) );
+	}
+	catch( invalid_argument &ia ){
+		completo = false;
+	}
+
+	try{
+		if( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) ){
+			descuento = stod( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
+			if( descuento > abs( pesoBruto - pesoTara ) ){
+				mostrarMensaje( "El descuento introducido excede la diferencia de pesos.\nIntroduzca un descuento válido." );
+				interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
+				descuento = 0.f;
+			}
 		}
 		else{
-			ticket -> establecerTipoRegistro( TIPO_REGISTRO_SALIDA );
-			interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Cliente:         " );
+			descuento = 0.f;
 		}
+	}
+	catch( invalid_argument &ia ){
+		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
+		completo = false;
+	}
+
+	// Intenta calculara el peso neto
+	if( completo ){
+		interfaz.ocultarElemento( "MensajeErrorCampo" );
+		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", pesoString( internoCalcularPesoNeto( pesoBruto, pesoTara, descuento ), 2 ) );
+		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
+		pendiente = false;
+	}
+	else{
+		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado
+		pendiente = true;
+		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );
+		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Pendiente" );
 	}
 }
 
@@ -278,7 +346,7 @@ void internoActualizarRegistros( list< Ticket * > &tickets, std::string idConten
         try{
 			elemento -> cargarWidget( "../resources/interfaces/ElementoTicket.glade" );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaFolioInterno", clave.str() );
-			elemento -> establecerTextoEtiqueta( "ItemEntradaFechaInterno", (*ticket) -> obtenerFechaRegistro() );
+			elemento -> establecerTextoEtiqueta( "ItemEntradaFechaInterno", (*ticket) -> obtenerFecha() );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaEmpresaInterno", (*ticket) -> obtenerEmpresa() -> obtenerNombre() );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaProductoInterno", (*ticket) -> obtenerProducto() -> obtenerNombre() );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaPlacaInterno", (*ticket) -> obtenerNumeroPlacas() );
@@ -337,20 +405,13 @@ void internoObtenerPorFecha( list< Ticket * > &registros, std::string fecha )
 
 // Cancela el registro
 void internoCancelarRegistro()
-{
-	if( ticket != nullptr ){
-		delete ticket;
-		ticket = nullptr;
-	}
-	
+{	
 	irHacia( nullptr, (void *)"Tickets" );
 }
 
 // Cancela la finalización
 void internoCancelarFinalizacion()
 {
-	ticket = nullptr;
-	
 	irHacia( nullptr, (void *)"Tickets" );
 }
 
@@ -358,7 +419,7 @@ void internoCancelarFinalizacion()
 void internoImprimirSeleccionado()
 {
 	if( ticket != nullptr ){
-		ticket -> imprimir( nombreEmpresa );
+		ticket -> imprimir( nombreEmpresa, numeroCopias );
 
 		mostrarMensaje( "Formato de impresión creado." );
 	}
@@ -500,7 +561,7 @@ void internoGenerarInforme()
     // Establece el nombre de la empresa
     archivo << nombreEmpresa << endl
     		<< "Reportes de pesajes" << endl
-    		<< "Fecha:," << obtenerFecha() << endl;
+    		<< "Fecha:, " << obtenerFecha() << endl;
 
     // Consulta a la base de datos
     string consulta = "select registros_internos.clave_empresa, nombre_empresa, productos.clave_producto, nombre_producto, sum( peso_bruto ), " 

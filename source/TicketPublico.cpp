@@ -30,7 +30,7 @@ unsigned int TicketPublico::obtenerFolio() const
 }
 
 // Fecha de registro
-void TicketPublico::establecerFechaRegistro( std::string fechaRegistro )
+void TicketPublico::establecerFecha( std::string fechaRegistro )
 {
 	if( fechaRegistro.size() > 10 ){
 		throw invalid_argument( "Se ha intentado establecer una fecha no adecuada." );
@@ -39,7 +39,7 @@ void TicketPublico::establecerFechaRegistro( std::string fechaRegistro )
 	this -> fechaRegistro = fechaRegistro;
 }
 
-std::string TicketPublico::obtenerFechaRegistro() const
+std::string TicketPublico::obtenerFecha() const
 {
 	return fechaRegistro;
 }
@@ -339,7 +339,7 @@ void TicketPublico::imprimir( string nombreEmpresa ) const
 	pesajePublico << "<!DOCTYPE html><html><head><title></title>Registro No. " << obtenerFolio() << "<style>*{ font-family: sans-serif; margin: 5px; }"
  					 "</style></head><body><p align='center'><strong>" << nombreEmpresa << "</strong></p><hr><p align='center'><strong>SERVICIO DE BÁSC"
  					 "ULA PUBLICA</strong></p><div style='display: flex; direction: row; justify-content: space-between; margin: 0;'><p><strong>Fecha:</strong>" 
- 					 << obtenerFechaRegistro() << "</p><p><strong>Folio: </strong>" << setfill( '0' )<< setw( 7 ) << obtenerFolio() << "</p></div>" << setfill( ' ' ) <<
+ 					 << obtenerFecha() << "</p><p><strong>Folio: </strong>" << setfill( '0' )<< setw( 7 ) << obtenerFolio() << "</p></div>" << setfill( ' ' ) <<
 					 "<p align='center'><strong>Datos de pesaje</strong></p><div style='display: flex; direction: row; justify-content: space-between; margin: 0;'>"
 					 "<div style='margin: 0;'><table style='border: 0; text-align: left;'><tr><th>Placas: </th><td>"
 					 << obtenerNumeroPlacas() << "</td></tr><tr><th>Conductor:</th><td>"

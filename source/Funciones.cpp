@@ -1,6 +1,7 @@
 #include "Funciones.h"
 #include "Aplicacion.h"
 #include "Registro.h"
+#include "Funciones.h"
 #include <stdexcept>
 #include <string>
 #include <sstream>
@@ -191,6 +192,14 @@ void registrarEmpresa()
 		interfaz.establecerTextoEtiqueta( "MensajeErrorRegistrarNombreEmpresa", ia.what() );
 		interfaz.mostrarElemento( "MensajeErrorRegistrarNombreEmpresa" );
 	}
+}
+
+// Peso a string
+string pesoString( double peso, int precision )
+{
+	stringstream pesoStr;
+	pesoStr << fixed << setprecision( precision ) << peso << " Kg" << endl;
+	return pesoStr.str();
 }
 
 // Encripta la cadena dado un número

@@ -39,6 +39,13 @@ void iniciar()
         interfaz.conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_main_quit ), nullptr );
         actualizarTiempo( nullptr, nullptr );
         
+        //
+        GtkCssProvider *provider = gtk_css_provider_new ();
+    	GdkDisplay *display = gdk_display_get_default();
+    	GdkScreen *screen = gdk_display_get_default_screen(display);
+    	gtk_style_context_add_provider_for_screen (screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
+    	gtk_css_provider_load_from_data ( provider, "#IniciarSesion{background-color: #000000;}", -1, NULL );
+
         // ¿Primer inicio?
         primerInicio();
 
@@ -65,6 +72,7 @@ void iniciar()
 
         // Carga la configuración de la bascula
         lectorBascula.cargarConfiguracion();
+        cargarOpcionesImpresion();
         
         if( !esInicio ){
             irHacia( nullptr, (void *)"IniciarSesion" );
@@ -114,6 +122,10 @@ void conectarSenales()
     // Vista Inicio
     interfaz.conectarSenal( "BotonBascula", "clicked", G_CALLBACK( irHacia ), (void *)"Bascula" );
     interfaz.conectarSenal( "BotonConfiguracion", "clicked", G_CALLBACK( vistaConfiguracion ), nullptr );
+
+    // Enlace hacia los créditos
+    interfaz.conectarSenal( "EnlaceCreditos", "activate-link", G_CALLBACK( irHacia ), (void *)"Creditos" );
+    interfaz.conectarSenal( "EnlaceCreditosRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
     
     // Barra de usuario
     interfaz.conectarSenal( "EnlaceCuenta", "activate-link", G_CALLBACK( vistaCuenta ), nullptr );
@@ -131,7 +143,7 @@ void conectarSenales()
     
     // Nuevo para ticket interno
     interfaz.conectarSenal( "EntradaNumeroPlacasInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
-    interfaz.conectarSenal( "BotonCalcularDescuento", "clicked", G_CALLBACK( internoLeerDescuento ), nullptr );
+    interfaz.conectarSenal( "BotonCalcularDescuento", "clicked", G_CALLBACK( internoActualizarPesoNeto ), nullptr );
     interfaz.conectarSenal( "NoDescuentoInterno", "toggled", G_CALLBACK( internoHabilitarDescuento ), nullptr );
     interfaz.conectarSenal( "RegistraEntrada", "toggled", G_CALLBACK( internoSeleccionarTipo ), nullptr );
 
@@ -147,7 +159,7 @@ void conectarSenales()
 
     // Vista de configuración
     interfaz.conectarSenal( "EnlaceConfiguracionRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
-    interfaz.conectarSenal( "BotonGuardarConfiguracion", "clicked", G_CALLBACK( lectorBasculaActualizarOpciones ), nullptr );
+    interfaz.conectarSenal( "BotonGuardarConfiguracion", "clicked", G_CALLBACK( guardarConfiguracion ), nullptr );
 }
 
 //
@@ -337,3 +349,5 @@ void actualizarTiempo( GtkWidget *widget, gpointer ptr )
     // Establece el saludo
     interfaz.establecerTextoEtiqueta( "Saludo", saludo );
 }
+
+

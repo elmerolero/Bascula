@@ -17,8 +17,8 @@ class Ticket
 		unsigned int obtenerFolio() const;
 		
 		// Fecha de registro
-		void establecerFechaRegistro( std::string fechaRegistro );
-		std::string obtenerFechaRegistro() const;
+		void establecerFecha( std::string fechaRegistro );
+		std::string obtenerFecha() const;
 		
 		// Tipo de registro
 		void establecerTipoRegistro( int tipoRegistro );
@@ -66,11 +66,11 @@ class Ticket
 		bool estaDescuentoEstablecido() const;
 		
 		// Peso neto
-		void calcularPesoNeto();
+		void establecerPesoNeto( std::string pesoNetoStr );
 		void establecerPesoNeto( double pesoNeto );
 		double obtenerPesoNeto() const;
-		void establecerPesoNetoCalculado( bool pesoNetoEstablecido );
-		bool estaPesoNetoCalculado() const;
+		void establecerPesoNetoEstablecido( bool pesoNetoEstablecido );
+		bool estaPesoNetoEstablecido() const;
 
 		// Permite  establecer la hora de entrada
 		void establecerHoraEntrada( std::string horaEntrada );
@@ -97,7 +97,7 @@ class Ticket
 		std::string obtenerNombreBasculista() const;
 		
 		// Imprime los datos del ticket
-		void imprimir( std::string nombreEmpresa ) const;
+		void imprimir( std::string nombreEmpresa, unsigned int numeroCopias ) const;
 	
 	private:
 		unsigned int folio;

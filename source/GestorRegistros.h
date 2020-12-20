@@ -40,6 +40,7 @@ extern bool esInicio;
 
 // Nombre de la empresa
 extern std::string nombreEmpresa;
+extern unsigned int numeroCopias;
 
 // Obtiene el contador de los folios
 void obtenerFolioActualInterno();
@@ -61,9 +62,12 @@ void crearRegistroPendiente( Ticket *ticket );
 void finalizarRegistro( Ticket *ticket );
 void finalizarRegistroPublico( TicketPublico *registroPublico );
 
+void guardarConfiguracion(); 
+
 // Realiza operaciones con el nombre de la empresa
 void registrarNombreEmpresa( std::string nombre );
 bool cargarNombreEmpresa();
+void cargarOpcionesImpresion();
 
 // Limpia la lista de tickets dada
 void limpiarRegistrosInternos( std::list< Ticket * > &registros );

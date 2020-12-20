@@ -11,7 +11,7 @@ class LectorBascula
 		LectorBascula();
 
 		void abrir( Widget &interfaz );
-		const char *leer();
+		std::string leer();
 		void actualizarOpciones();
 		void iniciarOpcion();
 		void cerrar();
@@ -22,6 +22,9 @@ class LectorBascula
 		
 		void establecerLecturaManual( bool lecturaManual );
 		bool lecturaManualActivada() const;
+
+		void establecerPeso( double peso );
+		double obtenerPeso() const;
 		
 		void establecerActivo( bool activo );
 		bool estaActivo() const;
@@ -55,8 +58,9 @@ class LectorBascula
 		bool lecturaManual;				// Indica si la lectura del peso se hizo de manera manual
 		guint botonLectorBasculaId;		// Identificador del boton de lectura
 		guint comboBoxLectorBasculaId;  // Indentificador del comboBoxText con las opciones que puede manejar la báscula
+		double peso;					// Peso leído por la báscula
 
-		std::string puerto;					// Puerto seleccionado
+		std::string puerto;				// Puerto seleccionado
 		unsigned int bytesIgnorados; 	// Indica el número de bytes a ignorar
 		DWORD baudRate;					// Velocidad de conexión
 		BYTE byteSize;					// Tamaño en bits

@@ -4,6 +4,7 @@
 #include <fstream>
 #include <stdexcept>
 #include <sstream>
+#include <iomanip>
 #include "Widget.h"
 #include "Aplicacion.h"
 using namespace std;
@@ -23,7 +24,7 @@ bool actualizando;
 
 LectorBascula::LectorBascula():
 	activado( false ), lecturaManual( false ), botonLectorBasculaId( 0 ), comboBoxLectorBasculaId( 0 ), bytesIgnorados( 4 ), baudRate( CBR_9600 ),
-	byteSize( 8 ), stopBits( 0 ), parity( NOPARITY )
+	byteSize( 8 ), stopBits( 0 ), parity( NOPARITY ), peso( 0 )
 {
 
 }
@@ -39,14 +40,32 @@ void LectorBascula::abrir( Widget &interfaz )
 	actualizarOpciones();
 	comboBoxLectorBasculaId = interfaz.conectarSenal( "BasculasDisponibles", "changed", G_CALLBACK( lectorBasculaIniciarOpcion ), nullptr );
 
+	// Establece el peso de entrada
 	interfaz.establecerTextoEntrada( "EntradaPeso", "" );
-	interfaz.establecerTextoEtiqueta( "EtiquetaPeso", "0.0 Kg" );
+	interfaz.establecerTextoEtiqueta( "EtiquetaPeso", "0,00 Kg" );
+
+	// Establece el peso leído en cero
+	establecerPeso( 0.f );
 }
 
-const char *LectorBascula::leer()
+string LectorBascula::leer()
 {
+	// Crea un string stream para leer el peso
+	stringstream peso;
+	if( lecturaManualActivada() ){
+		try{
+			double pesoLeido = stod( interfaz.obtenerTextoEntrada( "EntradaPeso" ) );
+			establecerPeso( pesoLeido );
+		}
+		catch( invalid_argument &ia ){
+			throw invalid_argument( "El peso introducido no es válido." );
+		}
+	}
+
+	peso << fixed << setprecision( 2 ) << obtenerPeso() << " Kg";
+
 	// Establece el peso leído en la etiqueta
-	return ( lecturaManualActivada() ? interfaz.obtenerTextoEntrada( "EntradaPeso" ) : interfaz.obtenerTextoEtiqueta( "EtiquetaPeso" ) );
+	return peso.str();
 }
 
 void LectorBascula::actualizarOpciones()
@@ -490,19 +509,15 @@ void lectorBasculaActualizarOpciones()
 					  << (int)lectorBascula.obtenerParity() << endl;
 
 		archivoConfig.close();
-
-		mostrarMensaje( "Configuración actualizada." );
-		irHacia( nullptr, (void *)"Inicio" );
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorConfiguracion", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorConfiguracion" );
-
 		lectorBascula.establecerBaudRate( baudrate );
 		lectorBascula.establecerByteSize( byteSize );
 		lectorBascula.establecerStopBits( stopBits );
 		lectorBascula.establecerParity( parity );
 		lectorBascula.establecerBytesIgnorados( bytesIgnorados );
+
+		throw ia;
 	}
 }
 
@@ -528,6 +543,16 @@ void lectorBasculaActualizarPeso()
 			actualizando = false;
 		}
 	}
+}
+
+void LectorBascula::establecerPeso( double peso )
+{
+	this -> peso = peso;
+}
+
+double LectorBascula::obtenerPeso() const
+{
+	return peso;
 }
 
 // Conecta con el medidor
@@ -593,7 +618,18 @@ void lectorBasculaObtenerPeso()
         	data << serialBuffer[ j ];
     	}
 
+    	// Convierte el peso leído a un número double
+    	try{
+    		double pesoLeido = stod( data.str() );
+    		lectorBascula.establecerPeso( pesoLeido );
+    	}
+    	catch( invalid_argument &ia ){
+    		lectorBascula.establecerPeso( 0.f );
+    	}
+
 		// Establece el tamaño en la etiqueta
+		data.str( "" );
+		data << fixed << setprecision( 2 ) << lectorBascula.obtenerPeso() << " Kg";
 		interfaz.establecerTextoEtiqueta( "EtiquetaPeso", data.str() );
 	}
 }

@@ -216,26 +216,25 @@ double TicketPublico::obtenerPesoTara() const
 }
 
 // Peso neto
-void TicketPublico::calcularPesoNeto()
+void TicketPublico::establecerPesoNeto( string pesoNetoStr )
 {
 	// ¿Se establecieron correctamente los campos necesarios para calcular el peso neto?
-	if( !estaPesoBrutoEstablecido() || !estaPesoTaraEstablecido() ){
-		establecerPesoNetoEstablecido( false );
-		throw invalid_argument( "No se han establecido los campos necesarios para calcular el peso neto." );
+	try{
+		double pesoNeto = stod( pesoNetoStr );
+		establecerPesoNeto( pesoNeto );
 	}
-
-	establecerPesoNeto( abs( obtenerPesoBruto() - obtenerPesoTara() ) );
+	catch( invalid_argument &ia ){
+		throw invalid_argument( "El peso neto introducido no es válido." );
+	}
 }
 
 void TicketPublico::establecerPesoNeto( double pesoNeto )
 {
-	if( !estaPesoBrutoEstablecido() || !estaPesoTaraEstablecido() ){
-		establecerPesoNetoEstablecido( false );
+	if( pesoNeto < 0 ){
 		throw invalid_argument( "El peso neto debe ser un valor absoluto positivo." );
 	}
 
 	this -> pesoNeto = pesoNeto;
-	establecerPesoNetoEstablecido( true );
 }
 
 double TicketPublico::obtenerPesoNeto() const

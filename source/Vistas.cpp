@@ -383,7 +383,6 @@ void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
 void vistaFinalizarRegistroPublico()
 {
 	// Busca el ticket
-	// Busca el ticket
 	try{
 		registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaSeguimiento" ) ), registrosPublicosPendientes );
 	}
@@ -434,7 +433,7 @@ void vistaFinalizarRegistroPublico()
 	
 	// Hora entrada y peso bruto
 	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", ( registroPublico -> estaPesoBrutoEstablecido() ? registroPublico -> obtenerHoraEntrada() : "No establecida" ) );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", ( registroPublico -> estaPesoBrutoEstablecido() ? to_string( registroPublico -> obtenerPesoBruto() ) + " Kg" : "No establecido" ) );
+	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", ( registroPublico -> estaPesoBrutoEstablecido() ? pesoString( registroPublico -> obtenerPesoBruto(), 2 ) : "No establecido" ) );
 	if( registroPublico -> estaPesoBrutoEstablecido() ){
 		// Deshabilita la señal para leer el peso bruto
 		interfaz.desconectarSenal( "BotonLeerPesoBrutoPublico", botonLeerPesoBrutoPublicoId );
@@ -442,10 +441,10 @@ void vistaFinalizarRegistroPublico()
 	
 	// Hora salida y peso tara
 	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", ( registroPublico -> estaPesoTaraEstablecido() ? registroPublico -> obtenerHoraSalida() : "No establecida" ) );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", ( registroPublico -> estaPesoTaraEstablecido() ? to_string( registroPublico -> obtenerPesoTara() ) + " Kg" : "No establecido" ) );
+	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", ( registroPublico -> estaPesoTaraEstablecido() ? pesoString( registroPublico -> obtenerPesoTara(), 2 ) : "No establecido" ) );
 	
 	// Peso neto
-	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", ( registroPublico -> estaPesoNetoEstablecido() ? to_string( registroPublico -> obtenerPesoNeto() ) + " Kg" : "No establecido" ) );
+	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", ( registroPublico -> estaPesoNetoEstablecido() ? pesoString( registroPublico -> obtenerPesoNeto(), 2 ) : "No establecido" ) );
 	
 	// Establece la señal para cancelar el registro
 	interfaz.desconectarSenal( "EnlaceRegresarPublico", botonCancelarPublicoId );
@@ -543,7 +542,7 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	botonCancelarInternoId = interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( internoCancelarRegistro ), nullptr );
 	
 	// Es un ticket pendiente hasta que no se demuestre lo contrario
-	pendiente = true;
+	internoPendiente = true;
 
 	// Establece la vista de nuevo ticket
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );

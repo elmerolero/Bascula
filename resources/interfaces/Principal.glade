@@ -100,7 +100,7 @@
     <property name="title" translatable="yes">Control de báscula</property>
     <property name="window_position">center</property>
     <property name="default_width">800</property>
-    <property name="default_height">600</property>
+    <property name="default_height">500</property>
     <child>
       <object class="GtkGrid">
         <property name="visible">True</property>
@@ -256,13 +256,11 @@ Apellidos</property>
                   <object class="GtkGrid">
                     <property name="visible">True</property>
                     <property name="can_focus">False</property>
-                    <property name="margin_right">11</property>
                     <property name="margin_start">10</property>
                     <property name="margin_end">10</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkGrid" id="IniciarSesion">
-                        <property name="visible">True</property>
                         <property name="can_focus">False</property>
                         <property name="halign">center</property>
                         <property name="hexpand">True</property>
@@ -2266,6 +2264,19 @@ Interno</property>
                           <packing>
                             <property name="left_attach">0</property>
                             <property name="top_attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLinkButton" id="EnlaceCreditos">
+                            <property name="label" translatable="yes">Créditos</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="relief">none</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">4</property>
                           </packing>
                         </child>
                       </object>
@@ -6862,7 +6873,6 @@ al programa identificarla y poder establecer su nombre en los registros.</proper
                             <property name="visible">True</property>
                             <property name="can_focus">True</property>
                             <property name="receives_default">False</property>
-                            <property name="margin_left">9</property>
                             <property name="margin_start">9</property>
                             <property name="margin_top">10</property>
                             <property name="margin_bottom">10</property>
@@ -6877,6 +6887,236 @@ al programa identificarla y poder establecer su nombre en los registros.</proper
                       <packing>
                         <property name="left_attach">0</property>
                         <property name="top_attach">21</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkGrid" id="Creditos">
+                        <property name="can_focus">False</property>
+                        <property name="margin_top">10</property>
+                        <property name="margin_bottom">10</property>
+                        <property name="column_spacing">5</property>
+                        <child>
+                          <object class="GtkLabel" id="TituloCuenta2">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Créditos</property>
+                            <attributes>
+                              <attribute name="font-desc" value="Standard Symbols L 18"/>
+                            </attributes>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLinkButton" id="EnlaceCreditosRegresar">
+                            <property name="label" translatable="yes">Regresar</property>
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="receives_default">True</property>
+                            <property name="relief">none</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="halign">center</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">Desarrollado por Mayra Elizabeth Barbosa Salas e Ismael Salas López para Básculas Bisa S.A. de C.V.
+
+Queda prohibida su reproducción parcial o total sin el consentimiento previo del autor, su uso sin la adquisión de una licencia previa
+así como su modificación y/o manipulación con el uso de los medios proporcionados por el programa en sí mismo.
+</property>
+                            <property name="justify">center</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">2</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can_focus">False</property>
+                            <property name="label" translatable="yes">Íconos provistos por:</property>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">3</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkScrolledWindow">
+                            <property name="visible">True</property>
+                            <property name="can_focus">True</property>
+                            <property name="hexpand">True</property>
+                            <property name="vexpand">True</property>
+                            <property name="shadow_type">in</property>
+                            <child>
+                              <object class="GtkViewport">
+                                <property name="visible">True</property>
+                                <property name="can_focus">False</property>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can_focus">False</property>
+                                    <property name="halign">center</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="vexpand">True</property>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkLinkButton">
+                                        <property name="label" translatable="yes">Freepik</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="relief">none</property>
+                                        <property name="uri">https://www.flaticon.com/authors/freepik</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLinkButton">
+                                        <property name="label" translatable="yes">Becris</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="valign">start</property>
+                                        <property name="relief">none</property>
+                                        <property name="uri">https://www.flaticon.com/authors/becris
+
+</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLinkButton">
+                                        <property name="label" translatable="yes">Pixel Perfect</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="relief">none</property>
+                                        <property name="uri">https://www.flaticon.com/authors/pixel-perfect
+</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLinkButton">
+                                        <property name="label" translatable="yes">Icongeek26</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="relief">none</property>
+                                        <property name="uri">https://www.flaticon.com/authors/icongeek26
+
+</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">3</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLinkButton">
+                                        <property name="label" translatable="yes">Monkik</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="relief">none</property>
+                                        <property name="uri">https://www.flaticon.com/authors/monkik
+
+</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">4</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLinkButton">
+                                        <property name="label" translatable="yes">Eucalyp</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="relief">none</property>
+                                        <property name="uri">https://www.flaticon.com/authors/eucalyp
+
+</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">5</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLinkButton">
+                                        <property name="label" translatable="yes">Xnimrodx</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="valign">center</property>
+                                        <property name="relief">none</property>
+                                        <property name="uri">https://www.flaticon.com/authors/xnimrodx
+
+</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">6</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLinkButton">
+                                        <property name="label" translatable="yes">Vectors Market</property>
+                                        <property name="visible">True</property>
+                                        <property name="can_focus">True</property>
+                                        <property name="receives_default">True</property>
+                                        <property name="relief">none</property>
+                                        <property name="uri">https://www.flaticon.com/authors/vectors-market</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">7</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="left_attach">0</property>
+                            <property name="top_attach">4</property>
+                          </packing>
+                        </child>
+                      </object>
+                      <packing>
+                        <property name="left_attach">0</property>
+                        <property name="top_attach">22</property>
                       </packing>
                     </child>
                   </object>

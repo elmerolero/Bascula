@@ -148,7 +148,7 @@ void conectarSenales()
     interfaz.conectarSenal( "RegistraEntrada", "toggled", G_CALLBACK( internoSeleccionarTipo ), nullptr );
 
     // Nuevo para ticket publico
-    interfaz.conectarSenal( "ViajeLocal", "toggled", G_CALLBACK( publicoSeleccionarTipo ), nullptr );
+    interfaz.conectarSenal( "EntradaNumeroPlacasPublico", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
 
     // Vista de registro de peso
     interfaz.conectarSenal( "BotonCancelarLectura", "clicked", G_CALLBACK( lectorBasculaCerrar ), nullptr );

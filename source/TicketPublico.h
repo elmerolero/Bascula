@@ -56,7 +56,7 @@ class TicketPublico
 		double obtenerPesoTara() const;
 		
 		// Peso neto
-		void calcularPesoNeto();
+		void establecerPesoNeto( std::string pesoNetoStr );
 		void establecerPesoNeto( double pesoNeto );
 		double obtenerPesoNeto() const;
 		

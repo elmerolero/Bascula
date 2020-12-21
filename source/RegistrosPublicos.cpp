@@ -1,6 +1,7 @@
 #include "RegistrosPublicos.h"
 #include "Aplicacion.h"
 #include "LectorBascula.h"
+#include "Funciones.h"
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -9,98 +10,129 @@
 using namespace std;
 
 TicketPublico *registroPublico = nullptr;
+bool publicoPendiente = true;
 
-// Registra un ticket pendiente
+TicketPublico *crearRegistroPublico()
+{
+	// Crea el ticket publico
+	TicketPublico *ticket = new TicketPublico();
+	if( ticket == nullptr ){
+		throw runtime_error( "Hubo un error al crear el ticket." );
+	}
+
+	return ticket;
+}
+
 void publicoRegistrarPendiente()
 {
-    // Obtiene el producto introducido
-    string nombreProducto = interfaz.obtenerTextoEntrada( "EntradaNombreProductoPublico" );
-    Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
-    
-    try{
-	registroPublico -> establecerFolio( ++folioActualPublico );
-	registroPublico -> establecerFecha( interfaz.obtenerTextoEtiqueta( "EntradaFechaPublico" ) );
-	registroPublico -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
-	registroPublico -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorPublico" ) );
-	registroPublico -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasPublico" ) );
-	registroPublico -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
-	
-	// ¿Se registró al menos el peso bruto?
-	if( !registroPublico -> estaPesoBrutoEstablecido() ){
-	    interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", "Es necesario registrar el peso bruto." );
-	    interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
-	    --folioActualPublico;
-	    return;
-	}
-	
-	// Establece si está pendiente
-	registroPublico -> establecerPendiente( !registroPublico -> estaPesoNetoEstablecido() );
-	
-	// Establece el nombre de la persona que generó el ticket
-	registroPublico -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
-	
-	crearRegistroPublicoPendiente( registroPublico );
-	
-	// Muestra mensaje de que el registro fue correctamente registrado
-	mostrarMensaje( "Registro creado\ncorrectamente." );
-	
-	// Actualiza la vista de tickets
-	publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorRegistros" );
+	// Crea el nuevo registro
+	TicketPublico *registroPublico;
+
+	try{
+		// Crea el nuevo registro
+		registroPublico = crearRegistroPublico();
+
+		// Obtiene el producto introducido
+   		string nombreProducto = interfaz.obtenerTextoEntrada( "EntradaNombreProductoPublico" );
+    	Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
+
+    	// Establece los datos obligatorios
+    	registroPublico -> establecerFolio( ++folioActualPublico );
+		registroPublico -> establecerFecha( interfaz.obtenerTextoEtiqueta( "EntradaFechaPublico" ) );
+		registroPublico -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
+		registroPublico -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorPublico" ) );
+		registroPublico -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasPublico" ) );
+		registroPublico -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
+		registroPublico -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
+
+		// Registra el peso bruto
+		registroPublico -> establecerPesoBruto( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoPublico" ) );
+		registroPublico -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaPublico" ) );
+		registroPublico -> establecerPesoBrutoEstablecido( true );
+
+		// Registra el tipo de registro
+		if( interfaz.obtenerEstadoBotonToggle( "ViajeLocal" ) ){
+	    	registroPublico -> establecerTipoViaje( VIAJE_LOCAL );
+		}
+		else{
+	    	registroPublico -> establecerTipoViaje( VIAJE_FORANEO );
+		}
+
+		// Registra si está pendiente
+		registroPublico -> establecerPendiente( true );
 		
-	// Establece las vistas
-	irHacia( nullptr, (void *)"Tickets" );
-    }
-    catch( invalid_argument &ia ){
-	folioActualPublico--;
-	interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
-	interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
-    }
+		// Crea el registro publico pendiente
+		crearRegistroPublicoPendiente( registroPublico );
+
+		// Muestra mensaje de que el registro fue correctamente registrado
+		mostrarMensaje( "Registro creado\ncorrectamente." );
+	
+		// Actualiza la vista de tickets
+		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorRegistros" );
+		
+		// Establece las vistas
+		irHacia( nullptr, (void *)"Tickets" );
+	}
+	catch( invalid_argument &ia ){
+		delete registroPublico;
+		registroPublico = nullptr;
+		folioActualPublico--;
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+	}
+	catch( runtime_error &re ){
+		folioActualPublico--;
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", re.what() );
+		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+	}
 }
 
 // Finalizar ticket
 void publicoFinalizarPendiente()
 {
-    // ¿Está establecido el peso bruto?
-    if( !registroPublico -> estaPesoBrutoEstablecido() ){
-	interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", "Es necesario establecer el peso bruto." );
-	interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
-	return;
-    }
-    
-    // ¿Está establecido el peso tara?
-    if( !registroPublico -> estaPesoTaraEstablecido() ){
-	interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", "Es necesario indicar el peso tara." );
-	interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
-	return;
-    }
-    
-    // ¿Está registrado el peso neto?
-    if( !registroPublico -> estaPesoNetoEstablecido() ){
-	interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", "Es necesario calcular el peso neto." );
-	interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
-	return;
-    }
-    
-    // Actualiza el tipo de viaje en caso de que hubiera cambiado
-    if( interfaz.obtenerEstadoBotonToggle( "ViajeLocal" ) ){
-	registroPublico -> establecerTipoViaje( VIAJE_LOCAL );
-    }
-    else{
-	registroPublico -> establecerTipoViaje( VIAJE_FORANEO );
-    }
-    
-    registroPublico -> establecerPendiente( false );
-    
-    finalizarRegistroPublico( registroPublico );
-    
-    // Actualiza la vista de tickets
-    publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
+	try{
+		// Registra el nuevo peso tara
+		registroPublico -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraPublico" ) );
+		registroPublico -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaPublico" ) );
+		registroPublico -> establecerPesoTaraEstablecido( true );
+
+		// Registra el nuevo peso neto
+		if( registroPublico -> estaPesoBrutoEstablecido() && registroPublico -> estaPesoTaraEstablecido() && registroPublico -> estaPendiente() ){
+			registroPublico -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoPublico" ) );
+			registroPublico -> establecerPesoNetoEstablecido( true );
+		}
+		else{
+			interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar todos los campos adecuadamente para calcular el peso neto." );
+			interfaz.mostrarElemento( "MensajeErrorCampo" );
+			return;
+		}
+
+		// Actualiza el tipo de viaje en caso de que hubiera cambiado
+	    if( interfaz.obtenerEstadoBotonToggle( "ViajeLocal" ) ){
+			registroPublico -> establecerTipoViaje( VIAJE_LOCAL );
+	    }
+	    else{
+			registroPublico -> establecerTipoViaje( VIAJE_FORANEO );
+	    }
+	    
+	    registroPublico -> establecerPendiente( false );
+	    
+	    finalizarRegistroPublico( registroPublico );
+	    
+	    // Actualiza la vista de tickets
+	    publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
+			
+	    // Establece las vistas
+	    irHacia( nullptr, (void *)"Tickets" );
 		
-    // Establece las vistas
-    irHacia( nullptr, (void *)"Tickets" );
-	
-    // Muestra un mensaje de que fue finalizado correctamente
-    mostrarMensaje( "Registro realizado correctamente." );
+	    // Muestra un mensaje de que fue finalizado correctamente
+	    mostrarMensaje( "Registro realizado correctamente." );
+
+	}
+	catch( invalid_argument &ia ){
+		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
+		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+	}
 }
 
 // Registra el peso bruto
@@ -122,7 +154,7 @@ void publicoRegistrarPesoBruto()
     }
     
     // Intenta calcular el peso neto
-    publicoCalcularPesoNeto();
+    publicoActualizarPesoNeto();
 }
 
 // Registra el peso tara
@@ -150,23 +182,49 @@ void publicoRegistrarPesoTara()
     }
     
     // Calcula el peso neto
-    publicoCalcularPesoNeto();
+    publicoActualizarPesoNeto();
 }
 
-// Calcula el peso neto
-void publicoCalcularPesoNeto()
+//
+double publicoCalcularPesoNeto( double pesoBruto, double pesoTara )
 {
-    try{
-		registroPublico -> calcularPesoNeto();
-		
-		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", to_string( registroPublico -> obtenerPesoNeto() ) + " Kg"  );
-		interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Finalizar" );
-    }
-    catch( invalid_argument &ia ){
-		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado
-		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", "No establecido" );
-		interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Pendiente" );
-    }
+	return abs( pesoBruto - pesoTara );
+}
+
+// Actualiza el peso neto
+void publicoActualizarPesoNeto()
+{
+	// Variables
+	double pesoBruto;
+	double pesoTara;
+	bool completo = true;
+
+	// Intenta obtener el peso bruto leído
+	try{
+		pesoBruto = stod( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoPublico" ) );
+	}
+	catch( invalid_argument &ia ){
+		completo = false;
+	}
+
+	// Intenta obtener el peso tara
+	try{
+		pesoTara = stod( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraPublico" ) );
+	}
+	catch( invalid_argument &ia ){
+		completo = false;
+	}
+
+	// Intenta calculara el peso neto
+	if( completo ){
+		interfaz.ocultarElemento( "MensajeErrorCampoPublico" );
+		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", pesoString( publicoCalcularPesoNeto( pesoBruto, pesoTara ), 2 ) );
+	}
+	else{
+		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado		
+		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );
+		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Pendiente" );
+	}
 }
 
 // Selecciona el tipo de registro publico

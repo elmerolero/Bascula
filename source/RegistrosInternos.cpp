@@ -7,11 +7,12 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <cmath>
 using namespace std;
 
 // Ticket a crear
 Ticket *ticket = nullptr;
-bool pendiente = true;
+bool internoPendiente = true;
 
 
 Ticket *crearRegistroInterno()
@@ -56,7 +57,7 @@ void internoRegistrarPendiente()
 		nuevo -> establecerPesoBrutoEstablecido( true );
 
 		// Lee el peso tara
-		if( !pendiente ){
+		if( !internoPendiente ){
 			nuevo -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraInterno" ) );
 			nuevo -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaInterno" ) );
 			nuevo -> establecerPesoTaraEstablecido( true );
@@ -75,7 +76,7 @@ void internoRegistrarPendiente()
 		}
 
 		// Intenta calcular el peso neto
-		if( nuevo -> estaPesoBrutoEstablecido() && nuevo -> estaPesoTaraEstablecido() && !pendiente ){
+		if( nuevo -> estaPesoBrutoEstablecido() && nuevo -> estaPesoTaraEstablecido() && !internoPendiente ){
 			if( nuevo -> permitirDescuento() && nuevo -> estaDescuentoEstablecido() ){
 				nuevo -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" ) );
 				nuevo -> establecerPesoNetoEstablecido( true );
@@ -101,7 +102,7 @@ void internoRegistrarPendiente()
 		nuevo -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
 
 		// ¿Está pendiente?
-		nuevo -> establecerPendiente( pendiente );
+		nuevo -> establecerPendiente( internoPendiente );
 		
 		// Crea el nuevo registros
 		crearRegistroPendiente( nuevo );
@@ -150,7 +151,7 @@ void internoFinalizarPendiente()
 		}
 
 		// Registra el peso neto
-		if( ticket -> estaPesoBrutoEstablecido() && ticket -> estaPesoTaraEstablecido() && !pendiente ){
+		if( ticket -> estaPesoBrutoEstablecido() && ticket -> estaPesoTaraEstablecido() && !internoPendiente ){
 			if( ticket -> permitirDescuento() && ticket -> estaDescuentoEstablecido() ){
 				ticket -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" ) );
 				ticket -> establecerPesoNetoEstablecido( true );
@@ -163,6 +164,7 @@ void internoFinalizarPendiente()
 		else{
 			interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar todos los campos adecuadamente para establecer el peso neto." );
 			interfaz.mostrarElemento( "MensajeErrorCampo" );
+			return;
 		}
 
 		// Actualiza el tipo de registro
@@ -320,13 +322,13 @@ void internoActualizarPesoNeto()
 		interfaz.ocultarElemento( "MensajeErrorCampo" );
 		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", pesoString( internoCalcularPesoNeto( pesoBruto, pesoTara, descuento ), 2 ) );
 		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
-		pendiente = false;
+		internoPendiente = false;
 	}
 	else{
-		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado
-		pendiente = true;
+		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado		
 		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );
 		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Pendiente" );
+		internoPendiente = true;
 	}
 }
 

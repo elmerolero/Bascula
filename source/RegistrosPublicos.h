@@ -12,13 +12,14 @@
 #include "TicketPublico.h"
 
 extern TicketPublico *registroPublico;
+extern bool publicoPendiente;
 
 void publicoRegistrarPendiente();
 void publicoFinalizarPendiente();
 void publicoRegistrarPesoBruto();
 void publicoRegistrarPesoTara();
-void publicoCalcularPesoNeto();
-void publicoSeleccionarTipo();
+double publicoCalcularPesoNeto( double pesoBruto, double pesoTara );
+void publicoActualizarPesoNeto();
 void publicoCancelarRegistro();
 void publicoCancelarFinalizacion();
 void publicoObtenerPorFecha( std::list <TicketPublico *> &registros, std::string fecha );

@@ -1,6 +1,4 @@
 Hubo un error en el regis
-Numero de placa vacío
-Identificar registros pendientes por folio
 No imprimio;
 Agregar de autoriza
 3 Copias de uso interno (imprimirlas en la misma hoja.
@@ -8,3 +6,4 @@ Juan Carlos Cleofas Calleros
 JuanCaJC23
 El Peso neto calculado fue Erròneo
 No registra el nombre de la impresa ni al usuario como administrador n caso de fallo.G
+EDITAR NOMBRE EMPRESA

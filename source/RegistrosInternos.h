@@ -11,7 +11,7 @@
 
 // Ticket a crear
 extern Ticket *ticket;
-extern bool pendiente;
+extern bool internoPendiente;
 
 void internoRegistrarPendiente();
 void internoFinalizarPendiente();

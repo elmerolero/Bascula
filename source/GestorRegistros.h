@@ -6,6 +6,7 @@
 #include "Ticket.h"
 #include "TicketPublico.h"
 #include "ContenedorRegistros.h"
+#include <gtk/gtk.h>
 
 // Base de datos
 extern Database database;
@@ -34,6 +35,14 @@ extern ContenedorRegistros empresas;
 
 // Registros de usuarios
 extern std::list< Usuario * > registrosUsuarios;
+
+// Completador para el nombre del conductor
+extern GtkListStore *listaNombresConductor;
+extern GtkEntryCompletion *completadorNombresConductor;
+
+// Completador 
+extern GtkListStore *listaNumerosPlaca;
+extern GtkEntryCompletion *completadorNumerosPlaca;
 
 // Primer inicio
 extern bool esInicio;
@@ -91,6 +100,10 @@ TicketPublico *buscarRegistroPublicoPorNumeroPlaca( std::string numeroPlacas, st
 
 // Busca un usuario por su nombre de usuario
 Usuario *buscarUsuarioPorNombreUsuario( std::string nombreUsuario, std::list< Usuario * > &registros );
+
+// 
+void actualizarElementosLista( GtkListStore **listaNombresRegistro, GtkEntryCompletion **completador, std::string registro );
+void agregarElementoLista( GtkListStore **listaNombresRegistro, std::string nombre );
 
 // Actualiza si el usuario es o no administrador
 void actualizarEstadoAdministrador();

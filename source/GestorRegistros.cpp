@@ -48,6 +48,56 @@ string nombreEmpresa;
 // Numero de copias a imprimir en el ticket
 unsigned int numeroCopias;
 
+// Completador para el nombre del conductor
+GtkListStore *listaNombresConductor = nullptr;
+GtkEntryCompletion *completadorNombresConductor = nullptr;
+
+// Completador 
+GtkListStore *listaNumerosPlaca = nullptr;
+GtkEntryCompletion *completadorNumerosPlaca = nullptr;
+
+// Crea una nueva lista
+void actualizarElementosLista( GtkListStore **listaNombresRegistro, GtkEntryCompletion **completador, std::string registro )
+{
+    // ¿La lista está vacía?
+    if( *listaNombresRegistro == nullptr ){
+        // Crea la nueva lista
+        *listaNombresRegistro = gtk_list_store_new( 1, G_TYPE_STRING );
+    }
+
+    // Conecta con la base de datos
+    database.open( nombreArchivo );
+
+    // Limpia la lista
+    gtk_list_store_clear( *listaNombresRegistro );
+
+    // Obtiene la clave actual de productos registrados
+    string consulta = "select distinct( " + registro + " ) from registros_internos where " + registro + " != '';";
+    database.query( consulta );
+    if( rows.size() > 0 ){
+        for( Row *row : rows ){
+            string nombreRegistro = row -> columns.at( 0 );
+            agregarElementoLista( listaNombresRegistro, nombreRegistro );
+        }
+    }
+    
+    database.close();
+
+    // Agrega el completador
+    *completador = gtk_entry_completion_new();
+    gtk_entry_completion_set_text_column( *completador, 0);
+    gtk_entry_completion_set_model( *completador, GTK_TREE_MODEL( *listaNombresRegistro ) );
+}
+
+// Agrega un elemento a la lista dada
+void agregarElementoLista( GtkListStore **listaNombresRegistros, std::string nombre )
+{
+    // Agrega los nombres de registro de autocompletado
+    GtkTreeIter iterador;
+    gtk_list_store_append( *listaNombresRegistros, &iterador );
+    gtk_list_store_set( *listaNombresRegistros, &iterador, 0, nombre.c_str(), -1 );
+}
+
 // Obtiene el folio actual en el que se encuentra el registro
 void obtenerFolioActualInterno()
 {
@@ -209,7 +259,7 @@ void crearRegistroPendiente( Ticket *ticket )
              << ( ticket -> estaDescuentoEstablecido() ? ticket -> obtenerDescuento() : 0 ) << ", " << ticket -> estaDescuentoEstablecido() << ", " << ticket -> permitirDescuento() << ", "
              << ( ticket -> estaPesoNetoEstablecido() ? ticket -> obtenerPesoNeto() : 0 ) << ", " << ticket -> estaPesoNetoEstablecido() << ", '"
              << ticket -> obtenerObservaciones() << "', " << ticket -> esEntradaManual() << ", " << ticket -> estaPendiente() << ", '" << ticket -> obtenerNombreBasculista() << "' )";
-            
+
     // Inserta el nuevo ticket
     try{
 	   database.query( consulta.str() );
@@ -226,6 +276,10 @@ void crearRegistroPendiente( Ticket *ticket )
     
     // Cierra la conexion
     database.close();
+
+    // Actualiza los registros actuales
+    actualizarElementosLista( &listaNombresConductor, &completadorNombresConductor, "nombre_conductor" );
+    actualizarElementosLista( &listaNumerosPlaca, &completadorNumerosPlaca, "numero_placas" );
 }
 
 void finalizarRegistro( Ticket *ticket )
@@ -683,7 +737,7 @@ void generarCodigoRecuperacion()
 void validarCodigoRecuperacion()
 {
     try{
-        string entradaUsuario = usuario.validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaRecuperacionUsuario" ) );
+        string entradaUsuario = Usuario::validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaRecuperacionUsuario" ) );
         string codigoSeguridad = interfaz.obtenerTextoEntrada( "EntradaRecuperacionCodigoSeguridad" );
 
         // Obtiene el código en base el nombre de usuario

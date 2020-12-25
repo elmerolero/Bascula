@@ -98,32 +98,32 @@ Registro *ContenedorRegistros::agregarNuevoRegistro( string nombre )
     Registro *registro = new Registro();
     
     try{
-	// Establece la clave
-	registro -> establecerClave( ++claveActual );
+	   // Establece la clave
+	   registro -> establecerClave( ++claveActual );
 
-	// Establece el nombre
-	registro -> establecerNombre( nombre );
+	   // Establece el nombre
+	   registro -> establecerNombre( nombre );
 	
-	// Lo agrega a los demás registros
-	registros.push_back( registro );
+	   // Lo agrega a los demás registros
+	   registros.push_back( registro );
 
-	// Agrega los nombres de registro de autocompletado
-	GtkTreeIter iterador;
-	gtk_list_store_append( listaNombresRegistros, &iterador );
-	gtk_list_store_set( listaNombresRegistros, &iterador, 0, registro -> obtenerNombre().c_str(), -1 );
+	   // Agrega los nombres de registro de autocompletado
+	   GtkTreeIter iterador;
+	   gtk_list_store_append( listaNombresRegistros, &iterador );
+	   gtk_list_store_set( listaNombresRegistros, &iterador, 0, registro -> obtenerNombre().c_str(), -1 );
 	
-	// Se agrega a la base de datos
-	database.open( nombreArchivo );
-	stringstream consulta;
-	consulta << "insert into " << obtenerNombrePlural() << " values( " << registro -> obtenerClave() << ", '" << registro -> obtenerNombre() << "' )";
-	database.query( consulta.str() );
-	database.close();
+	   // Se agrega a la base de datos
+	   database.open( nombreArchivo );
+	   stringstream consulta;
+	   consulta << "insert into " << obtenerNombrePlural() << " values( " << registro -> obtenerClave() << ", '" << registro -> obtenerNombre() << "' )";
+	   database.query( consulta.str() );
+	   database.close();
     }
     catch( invalid_argument &ia ){
-	delete registro;
-	--claveActual;
-	registro = nullptr;
-	throw invalid_argument( "Debe establecer un nombre válido para " + obtenerNombreSingular() );
+	   delete registro;
+	   --claveActual;
+	   registro = nullptr;
+	   throw invalid_argument( "Debe establecer un nombre válido para " + obtenerNombreSingular() );
     }
 	
     // Returna el registro creado

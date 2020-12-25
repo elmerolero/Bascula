@@ -4,7 +4,7 @@ LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
 OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o LectorBascula.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o
 
 ../build/aplicacion:  main.cpp $(OBJS)
-	$(CC) main.cpp $(CFLAGS) -o ../build/aplicacion $(OBJS) $(LIBS)
+	$(CC) main.cpp aplicacion.res $(CFLAGS) -o ../build/aplicacion $(OBJS) $(LIBS)
 
 GestorRegistros.o: GestorRegistros.h GestorRegistros.cpp
 	$(CC) $(CFLAGS) -c GestorRegistros.h GestorRegistros.cpp
@@ -13,10 +13,10 @@ Aplicacion.o:	Aplicacion.h Aplicacion.cpp
 	$(CC) $(CFLAGS) -c Aplicacion.h Aplicacion.cpp $(LIBS)
 
 Widget.o:	Widget.h Widget.cpp
-	$(CC) $(CFLAGS) -c Widget.cpp $(LIBS)
+	$(CC) $(CFLAGS) -c Widget.h Widget.cpp $(LIBS)
 
 Usuario.o:	Usuario.h Usuario.cpp
-	$(CC) -c Usuario.cpp
+	$(CC) -c Usuario.h Usuario.cpp
 	
 Funciones.o: Funciones.h Funciones.cpp
 	$(CC) $(CFLAGS) -c Funciones.h Funciones.cpp

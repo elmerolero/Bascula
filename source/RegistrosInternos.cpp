@@ -92,10 +92,10 @@ void internoRegistrarPendiente()
 
 		// Registra el tipo de registro
 		if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
-			ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
+			nuevo -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
 		}
 		else{
-			ticket -> establecerTipoRegistro( TIPO_REGISTRO_SALIDA );
+			nuevo -> establecerTipoRegistro( TIPO_REGISTRO_SALIDA );
 		}
 
 		// Nombre del basculista
@@ -103,7 +103,7 @@ void internoRegistrarPendiente()
 
 		// ¿Está pendiente?
 		nuevo -> establecerPendiente( internoPendiente );
-		
+
 		// Crea el nuevo registros
 		crearRegistroPendiente( nuevo );
 

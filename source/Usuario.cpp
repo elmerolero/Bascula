@@ -187,7 +187,7 @@ bool Usuario::esAdministrador() const
 }
 
 // Valida la constraseña del usuario
-string validarContrasena( std::string contrasena ){
+string Usuario::validarContrasena( std::string contrasena ){
     // Formato de validación del nombre introducido
     std::regex formato( "[a-zA-Z0-9_\\-#@?*%$&]*" );
     if( contrasena.empty() ){

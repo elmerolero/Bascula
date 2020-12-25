@@ -19,11 +19,11 @@ void registrarUsuario()
 
 	try{
 		// Obtiene los datos del formulario
-		string nombre = usuario.validarNombre( interfaz.obtenerTextoEntrada( "EntradaRegistroNombre" ) );
-		string apellidos = usuario.validarApellidos( interfaz.obtenerTextoEntrada( "EntradaRegistroApellidos" ) );
-		string nombreUsuario = usuario.validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaRegistroNombreUsuario" ) );
-		string contrasena = usuario.validarContrasena( interfaz.obtenerTextoEntrada( "EntradaRegistroContrasena" ) );
-		string confirmacion = usuario.validarContrasena( interfaz.obtenerTextoEntrada( "EntradaRegistroConfirmarContrasena" ) );
+		string nombre = Usuario::validarNombre( interfaz.obtenerTextoEntrada( "EntradaRegistroNombre" ) );
+		string apellidos = Usuario::validarApellidos( interfaz.obtenerTextoEntrada( "EntradaRegistroApellidos" ) );
+		string nombreUsuario = Usuario::validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaRegistroNombreUsuario" ) );
+		string contrasena = Usuario::validarContrasena( interfaz.obtenerTextoEntrada( "EntradaRegistroContrasena" ) );
+		string confirmacion = Usuario::validarContrasena( interfaz.obtenerTextoEntrada( "EntradaRegistroConfirmarContrasena" ) );
 		
 		// Se asegura de que el usuario que se desea registrar no existe
 		nombreUsuarioOcupado( nombreUsuario );
@@ -70,9 +70,9 @@ void actualizarDatosUsuario()
 		verificarContrasena( contrasenaActual, usuario.obtenerSal(), usuario.obtenerHash() );
 		
 		// Obtiene los datos del formulario
-		string nombre = usuario.validarNombre( interfaz.obtenerTextoEntrada( "EntradaCuentaNombre" ) );
-		string apellidos = usuario.validarApellidos( interfaz.obtenerTextoEntrada( "EntradaCuentaApellidos" ) );
-		string nombreUsuario = usuario.validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaCuentaNombreUsuario" ) );
+		string nombre = Usuario::validarNombre( interfaz.obtenerTextoEntrada( "EntradaCuentaNombre" ) );
+		string apellidos = Usuario::validarApellidos( interfaz.obtenerTextoEntrada( "EntradaCuentaApellidos" ) );
+		string nombreUsuario = Usuario::validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaCuentaNombreUsuario" ) );
 		string contrasena = interfaz.obtenerTextoEntrada( "EntradaCuentaContrasenaNueva" );
 		string confirmacion = interfaz.obtenerTextoEntrada( "EntradaCuentaContrasenaConfirmacion" );
 		string sal;
@@ -86,8 +86,8 @@ void actualizarDatosUsuario()
 		// ¿Se introdujo una nueva contraseña?
 		if( !contrasena.empty() ){
 			// Se asegura que las contraseñas introducidas sean válidas
-			contrasena = usuario.validarContrasena( contrasena );
-			confirmacion = usuario.validarContrasena( confirmacion );
+			contrasena = Usuario::validarContrasena( contrasena );
+			confirmacion = Usuario::validarContrasena( confirmacion );
 			
 			// Se asegura que las contraseñas introducidas sean iguales
 			compararContrasenas( contrasena, confirmacion );
@@ -135,8 +135,8 @@ void iniciarSesion()
 		
 	try{
 		// Establece el nombre de usuario
-		string nombreUsuario = usuario.validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaUsuario" ) );
-		string contrasena = usuario.validarContrasena( interfaz.obtenerTextoEntrada( "EntradaContrasena" ) );
+		string nombreUsuario = Usuario::validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaUsuario" ) );
+		string contrasena = Usuario::validarContrasena( interfaz.obtenerTextoEntrada( "EntradaContrasena" ) );
 		
 		// Busca en la base de datos el usuario solicitado
 		string consulta = "select * from usuarios where nombre_usuario = '" + nombreUsuario + "'";
@@ -275,7 +275,7 @@ void cambiarContrasenaUsuario()
 {
 	try{
 		// Obtiene los campos introducidos
-		string contrasena = usuario.validarContrasena( interfaz.obtenerTextoEntrada( "EntradaReemplazarContrasena" ) );
+		string contrasena = Usuario::validarContrasena( interfaz.obtenerTextoEntrada( "EntradaReemplazarContrasena" ) );
 		string confirmacion = interfaz.obtenerTextoEntrada( "EntradaReemplazarConfirmacion" );
 
 		// Compara las contraseñas

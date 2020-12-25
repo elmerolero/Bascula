@@ -64,6 +64,12 @@ void iniciar()
         obtenerRegistrosInternosPendientes();
         obtenerRegistrosPublicosPendientes();
 
+        // Obtine los registros de completado de conductor y numero de placas
+        actualizarElementosLista( &listaNombresConductor, &completadorNombresConductor, "nombre_conductor" );
+        actualizarElementosLista( &listaNumerosPlaca, &completadorNumerosPlaca, "numero_placas" ); 
+        interfaz.establecerCompletadorEntrada( "EntradaNombreConductorInterno", completadorNombresConductor );
+        interfaz.establecerCompletadorEntrada( "EntradaNumeroPlacasInterno", completadorNumerosPlaca );
+
         // Establece la hora
         g_timeout_add( 1000, G_SOURCE_FUNC( actualizarTiempo ), nullptr );
 

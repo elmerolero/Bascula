@@ -1,10 +1,10 @@
 CC=g++
 CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3`
 LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
-OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o LectorBascula.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o
+OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o LectorBascula.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o aplicacion.res
 
 ../build/aplicacion:  main.cpp $(OBJS)
-	$(CC) main.cpp aplicacion.res $(CFLAGS) -o ../build/aplicacion $(OBJS) $(LIBS)
+	$(CC) main.cpp $(CFLAGS) -o ../build/aplicacion $(OBJS) $(LIBS)
 
 GestorRegistros.o: GestorRegistros.h GestorRegistros.cpp
 	$(CC) $(CFLAGS) -c GestorRegistros.h GestorRegistros.cpp
@@ -53,3 +53,6 @@ RegistrosPublicos.o: RegistrosPublicos.h RegistrosPublicos.cpp
 
 TicketPublico.o: TicketPublico.h TicketPublico.cpp
 	$(CC) -c TicketPublico.h TicketPublico.cpp
+
+aplicacion.res: aplicacion.rc
+	windres aplicacion.rc -O coff -o aplicacion.res

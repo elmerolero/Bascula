@@ -44,12 +44,12 @@ extern GtkEntryCompletion *completadorNombresConductor;
 extern GtkListStore *listaNumerosPlaca;
 extern GtkEntryCompletion *completadorNumerosPlaca;
 
-// Primer inicio
-extern bool esInicio;
-
 // Nombre de la empresa
 extern std::string nombreEmpresa;
+extern unsigned int numeroFormatos;
 extern unsigned int numeroCopias;
+
+extern bool esInicio;
 
 // Obtiene el contador de los folios
 void obtenerFolioActualInterno();

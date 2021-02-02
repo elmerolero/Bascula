@@ -102,7 +102,7 @@ void LectorBascula::iniciarOpcion()
 {
 	// Obtiene la opcion
 	string opcion = interfaz.obtenerOpcionComboBoxText( "BasculasDisponibles" );
-	interfaz.establecerTextoEntrada( "EntradaPeso", "" );
+	interfaz.establecerTextoEntrada( "EntradaPeso", "0.0" );
 	interfaz.establecerTextoEtiqueta( "EtiquetaPeso", "0.0 Kg" );
 
 	// Si la opcion seleccionada es "Introducción manual

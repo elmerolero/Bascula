@@ -399,7 +399,7 @@ std::string Ticket::obtenerNombreBasculista() const
 }
 
 // Imprime los datos del ticket
-void Ticket::imprimir( std::string nombreEmpresa, unsigned int numeroCopias ) const
+void Ticket::imprimir( std::string nombreEmpresa, unsigned int numeroFormatos, unsigned int numeroCopias ) const
 {
 	// Esta finalizado (o no está pendiente)
 	if( estaPendiente() ){
@@ -422,30 +422,77 @@ void Ticket::imprimir( std::string nombreEmpresa, unsigned int numeroCopias ) co
 	pesajeInterno << "<!DOCTYPE html><html><head><meta charset='utf-8'><style>*{font-family: sans-serif; font-size: 15px; "
 			         "margin: 1px; }</style></head><body>";
 
-	// Incrusta en el documento el numero de copias deseadas
+	// Incrusta el número de formatos solicitados
+	for( size_t contador = 0; contador < numeroFormatos; ++contador ){
+		pesajeInterno << "<div><strong><p align='center'>" << nombreEmpresa
+					  << "</p></strong><hr> <div style='display: flex; direction: row; justify-content: space-between;'>"
+					  << "<p><strong>FECHA:</strong>" << obtenerFecha() 
+					  << "</p><p align='center'><strong>" << ( obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Proveedor " : "Cliente " )
+					  << "</strong>" << obtenerEmpresa() -> obtenerClave() << " - " << obtenerEmpresa() -> obtenerNombre()
+					  << "</p><p><strong>FOLIO: </strong>" << obtenerFolio()
+					  << "</p></div><div style='display: flex; justify-content: space-between;'><div style='width: 50%;'>"
+						 "<table style='border: 0; text-align: left;'><tr>"
+					  << "<th>Registra: </th><td>" << ( obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" )
+					  << "</td></tr><tr>"
+					  << "<th>Producto: </th><td>" << obtenerProducto() -> obtenerClave() << " - " << obtenerProducto() -> obtenerNombre()
+					  << "</td></tr><tr>"
+					  << "<th>Placas: </th><td>" << obtenerNumeroPlacas()
+					  << "</td></tr><tr>"
+					  << "<th>Conductor: </th><td>" << obtenerNombreBasculista()
+					  << "</td></tr></table></div><div style='display: flex; align-items: space-between;'>"
+					  << "<table style='border: 0; text-align: left;'><tr>"
+					  << "<th>Hora entrada:</th><td>" << obtenerHoraEntrada()
+					  << "</td></tr><tr>"
+					  << "<th>Hora salida:</th><td>" << obtenerHoraSalida()
+					  << "</td></tr></table><table style='border: 0; text-align: left; margin-left: auto;'><tr>"
+					  << "<th>Peso bruto:</th><td>" << obtenerPesoBruto()
+					  << "</td></tr><tr>"
+					  << "<th>Peso tara:</th><td>" << obtenerPesoTara()
+					  << "</td></tr><tr>"
+					  << "<th>Descuento:</th><td>" << obtenerDescuento()
+					  << "</td></tr></table></div></div><hr><table style='border: 0; text-align: left; margin-left: auto;'><tr>"
+					  << "<th>Peso neto:</th><td>" << obtenerPesoNeto()
+					  << "</td></tr></table><hr><p><strong>Observaciones:</strong></p>"
+					  << "<p>" << obtenerObservaciones() << "</p>"
+					  << "<hr>"
+					  << "<p>" << ( esEntradaManual() ? "El pesaje en alguno de los campos fue introducido de manera manual. " : "" ) 
+					  << "Registro realizado por el basculista <u>" << obtenerNombreBasculista() 
+					  << "</u></p><br><p><strong>Autoriza: </strong>_______________________</p><br><hr></div>" << endl;
+	}
+
+	// Crea el número de copias
 	for( size_t contador = 0; contador < numeroCopias; ++contador ){
 		pesajeInterno << "<div><strong><p align='center'>" << nombreEmpresa
-					  << "</p></strong><hr><div style='display: flex; direction: row; justify-content: space-between;''><p>"
-					  << "<strong>FECHA:</strong>" << obtenerFecha() << "</p><p align='center'>"
-					  << obtenerEmpresa() -> obtenerClave() << " - " << obtenerEmpresa() -> obtenerNombre()
-					  << "</p><p><strong>FOLIO: </strong>" << obtenerFolio() << "</p></div>"
-					  << "<div style='display: flex; justify-content: space-between;'><div style='width: 50%;'>"
-					  << "<table style='border: 0; text-align: left;'><tr><th>Registra: </th><td>"
-					  << ( obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" )
-					  << "</td></tr><tr><th>Producto: </th><td>" << obtenerProducto() -> obtenerClave() << " - " << obtenerProducto() -> obtenerNombre()
-					  << "</td></tr><tr><th>Placas: </th><td>" << obtenerNumeroPlacas()
-					  << "</td></tr><tr><th>Conductor: </th><td>" << obtenerNombreConductor()
+					  << "</p></strong><hr> <div style='display: flex; direction: row; justify-content: space-between;'>"
+					  << "<p><strong>FECHA:</strong>" << obtenerFecha() 
+					  << "</p><p align='center'><strong>" << ( obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Proveedor" : "Cliente" )
+					  << "</strong>" << obtenerEmpresa() -> obtenerClave() << " - " << obtenerEmpresa() -> obtenerNombre()
+					  << "</p><p><strong>FOLIO: </strong>" << obtenerFolio()
+					  << "</p></div><div style='display: flex; justify-content: space-between;'><div style='width: 50%;'>"
+						 "<table style='border: 0; text-align: left;'><tr>"
+					  << "<th>Registra: </th><td>" << ( obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" )
+					  << "</td></tr><tr>"
+					  << "<th>Producto: </th><td>" << obtenerProducto() -> obtenerClave() << " - " << obtenerProducto() -> obtenerNombre()
+					  << "</td></tr><tr>"
+					  << "<th>Placas: </th><td>" << obtenerNumeroPlacas()
+					  << "</td></tr><tr>"
+					  << "<th>Conductor: </th><td>" << obtenerNombreBasculista()
 					  << "</td></tr></table></div><div style='display: flex; align-items: space-between;'>"
-					  << "<table style='border: 0; text-align: left;'><tr><th>Hora entrada:</th><td>"
-					  << obtenerHoraEntrada() << "</td></tr><tr><th>Hora salida:</th><td>"
-					  << obtenerHoraSalida() << "</td></tr></table><table style='border: 0; text-align: left; margin-left: auto;'>"
-					  << "<tr><th>Peso bruto:</th><td>" << obtenerPesoBruto() << "</td></tr><tr><th>Peso tara:</th><td>"
-					  << obtenerPesoTara() << "</td></tr><tr><th>Descuento:</th><td>" << obtenerDescuento()
-					  << "</td></tr></table></div></div><hr><table style='border: 0; text-align: left; margin-left: auto;'>"
-					  << "<tr><th>Peso neto:</th><td>" << obtenerPesoNeto() << "</td></tr></table><hr><p><strong>"
-					  << "Observaciones:<br></strong></p><p>" << obtenerObservaciones() << "</p><hr><p>"
-					  << ( esEntradaManual() ? "El pesaje en alguno de los campos fue introducido de manera manual. " : "" )
-					  << "Registro realizado por el basculista <u>" << obtenerNombreBasculista() << "</u></p></div><br><hr>" << endl;
+					  << "<table style='border: 0; text-align: left;'><tr>"
+					  << "<th>Hora entrada:</th><td>" << obtenerHoraEntrada()
+					  << "</td></tr><tr>"
+					  << "<th>Hora salida:</th><td>" << obtenerHoraSalida()
+					  << "</td></tr></table><table style='border: 0; text-align: left; margin-left: auto;'><tr>"
+					  << "<th>Peso bruto:</th><td>" << obtenerPesoBruto()
+					  << "</td></tr><tr>"
+					  << "<th>Peso tara:</th><td>" << obtenerPesoTara()
+					  << "</td></tr><tr>"
+					  << "<th>Descuento:</th><td>" << obtenerDescuento()
+					  << "</td></tr></table></div></div><hr><table style='border: 0; text-align: left; margin-left: auto;'><tr>"
+					  << "<th>Peso neto:</th><td>" << obtenerPesoNeto()
+					  << "</td></tr></table><hr><p><strong>Observaciones:</strong></p>"
+					  << "<p>" << obtenerObservaciones() << "</p>"
+					  << "<hr><br><p><strong>Autoriza: </strong>_______________________</p><br><hr></div>" << endl;
 	}
 
 	// Establece el pié de página del documento

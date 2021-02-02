@@ -15,6 +15,7 @@ extern bool internoPendiente;
 
 void internoRegistrarPendiente();
 void internoFinalizarPendiente();
+void internoCancelar();
 void internoRegistrarPesoBruto();
 void internoRegistrarPesoTara();
 void internoActualizarPesoNeto();
@@ -24,8 +25,6 @@ void internoLeerDescuento();
 void internoSeleccionarTipo();
 void internoActualizarRegistros( std::list< Ticket * > &tickets, std::string idContenedor );
 void internoObtenerPorFecha( std::list <Ticket *> &registros, std::string fecha );
-void internoCancelarRegistro();
-void internoCancelarFinalizacion();
 void internoImprimirSeleccionado();
 void internoAlertaEliminar();
 void internoEliminarSeleccionado();

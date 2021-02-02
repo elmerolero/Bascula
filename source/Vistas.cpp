@@ -272,6 +272,7 @@ void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
 	interfaz.establecerTextoEntrada( "OpcionesBytesIgnorados", to_string( lectorBascula.obtenerBytesIgnorados() ) );
 
 	// Numero copias
+	interfaz.establecerTextoEntrada( "OpcionesImpresionFormatos", to_string( numeroFormatos ) );
 	interfaz.establecerTextoEntrada( "OpcionesImpresionCopias", to_string( numeroCopias ) );
 
 	// Se dirige a la vista
@@ -478,43 +479,16 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	// Fecha
 	interfaz.establecerTextoEtiqueta( "EntradaFechaInterno", obtenerFecha() );
 	
-	// Empresa
-	interfaz.habilitarEdicionEntrada( "EntradaNombreEmpresaInterno" );
-	interfaz.establecerTextoEntrada( "EntradaNombreEmpresaInterno", "" );
-	
-	// Producto
-	interfaz.habilitarEdicionEntrada( "EntradaNombreProductoInterno" );
-	interfaz.establecerTextoEntrada( "EntradaNombreProductoInterno", "" );
-	
-	// Nombre del conductor
-	interfaz.habilitarEdicionEntrada( "EntradaNombreConductorInterno" );
-	interfaz.establecerTextoEntrada( "EntradaNombreConductorInterno", "" );
-	
-	// Numero de placas
-	interfaz.habilitarEdicionEntrada( "EntradaNumeroPlacasInterno" );
-	interfaz.establecerTextoEntrada( "EntradaNumeroPlacasInterno", "" );
-	
-	// Hora entrada y Peso Bruto
-	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", "No establecida" );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", "No establecido" );
-	
-	// Hora salida y Peso Tara
-	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", "No establecida" );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );
-	
+	// Limpia el formulario
+	internoLimpiarFormulario();
+
 	// Descuento
 	interfaz.establecerActivoBotonToggle( "NoDescuentoInterno" );
 	interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
 	interfaz.deshabilitarEdicionEntrada( "EntradaDescuentoInterno" );
-	
-	// Tipo de registro
+
+	// Tipo de registro (registra entrada por defecto)
 	interfaz.establecerActivoBotonToggle( "RegistraEntrada" );
-	
-	// Peso neto
-	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );
-	
-	// Observaciones
-	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", "" );
 	
 	// Establece el completador de empresa
 	interfaz.establecerCompletadorEntrada( "EntradaConsultarNombre", NULL );
@@ -525,41 +499,11 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoPublico", NULL );
 	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoInterno", productos.obtenerCompletador() );
 	
-	// Señal peso bruto
-	interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoInternoId );
-	botonLeerPesoBrutoInternoId = interfaz.conectarSenal( "BotonLeerPesoBrutoInterno", "clicked", G_CALLBACK( vistaLeerPesoBruto ), nullptr );
-	
-	// Señal peso tara
-	interfaz.desconectarSenal( "BotonLeerPesoTaraInterno", botonLeerPesoTaraInternoId );
-	botonLeerPesoTaraInternoId = interfaz.conectarSenal( "BotonLeerPesoTaraInterno", "clicked", G_CALLBACK( vistaLeerPesoTara ), nullptr);
-
-	// Establece la señal para registrar el ticket
-	interfaz.desconectarSenal( "BotonRegistrarInterno", botonRegistrarTicketId );
-	botonRegistrarTicketId = interfaz.conectarSenal( "BotonRegistrarInterno", "clicked", G_CALLBACK( internoRegistrarPendiente ), nullptr );
-	
-	// Establece la señal para cancelar el registro
-	interfaz.desconectarSenal( "EnlaceRegresarInterno", botonCancelarInternoId );
-	botonCancelarInternoId = interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( internoCancelarRegistro ), nullptr );
-	
 	// Es un ticket pendiente hasta que no se demuestre lo contrario
 	internoPendiente = true;
 
-	// Establece la vista de nuevo ticket
+	// Establece la vista de nuevo ticket 
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
-}
-
-void vistaLeerPesoBruto()
-{
-	interfaz.ocultarElemento( "MensajeErrorCampo" );
-	lectorBascula.abrir( interfaz );
-	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( internoRegistrarPesoBruto ), nullptr ) );
-}
-
-void vistaLeerPesoTara()
-{
-	interfaz.ocultarElemento( "MensajeErrorCampo" );
-	lectorBascula.abrir( interfaz );
-	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( internoRegistrarPesoTara ), nullptr ) );
 }
 
 void vistaFinalizarRegistro()
@@ -641,14 +585,6 @@ void vistaFinalizarRegistro()
 		
 	// Motivos y observaciones
 	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", ticket -> obtenerObservaciones() );
-
-	// Señal leer peso tara
-	interfaz.desconectarSenal( "BotonLeerPesoTaraInterno", botonLeerPesoTaraInternoId );
-	botonLeerPesoTaraInternoId = interfaz.conectarSenal( "BotonLeerPesoTaraInterno", "clicked", G_CALLBACK( vistaLeerPesoTara ), nullptr);
-	
-	// Boton cancelar
-	interfaz.desconectarSenal( "EnlaceRegresarInterno", botonCancelarInternoId );
-	botonCancelarInternoId = interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( internoCancelarFinalizacion ), nullptr );
 	
 	// Boton registrar
 	interfaz.desconectarSenal( "BotonRegistrarInterno", botonRegistrarTicketId );
@@ -659,6 +595,20 @@ void vistaFinalizarRegistro()
 
 	// Va hacia la vista
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
+}
+
+void vistaLeerPesoBruto()
+{
+	interfaz.ocultarElemento( "MensajeErrorCampo" );
+	lectorBascula.abrir( interfaz );
+	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( internoRegistrarPesoBruto ), nullptr ) );
+}
+
+void vistaLeerPesoTara()
+{
+	interfaz.ocultarElemento( "MensajeErrorCampo" );
+	lectorBascula.abrir( interfaz );
+	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( internoRegistrarPesoTara ), nullptr ) );
 }
 
 void vistaLeerPesoBrutoPublico()
@@ -810,59 +760,26 @@ void vistaConsultarRegistroInterno()
 		return;
 	}
 
-	// Folio
-	interfaz.establecerTextoEtiqueta( "FolioInterno", to_string( ticket -> obtenerFolio() ) );
-
-	// Fecha
-	interfaz.establecerTextoEtiqueta( "FechaInterno", ticket -> obtenerFecha() );
-
-	// Empresa
-	interfaz.establecerTextoEntrada( "NombreEmpresaInterno", ticket -> obtenerEmpresa() -> obtenerNombre() );
-
-	// Producto
-	interfaz.establecerTextoEntrada( "NombreProductoInterno", ticket -> obtenerProducto() -> obtenerNombre() );
-
-	// Nombre del conductor
-	interfaz.establecerTextoEntrada( "NombreConductorInterno", ticket -> obtenerNombreConductor() );
-
-	// Número de placas
-	interfaz.establecerTextoEntrada( "NumeroPlacasInterno", ticket -> obtenerNumeroPlacas() );
-
-	// Hora entrada
-	interfaz.establecerTextoEtiqueta( "HoraEntradaInterno", ticket -> obtenerHoraEntrada() );
-
-	// Peso bruto
-	interfaz.establecerTextoEtiqueta( "PesoBrutoInterno", to_string( ticket -> obtenerPesoBruto() ) );
-
-	// Hora salida
-	interfaz.establecerTextoEtiqueta( "HoraSalidaInterno", ticket -> obtenerHoraSalida() );
-
-	// Peso tara
-	interfaz.establecerTextoEtiqueta( "PesoTaraInterno", to_string( ticket -> obtenerPesoTara() ) ) ;
-
-
-	// Descuento (permiso)
-	interfaz.establecerTextoEntrada( "PermitirDescuentoInterno", ( ticket -> permitirDescuento() ? "Sí" : "No" ) );
-
-	// Descuento
-	interfaz.establecerTextoEntrada( "DescuentoInterno", ( ticket -> permitirDescuento() ? to_string( ticket -> obtenerDescuento() ) : "" ) );
-
-	// Tipo de registro
-	interfaz.establecerTextoEntrada( "TipoRegistroInterno", ( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" ) );
-
-	// Peso neto
-	interfaz.establecerTextoEtiqueta( "PesoNetoInterno", to_string( ticket -> obtenerPesoNeto() ) );
-
-	// Observaciones
-	interfaz.establecerTextoEntrada( "ObservacionesInterno", ticket -> obtenerObservaciones() );
+	// Establece los datos del ticket en el formulario
+	interfaz.establecerTextoEtiqueta( "FolioInterno", to_string( ticket -> obtenerFolio() ) ); 					// Folio
+	interfaz.establecerTextoEtiqueta( "FechaInterno", ticket -> obtenerFecha() );			   					// Fecha
+	interfaz.establecerTextoEntrada( "NombreEmpresaInterno", ticket -> obtenerEmpresa() -> obtenerNombre() );	// Empresa
+	interfaz.establecerTextoEntrada( "NombreProductoInterno", ticket -> obtenerProducto() -> obtenerNombre() );	// Producto
+	interfaz.establecerTextoEntrada( "NombreConductorInterno", ticket -> obtenerNombreConductor() );			// Nombre del conductor
+	interfaz.establecerTextoEntrada( "NumeroPlacasInterno", ticket -> obtenerNumeroPlacas() );					// Número de placas
+	interfaz.establecerTextoEtiqueta( "HoraEntradaInterno", ticket -> obtenerHoraEntrada() );					// Hora entrada
+	interfaz.establecerTextoEtiqueta( "PesoBrutoInterno", to_string( ticket -> obtenerPesoBruto() ) );			// Peso bruto
+	interfaz.establecerTextoEtiqueta( "HoraSalidaInterno", ticket -> obtenerHoraSalida() );						// Hora salida
+	interfaz.establecerTextoEtiqueta( "PesoTaraInterno", to_string( ticket -> obtenerPesoTara() ) ) ;			// Peso tara
+	interfaz.establecerTextoEntrada( "PermitirDescuentoInterno", ( ticket -> permitirDescuento() ? "Sí" : "No" ) );	// Descuento (permiso)
+	interfaz.establecerTextoEntrada( "DescuentoInterno", ( ticket -> permitirDescuento() ? to_string( ticket -> obtenerDescuento() ) : "" ) );	// Descuento
+	interfaz.establecerTextoEntrada( "TipoRegistroInterno", ( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" ) );	// Tipo de registro
+	interfaz.establecerTextoEtiqueta( "PesoNetoInterno", to_string( ticket -> obtenerPesoNeto() ) );			// Peso neto
+	interfaz.establecerTextoEntrada( "ObservacionesInterno", ticket -> obtenerObservaciones() );				// Observaciones
 
 	// Señal de boton si
 	interfaz.desconectarSenal( "BotonSi", botonSiId );
 	botonSiId = interfaz.conectarSenal( "BotonSi", "clicked", G_CALLBACK( internoEliminarSeleccionado ), nullptr );
-
-	// Señal boton imprimir interno
-	interfaz.desconectarSenal( "ImprimirRegistroInterno", imprimirRegistroInternoId );
-	imprimirRegistroInternoId = interfaz.conectarSenal( "ImprimirRegistroInterno", "clicked", G_CALLBACK( internoImprimirSeleccionado ), nullptr );
 
 	// Señal boton de eliminar registro interno seleccionado
 	interfaz.desconectarSenal( "EliminarRegistroInterno", eliminarRegistroInternoId );
@@ -888,39 +805,18 @@ void vistaConsultarRegistroPublico()
 		mostrarMensaje( "Registro no encontrado." );
 		return;
 	}
-
-	// Folio
-	interfaz.establecerTextoEtiqueta( "FolioPublico", to_string( registroPublico -> obtenerFolio() ) );
-
-	// Fecha
-	interfaz.establecerTextoEtiqueta( "FechaPublico", registroPublico -> obtenerFecha() );
-
-	// Producto
-	interfaz.establecerTextoEntrada( "NombreProductoPublico", registroPublico -> obtenerProducto() -> obtenerNombre() );
-
-	// Nombre del conductor
-	interfaz.establecerTextoEntrada( "NombreConductorPublico", registroPublico -> obtenerNombreConductor() );
-
-	// Número de placas
-	interfaz.establecerTextoEntrada( "NumeroPlacasPublico", registroPublico -> obtenerNumeroPlacas() );
-
-	// Hora entrada
-	interfaz.establecerTextoEtiqueta( "HoraEntradaPublico", registroPublico -> obtenerHoraEntrada() );
-
-	// Peso bruto
-	interfaz.establecerTextoEtiqueta( "PesoBrutoPublico", to_string( registroPublico -> obtenerPesoBruto() ) );
-
-	// Hora salida
-	interfaz.establecerTextoEtiqueta( "HoraSalidaPublico", registroPublico -> obtenerHoraSalida() );
-
-	// Peso tara
-	interfaz.establecerTextoEtiqueta( "PesoTaraPublico", to_string( registroPublico -> obtenerPesoTara() ) ) ;
-
-	// Tipo de registro
-	interfaz.establecerTextoEntrada( "TipoViajePublico", ( registroPublico -> obtenerTipoViaje() == VIAJE_LOCAL ? "Local" : "Foráneo" ) );
-
-	// Peso neto
-	interfaz.establecerTextoEtiqueta( "PesoNetoPublico", to_string( registroPublico -> obtenerPesoNeto() ) );
+	
+	interfaz.establecerTextoEtiqueta( "FolioPublico", to_string( registroPublico -> obtenerFolio() ) );	// Folio
+	interfaz.establecerTextoEtiqueta( "FechaPublico", registroPublico -> obtenerFecha() );				// Fecha
+	interfaz.establecerTextoEntrada( "NombreProductoPublico", registroPublico -> obtenerProducto() -> obtenerNombre() ); // Producto
+	interfaz.establecerTextoEntrada( "NombreConductorPublico", registroPublico -> obtenerNombreConductor() );// Nombre del conductor	
+	interfaz.establecerTextoEntrada( "NumeroPlacasPublico", registroPublico -> obtenerNumeroPlacas() );// Número de placas
+	interfaz.establecerTextoEtiqueta( "HoraEntradaPublico", registroPublico -> obtenerHoraEntrada() );// Hora entrada
+	interfaz.establecerTextoEtiqueta( "PesoBrutoPublico", to_string( registroPublico -> obtenerPesoBruto() ) );// Peso bruto
+	interfaz.establecerTextoEtiqueta( "HoraSalidaPublico", registroPublico -> obtenerHoraSalida() );// Hora salida
+	interfaz.establecerTextoEtiqueta( "PesoTaraPublico", to_string( registroPublico -> obtenerPesoTara() ) ) ;// Peso tara
+	interfaz.establecerTextoEntrada( "TipoViajePublico", ( registroPublico -> obtenerTipoViaje() == VIAJE_LOCAL ? "Local" : "Foráneo" ) );// Tipo de registro
+	interfaz.establecerTextoEtiqueta( "PesoNetoPublico", to_string( registroPublico -> obtenerPesoNeto() ) );// Peso neto
 
 	// Señal boton de eliminar registro interno seleccionado
 	interfaz.desconectarSenal( "EliminarRegistroInterno", eliminarRegistroInternoId );
@@ -1039,4 +935,18 @@ void vistaReemplazarContrasena()
 
 	// Redirige hacia la vista
 	irHacia( nullptr, (void *)"ReemplazarContrasena" );
+}
+
+void internoLimpiarFormulario()
+{
+	interfaz.establecerTextoEntrada( "EntradaNombreEmpresaInterno", "" );				// Empresa
+	interfaz.establecerTextoEntrada( "EntradaNombreProductoInterno", "" );				// Producto
+	interfaz.establecerTextoEntrada( "EntradaNombreConductorInterno", "" );				// Nombre del conductor
+	interfaz.establecerTextoEntrada( "EntradaNumeroPlacasInterno", "" );				// Numero de placas
+	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", "No establecida" );	// Hora entrada
+	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", "No establecido" );	// Peso bruto
+	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", "No establecida" );	// Hora salida
+	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );		// Peso tara
+	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );		// Peso neto
+	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", "" );				// Observaciones
 }

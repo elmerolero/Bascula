@@ -39,14 +39,14 @@ list< Usuario * > registrosUsuarios;
 ContenedorRegistros productos;
 ContenedorRegistros empresas;
 
-// Primer inicio
-bool esInicio;
-
 // Nombre de la empresa
 string nombreEmpresa;
 
 // Numero de copias a imprimir en el ticket
-unsigned int numeroCopias;
+unsigned int numeroFormatos = 0;
+unsigned int numeroCopias = 0;
+
+bool esInicio;
 
 // Completador para el nombre del conductor
 GtkListStore *listaNombresConductor = nullptr;
@@ -260,22 +260,19 @@ void crearRegistroPendiente( Ticket *ticket )
              << ( ticket -> estaPesoNetoEstablecido() ? ticket -> obtenerPesoNeto() : 0 ) << ", " << ticket -> estaPesoNetoEstablecido() << ", '"
              << ticket -> obtenerObservaciones() << "', " << ticket -> esEntradaManual() << ", " << ticket -> estaPendiente() << ", '" << ticket -> obtenerNombreBasculista() << "' )";
 
-    // Inserta el nuevo ticket
     try{
-	   database.query( consulta.str() );
-	   if( ticket -> estaPendiente() ){
-	        registrosInternosPendientes.push_back( ticket );
-	   }
-	   else{
-	       ticket -> imprimir( nombreEmpresa, numeroCopias );
-	   }
+        // Inserta el nuevo ticket
+	    database.query( consulta.str() );
     }
     catch( runtime_error &re ){
-	   cerr << re.what() << endl;
+	    cerr << re.what() << endl;
     }
     
     // Cierra la conexion
     database.close();
+
+    // Agrega el ticket a la lista de registros pendientes
+    registrosInternosPendientes.push_back( ticket );
 
     // Actualiza los registros actuales
     actualizarElementosLista( &listaNombresConductor, &completadorNombresConductor, "nombre_conductor" );
@@ -300,7 +297,7 @@ void finalizarRegistro( Ticket *ticket )
 	database.query( consulta.str() );
 	
 	// Imprime el ticket
-	ticket -> imprimir( nombreEmpresa, numeroCopias );
+	ticket -> imprimir( nombreEmpresa, numeroFormatos, numeroCopias );
 	
 	// Remueve el ticket de los registros pendientes
 	registrosInternosPendientes.remove( ticket );
@@ -445,11 +442,13 @@ void cargarOpcionesImpresion()
     // Intenta abrir el archivo
     archivo.open( "../resources/data/impresion.dat" );
     if( !archivo.is_open() ){
-        numeroCopias = 1;
+        numeroFormatos = 1;
+        numeroCopias = 0;
         return;
     }
 
     // Lee el numero de copias
+    archivo >> numeroFormatos;
     archivo >> numeroCopias;
 
     archivo.close();
@@ -457,18 +456,19 @@ void cargarOpcionesImpresion()
 
 void actualizarOpcionesImpresion()
 {
-    // Numero copias
-    unsigned int numeroDeCopias;
+    try{
+        numeroFormatos = stoi( interfaz.obtenerTextoEntrada( "OpcionesImpresionFormatos" ) );
+    }
+    catch( invalid_argument &ia ){
+        throw invalid_argument( "Numero de formatos no válido." );
+    }
 
     try{
-        numeroDeCopias = stoi( interfaz.obtenerTextoEntrada( "OpcionesImpresionCopias" ) );
+        numeroCopias = stoi( interfaz.obtenerTextoEntrada( "OpcionesImpresionCopias" ) );
     }
     catch( invalid_argument &ia ){
         throw invalid_argument( "Numero de copias no válido." );
     }
-
-    // Establece el número de copias
-    numeroCopias = numeroDeCopias;
 
     // Archivo de configuración de impresión
     ofstream archivoConfig;
@@ -479,7 +479,8 @@ void actualizarOpcionesImpresion()
         throw runtime_error( "No se pudieron guardar los opciones de impresion." );
     }
 
-    archivoConfig << (int)numeroCopias << endl;
+    archivoConfig << (int)numeroFormatos << endl
+                  << (int)numeroCopias << endl;
 
     archivoConfig.close();
 }

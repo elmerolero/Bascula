@@ -148,6 +148,11 @@ void conectarSenales()
     interfaz.conectarSenal( "EnlaceBasculaRegresar", "activate-link", G_CALLBACK( irHacia ), (void*)"Bascula" );
     
     // Nuevo para ticket interno
+    interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( internoCancelar ), nullptr );
+    interfaz.conectarSenal( "BotonLeerPesoBrutoInterno", "clicked", G_CALLBACK( vistaLeerPesoBruto ), nullptr );
+    interfaz.conectarSenal( "BotonLeerPesoTaraInterno", "clicked", G_CALLBACK( vistaLeerPesoTara ), nullptr);
+    interfaz.conectarSenal( "BotonRegistrarPendienteInterno", "clicked", G_CALLBACK( internoRegistrarPendiente ), nullptr );
+    interfaz.conectarSenal( "BotonFinalizarPendienteInterno", "clicked", G_CALLBACK( internoFinalizarPendiente ), nullptr );
     interfaz.conectarSenal( "EntradaNumeroPlacasInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
     interfaz.conectarSenal( "BotonCalcularDescuento", "clicked", G_CALLBACK( internoActualizarPesoNeto ), nullptr );
     interfaz.conectarSenal( "NoDescuentoInterno", "toggled", G_CALLBACK( internoHabilitarDescuento ), nullptr );
@@ -166,6 +171,9 @@ void conectarSenales()
     // Vista de configuración
     interfaz.conectarSenal( "EnlaceConfiguracionRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
     interfaz.conectarSenal( "BotonGuardarConfiguracion", "clicked", G_CALLBACK( guardarConfiguracion ), nullptr );
+
+    // Consultar registro interno
+    interfaz.conectarSenal( "ImprimirRegistroInterno", "clicked", G_CALLBACK( internoImprimirSeleccionado ), nullptr );
 }
 
 //

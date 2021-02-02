@@ -46,6 +46,8 @@ void vistaConsultarUsuarios();
 void vistaConsultarUsuario();
 void vistaReemplazarContrasena();
 
+void internoLimpiarFormulario();
+
 void regresarInicio();
 void regresarUsuarios();
 

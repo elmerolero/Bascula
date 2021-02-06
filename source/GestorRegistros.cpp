@@ -254,10 +254,10 @@ void crearRegistroPendiente( Ticket *ticket )
              << ticket -> obtenerEmpresa() -> obtenerClave() << ", " << ticket -> obtenerProducto() -> obtenerClave() << ", '" << ticket -> obtenerNumeroPlacas() << "', '" 
              << ticket -> obtenerNombreConductor() << "', " << ( ticket -> estaPesoBrutoEstablecido() ? "'" + ticket -> obtenerHoraEntrada() + "'" : "null" ) << ", "
              << ( ticket -> estaPesoTaraEstablecido() ? "'" + ticket -> obtenerHoraSalida() + "'" : "null" ) << ", "
-             << ( ticket -> estaPesoBrutoEstablecido() ? ticket -> obtenerPesoBruto() : 0 ) << ", " << ticket -> estaPesoBrutoEstablecido() << ", " 
-             << ( ticket -> estaPesoTaraEstablecido() ? ticket -> obtenerPesoTara() : 0 ) << ", " << ticket -> estaPesoTaraEstablecido() << ", "
-             << ( ticket -> estaDescuentoEstablecido() ? ticket -> obtenerDescuento() : 0 ) << ", " << ticket -> estaDescuentoEstablecido() << ", " << ticket -> permitirDescuento() << ", "
-             << ( ticket -> estaPesoNetoEstablecido() ? ticket -> obtenerPesoNeto() : 0 ) << ", " << ticket -> estaPesoNetoEstablecido() << ", '"
+             << ticket -> obtenerPesoBruto() << ", " << ticket -> estaPesoBrutoEstablecido() << ", " 
+             << ticket -> obtenerPesoTara() << ", " << ticket -> estaPesoTaraEstablecido() << ", "
+             << ticket -> obtenerDescuento() << ", " << ticket -> estaDescuentoEstablecido() << ", " << ticket -> permitirDescuento() << ", "
+             << ticket -> obtenerPesoNeto() << ", " << ticket -> estaPesoNetoEstablecido() << ", '"
              << ticket -> obtenerObservaciones() << "', " << ticket -> esEntradaManual() << ", " << ticket -> estaPendiente() << ", '" << ticket -> obtenerNombreBasculista() << "' )";
 
     try{
@@ -279,6 +279,41 @@ void crearRegistroPendiente( Ticket *ticket )
     actualizarElementosLista( &listaNumerosPlaca, &completadorNumerosPlaca, "numero_placas" );
 }
 
+void actualizarRegistroPendiente( Ticket *ticket )
+{
+    // Conecta con la base de datos
+    database.open( nombreArchivo );
+    
+    // Consulta para el registro en la base de datos
+    stringstream consulta;
+    consulta << "update registros_internos set fecha = '" << ticket -> obtenerFecha() << "', "
+             << "tipo_registro = " << ticket -> obtenerTipoRegistro() << ", " 
+             << "clave_empresa = " << ticket -> obtenerEmpresa() -> obtenerClave() << ", " 
+             << "clave_producto = " << ticket -> obtenerProducto() -> obtenerClave() << ", "
+             << "numero_placas = '" << ticket -> obtenerNumeroPlacas() << "', "
+             << "nombre_conductor = '" << ticket -> obtenerNombreConductor() << "', "
+             << "hora_entrada = " << ( ticket -> estaPesoBrutoEstablecido() ? "'" + ticket -> obtenerHoraEntrada() + "'" : "null" ) << ", "
+             << "hora_salida = " << ( ticket -> estaPesoTaraEstablecido() ? "'" + ticket -> obtenerHoraSalida() + "'" : "null" ) << ", "
+             << "peso_bruto = " << ticket -> obtenerPesoBruto() << ", bruto_establecido = " << ticket -> estaPesoBrutoEstablecido() << ", " 
+             << "peso_tara = " << ticket -> obtenerPesoTara() << ", tara_establecido = " << ticket -> estaPesoTaraEstablecido() << ", "
+             << "descuento = " << ticket -> obtenerDescuento() << ", descuento_establecido = " << ticket -> estaDescuentoEstablecido() << ", " << "descuento_permitido = " << ticket -> permitirDescuento() << ", "
+             << "peso_neto = " << ticket -> obtenerPesoNeto() << ", neto_establecido = " << ticket -> estaPesoNetoEstablecido() << ", "
+             << "observaciones = '" << ticket -> obtenerObservaciones() << "', " 
+             << "manual_activado = " << ticket -> esEntradaManual() << ", pendiente = " << ticket -> estaPendiente() << " "
+             << "where folio = " << ticket -> obtenerFolio() << ";";
+
+    try{
+        // Inserta el nuevo ticket
+	    database.query( consulta.str() );
+    }
+    catch( runtime_error &re ){
+	    cerr << re.what() << endl;
+    }
+    
+    // Cierra la conexion
+    database.close();
+}
+
 void finalizarRegistro( Ticket *ticket )
 {
     // Conecta con la base de datos
@@ -286,28 +321,38 @@ void finalizarRegistro( Ticket *ticket )
     
     // Consulta para el registro en la base de datos
     stringstream consulta;
-    consulta << "update registros_internos set peso_tara = " << ticket -> obtenerPesoTara() << ", tara_establecido = " << ticket -> estaPesoTaraEstablecido() 
-	     << ", hora_salida = '" << ticket -> obtenerHoraSalida() << "', pendiente = 0"
-	     << ", descuento = " << ( ticket -> estaDescuentoEstablecido() ? ticket -> obtenerDescuento() : 0 ) << ", descuento_establecido = " << ticket -> estaDescuentoEstablecido() 
-	     << ", descuento_permitido = " << ticket -> permitirDescuento() << ", peso_neto = " << ticket -> obtenerPesoNeto() << ", neto_establecido = " << ticket -> estaPesoNetoEstablecido()
-	     << ", tipo_registro = " << ticket -> obtenerTipoRegistro() << ", observaciones = '" << ticket -> obtenerObservaciones() << "' where folio = " << ticket  -> obtenerFolio();
+    consulta << "update registros_internos set fecha = '" << ticket -> obtenerFecha() << "', "
+             << "tipo_registro = " << ticket -> obtenerTipoRegistro() << ", " 
+             << "clave_empresa = " << ticket -> obtenerEmpresa() -> obtenerClave() << ", " 
+             << "clave_producto = " << ticket -> obtenerProducto() -> obtenerClave() << ", "
+             << "numero_placas = '" << ticket -> obtenerNumeroPlacas() << "', "
+             << "nombre_conductor = '" << ticket -> obtenerNombreConductor() << "', "
+             << "hora_entrada = " << ( ticket -> estaPesoBrutoEstablecido() ? "'" + ticket -> obtenerHoraEntrada() + "'" : "null" ) << ", "
+             << "hora_salida = " << ( ticket -> estaPesoTaraEstablecido() ? "'" + ticket -> obtenerHoraSalida() + "'" : "null" ) << ", "
+             << "peso_bruto = " << ticket -> obtenerPesoBruto() << ", bruto_establecido = " << ticket -> estaPesoBrutoEstablecido() << ", " 
+             << "peso_tara = " << ticket -> obtenerPesoTara() << ", tara_establecido = " << ticket -> estaPesoTaraEstablecido() << ", "
+             << "descuento = " << ticket -> obtenerDescuento() << ", descuento_establecido = " << ticket -> estaDescuentoEstablecido() << ", " << "descuento_permitido = " << ticket -> permitirDescuento() << ", "
+             << "peso_neto = " << ticket -> obtenerPesoNeto() << ", neto_establecido = " << ticket -> estaPesoNetoEstablecido() << ", "
+             << "observaciones = '" << ticket -> obtenerObservaciones() << "', " 
+             << "manual_activado = " << ticket -> esEntradaManual() << ", pendiente = " << ticket -> estaPendiente() << " "
+             << "where folio = " << ticket -> obtenerFolio() << ";";
 	    
     try{
-	// Inserta el nuevo ticket
-	database.query( consulta.str() );
-	
-	// Imprime el ticket
-	ticket -> imprimir( nombreEmpresa, numeroFormatos, numeroCopias );
-	
-	// Remueve el ticket de los registros pendientes
-	registrosInternosPendientes.remove( ticket );
-	
-	// Elimina el ticket
-	delete ticket;
-	ticket = nullptr;
+        // Inserta el nuevo ticket
+        database.query( consulta.str() );
+        
+        // Imprime el ticket
+        ticket -> imprimir( nombreEmpresa, numeroFormatos, numeroCopias );
+        
+        // Remueve el ticket de los registros pendientes
+        registrosInternosPendientes.remove( ticket );
+        
+        // Elimina el ticket
+        delete ticket;
+        ticket = nullptr;
     }
     catch( runtime_error &re ){
-	cerr << re.what() << endl;
+	    cerr << re.what() << endl;
     }
     
     // Cierra la conexion
@@ -783,26 +828,47 @@ void establecerRegistroInternoDesdeRenglon( Ticket *registroInterno, Row *row )
 
     // Se establece los datos del registro interno
     registroInterno -> establecerFolio( static_cast< unsigned int >( stoi( row -> columns.at( 0 ) ) ) );
+    cout << "Folio ";
     registroInterno -> establecerFecha( row -> columns.at( 1 ) );
+    cout << "Fecha ";
     registroInterno -> establecerTipoRegistro( stoi( row -> columns.at( 2 ) ) );
+    cout << "Tipo ";
     registroInterno -> establecerEmpresa( empresas.buscarRegistroPorClave( stoi( row -> columns.at( 3 ) ) ) );
+    cout << "Empresa ";
     registroInterno -> establecerProducto( productos.buscarRegistroPorClave( stoi( row -> columns.at( 4 ) ) ) );
+    cout << "Producto ";
     registroInterno -> establecerNumeroPlacas( row -> columns.at( 5 ) );
+    cout << "Placas ";
     registroInterno -> establecerNombreConductor( row -> columns.at( 6 ) );
+    cout << "Conductor ";
     registroInterno -> establecerHoraEntrada( row -> columns.at( 7 ) );
+    cout << "Entrada ";
     registroInterno -> establecerHoraSalida( row -> columns.at( 8 ) );
+    cout << "Salida ";
     registroInterno -> establecerPesoBruto( row -> columns.at( 9 ) );
+    cout << "Bruto ";
     registroInterno -> establecerPesoBrutoEstablecido( stoi( row -> columns.at( 10 ) ) );
+    cout << "Besta ";
     registroInterno -> establecerPesoTara( row -> columns.at( 11 ) );
+    cout << "Tara ";
     registroInterno -> establecerPesoTaraEstablecido( stoi( row -> columns.at( 12 ) ) );
+    cout << "Testa ";
     registroInterno -> permitirDescuento( stoi( row -> columns.at( 15 ) ) );
+    cout << "PDescu ";
     registroInterno -> establecerDescuento( row -> columns.at( 13 ) );
+    cout << "Descuento ";
     registroInterno -> establecerDescuentoEstablecido( stoi( row -> columns.at( 14 ) ) );
+    cout << "Desta ";
     registroInterno -> establecerPesoNeto( row -> columns.at( 16 ) );
+    cout << "Neto ";
     registroInterno -> establecerPesoNetoEstablecido( stoi( row -> columns.at( 17 ) ) );
+    cout << "Nesta ";
     registroInterno -> establecerObservaciones( row -> columns.at( 18 ) );
+    cout << "Observaciones ";
     registroInterno -> establecerEntradaManual( stoi( row -> columns.at( 19 ) ) );
+    cout << "Manual ";
     registroInterno -> establecerPendiente( stoi( row -> columns.at( 20 ) ) );
+    cout << "Basculista " << endl;
     registroInterno -> establecerNombreBasculista( row -> columns.at( 21 ) );
 }
 

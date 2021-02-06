@@ -202,6 +202,14 @@ string pesoString( double peso, int precision )
 	return pesoStr.str();
 }
 
+// Peso a string
+string pesoString( double peso, int precision, bool mostrarUnidad )
+{
+	stringstream pesoStr;
+	pesoStr << fixed << setprecision( precision ) << peso << ( mostrarUnidad ? " Kg" : "" );
+	return pesoStr.str();
+}
+
 // Encripta la cadena dado un número
 string encriptar( string texto, int numero )
 {

@@ -310,8 +310,8 @@ void vistaBasculaInterna( GtkWidget *widget, gpointer ptr )
 	
 	// Conecta las señales correspondientes
     botonBasculaNuevoId = interfaz.conectarSenal( "BotonBasculaNuevo", "clicked", G_CALLBACK( vistaCrearRegistro ), nullptr );
-    entradaSeguimientoId = interfaz.conectarSenal( "EntradaSeguimiento", "activate", G_CALLBACK( vistaFinalizarRegistro ), nullptr );
-    botonSeguimientoId = interfaz.conectarSenal( "BotonSeguimiento", "clicked", G_CALLBACK( vistaFinalizarRegistro ), nullptr );
+    entradaSeguimientoId = interfaz.conectarSenal( "EntradaSeguimiento", "activate", G_CALLBACK( vistaInternoEditarRegistro ), nullptr );
+    botonSeguimientoId = interfaz.conectarSenal( "BotonSeguimiento", "clicked", G_CALLBACK( vistaInternoEditarRegistro ), nullptr );
 
     // Establece las vistas
 	irHacia( nullptr, (void *)"Tickets" );
@@ -500,15 +500,15 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoInterno", productos.obtenerCompletador() );
 	
 	// Es un ticket pendiente hasta que no se demuestre lo contrario
-	internoPendiente = true;
+	// internoPendiente = true;
 
 	// Establece la vista de nuevo ticket 
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
 }
 
-void vistaFinalizarRegistro()
+void vistaInternoEditarRegistro()
 {
-	// Busca el ticket
+	Ticket *ticket;
 	try{
 		ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaSeguimiento" ) ), registrosInternosPendientes );
 	}
@@ -540,34 +540,28 @@ void vistaFinalizarRegistro()
 	// Tipo registro
 	if( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ){
 		interfaz.establecerActivoBotonToggle( "RegistraEntrada" );
+		interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Proveedor:      " );
 	}
 	else{
 		interfaz.establecerActivoBotonToggle( "RegistraSalida" );
+		interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Cliente:           " );
 	}
 
-	// Nombre de la empresa (no permite edicion)
+	// Nombre de la empresa
 	interfaz.establecerTextoEntrada( "EntradaNombreEmpresaInterno", ticket -> obtenerEmpresa() -> obtenerNombre() );
-	interfaz.deshabilitarEdicionEntrada( "EntradaNombreEmpresaInterno" );
 	
-	// Nombre del producto (no permite edicion)
+	// Nombre del producto
 	interfaz.establecerTextoEntrada( "EntradaNombreProductoInterno", ticket -> obtenerProducto() -> obtenerNombre() );
-	interfaz.deshabilitarEdicionEntrada( "EntradaNombreProductoInterno" );
 	
-	// Nombre del conductor (no permite edicion)
+	// Nombre del conductor
 	interfaz.establecerTextoEntrada( "EntradaNombreConductorInterno", ticket -> obtenerNombreConductor() );
-	interfaz.deshabilitarEdicionEntrada( "EntradaNombreConductorInterno" );
 	
-	// Numero de placas (no permite edicion)
+	// Numero de placas
 	interfaz.establecerTextoEntrada( "EntradaNumeroPlacasInterno", ticket -> obtenerNumeroPlacas() );
-	interfaz.deshabilitarEdicionEntrada( "EntradaNumeroPlacasInterno" );
 	
 	// Hora entrada y peso bruto
 	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", ( ticket -> estaPesoBrutoEstablecido() ? ticket -> obtenerHoraEntrada() : "No establecida" ) );
 	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", ( ticket -> estaPesoBrutoEstablecido() ? pesoString( ticket -> obtenerPesoBruto(), 2 ) : "No establecido" ) );
-	if( ticket -> estaPesoBrutoEstablecido() ){
-		// Deshabilita la señal para leer el peso bruto
-		interfaz.desconectarSenal( "BotonLeerPesoBrutoInterno", botonLeerPesoBrutoInternoId );
-	}
 	
 	// Hora salida y peso tara
 	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", ( ticket -> estaPesoTaraEstablecido() ? ticket -> obtenerHoraSalida() : "No establecida" ) );
@@ -576,23 +570,21 @@ void vistaFinalizarRegistro()
 	// Descuento
 	if( ticket -> permitirDescuento() ){
 		interfaz.establecerActivoBotonToggle( "SiDescuentoInterno" );
-		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", to_string( ticket -> obtenerDescuento() ) );
+		interfaz.habilitarEdicionEntrada( "EntradaDescuentoInterno" );
+		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", pesoString( ticket -> obtenerDescuento(), 2, false ) );
 	}
 	else{
 		interfaz.establecerActivoBotonToggle( "NoDescuentoInterno" );
+		interfaz.deshabilitarEdicionEntrada( "EntradaDescuentoInterno" );
 		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
 	}
+
+	// Peso neto
+	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", ( ticket -> estaPesoNetoEstablecido() ? pesoString( ticket -> obtenerPesoNeto(), 2 ) : "No establecido" ) );
 		
 	// Motivos y observaciones
 	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", ticket -> obtenerObservaciones() );
 	
-	// Boton registrar
-	interfaz.desconectarSenal( "BotonRegistrarInterno", botonRegistrarTicketId );
-	botonRegistrarTicketId = interfaz.conectarSenal( "BotonRegistrarInterno", "clicked", G_CALLBACK( internoFinalizarPendiente ), nullptr );
-	
-	// 
-	interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Finalizar" );
-
 	// Va hacia la vista
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
 }
@@ -745,6 +737,9 @@ void vistaConsultarPesajesPublicos()
 
 void vistaConsultarRegistroInterno()
 {
+	// Ticket para obtener la información
+	Ticket *ticket;
+
 	// Obtiene el ticket que se desea consultar
 	try{
 		ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaRegistrosPesajeFolio" ) ), registrosInternosConsultados );

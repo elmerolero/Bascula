@@ -32,7 +32,7 @@ void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr );
 void vistaCrearRegistro( GtkWidget *widget, gpointer ptr );
 void vistaLeerPesoBruto();
 void vistaLeerPesoTara();
-void vistaFinalizarRegistro();
+void vistaInternoEditarRegistro();
 void vistaFinalizarRegistroPublico();
 void vistaLeerPesoBrutoPublico();
 void vistaLeerPesoTaraPublico();

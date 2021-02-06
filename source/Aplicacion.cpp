@@ -38,13 +38,6 @@ void iniciar()
         interfaz.cargarWidget( "../resources/interfaces/Principal.glade" );
         interfaz.conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_main_quit ), nullptr );
         actualizarTiempo( nullptr, nullptr );
-        
-        //
-        GtkCssProvider *provider = gtk_css_provider_new ();
-    	GdkDisplay *display = gdk_display_get_default();
-    	GdkScreen *screen = gdk_display_get_default_screen(display);
-    	gtk_style_context_add_provider_for_screen (screen, GTK_STYLE_PROVIDER(provider), GTK_STYLE_PROVIDER_PRIORITY_USER);
-    	gtk_css_provider_load_from_data ( provider, "#IniciarSesion{background-color: #000000;}", -1, NULL );
 
         // ¿Primer inicio?
         primerInicio();

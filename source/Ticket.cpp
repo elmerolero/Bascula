@@ -284,7 +284,7 @@ void Ticket::establecerPesoNeto( string pesoNetoStr )
 void Ticket::establecerPesoNeto( double pesoNeto )
 {
 	if( pesoNeto < 0 ){
-		throw invalid_argument( "El peso neto debe ser un valor absoluto positivo." );
+		throw invalid_argument( "El peso neto debe ser un valor absoluto positivo. Asegurése de que el \npeso neto introducido no sea mayor que la diferencia." );
 	}
 
 	this -> pesoNeto = pesoNeto;
@@ -465,7 +465,7 @@ void Ticket::imprimir( std::string nombreEmpresa, unsigned int numeroFormatos, u
 		pesajeInterno << "<div><strong><p align='center'>" << nombreEmpresa
 					  << "</p></strong><hr> <div style='display: flex; direction: row; justify-content: space-between;'>"
 					  << "<p><strong>FECHA:</strong>" << obtenerFecha() 
-					  << "</p><p align='center'><strong>" << ( obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Proveedor" : "Cliente" )
+					  << "</p><p align='center'><strong>" << ( obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Proveedor " : "Cliente " )
 					  << "</strong>" << obtenerEmpresa() -> obtenerClave() << " - " << obtenerEmpresa() -> obtenerNombre()
 					  << "</p><p><strong>FOLIO: </strong>" << obtenerFolio()
 					  << "</p></div><div style='display: flex; justify-content: space-between;'><div style='width: 50%;'>"

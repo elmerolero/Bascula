@@ -1527,9 +1527,9 @@ aquí para reestablecer tu contraseña.</property>
                                         <property name="visible">True</property>
                                         <property name="can-focus">True</property>
                                         <property name="editable">False</property>
-                                        <property name="max-length">5</property>
+                                        <property name="max-length">10</property>
                                         <property name="width-chars">9</property>
-                                        <property name="placeholder-text" translatable="yes">Porcentaje</property>
+                                        <property name="placeholder-text" translatable="yes">Peso</property>
                                       </object>
                                       <packing>
                                         <property name="left-attach">1</property>
@@ -5752,9 +5752,9 @@ al programa identificarla y poder establecer su nombre en los registros.</proper
                                         <property name="visible">True</property>
                                         <property name="can-focus">True</property>
                                         <property name="editable">False</property>
-                                        <property name="max-length">5</property>
+                                        <property name="max-length">10</property>
                                         <property name="width-chars">9</property>
-                                        <property name="placeholder-text" translatable="yes">Porcentaje</property>
+                                        <property name="placeholder-text" translatable="yes">Peso</property>
                                       </object>
                                       <packing>
                                         <property name="left-attach">1</property>

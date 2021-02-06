@@ -3,5 +3,7 @@
 *.res
 *.gch
 *.swp
+*.html
+*.csv
 /build
 resources/data/

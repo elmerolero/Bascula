@@ -166,22 +166,14 @@ void iniciarSesion()
 			mostrarUsuario();
 			
 			// Redirige hacia la vista de inicio
-			if( !esInicio && cargarNombreEmpresa() ){
-				irHacia( nullptr, (void *)"Inicio" );
-				actualizarNombreEmpresa();
-			}
-			else{
-				irHacia( nullptr, (void *)"RegistrarEmpresa" );
-			}
+			irHacia( nullptr, (void *)"Inicio" );
 			
+			// Carga la información
+			cargarInformacion();
+			
+			// Conecta las señales
 			if( usuario.esAdministrador() ){
-				interfaz.mostrarElemento( "BotonRegistros" );
-				interfaz.mostrarElemento( "BotonUsuarios" );
 				conectarSenalesAdministrador();
-			}
-			else{
-				interfaz.ocultarElemento( "BotonRegistros" );
-				interfaz.ocultarElemento( "BotonUsuarios" );
 			}
 
 			// Manda a conectar todas las señales de las vistas
@@ -304,5 +296,25 @@ void cambiarContrasenaUsuario()
 	catch( invalid_argument &ia ){
 		interfaz.establecerTextoEtiqueta( "MensajeErrorReemplazarContrasena", ia.what() );
 		interfaz.mostrarElemento( "MensajeErrorReemplazarContrasena" );
+	}
+}
+
+void consultarExistenciaUsuarios()
+{
+	try{
+		// Abre la base de datos
+		database.open( nombreArchivo );
+
+		// Consulta todos los usuarios registrados
+		database.query( "select * from usuarios where nombre_usuario != 'admin'" );
+		if( rows.size() <= 0 ){
+			irHacia( nullptr, (void *)"RegistrarUsuario" );
+		}
+
+		// Cierra la conexión
+		database.close();
+	}
+	catch( exception &e ){
+		cerr << e.what() << endl;
 	}
 }

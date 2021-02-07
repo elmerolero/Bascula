@@ -39,47 +39,53 @@ void iniciar()
         interfaz.conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_main_quit ), nullptr );
         actualizarTiempo( nullptr, nullptr );
 
-        // ¿Primer inicio?
-        primerInicio();
-
-        // Obtiene las empresas y los productos registrados en la base de datos
-        productos.establecerNombrePlural( "productos" );
-        productos.establecerNombreSingular( "producto" );
-        productos.obtenerRegistros();
-        
-        empresas.establecerNombrePlural( "empresas" );
-        empresas.establecerNombreSingular( "empresa" );
-        empresas.obtenerRegistros();
-        
-        // Obtiene los tickets registrados y pendientes
-        obtenerFolioActualInterno();
-        obtenerFolioActualPublico();
-        obtenerRegistrosInternosPendientes();
-        obtenerRegistrosPublicosPendientes();
-
-        // Obtine los registros de completado de conductor y numero de placas
-        actualizarElementosLista( &listaNombresConductor, &completadorNombresConductor, "nombre_conductor" );
-        actualizarElementosLista( &listaNumerosPlaca, &completadorNumerosPlaca, "numero_placas" ); 
-        interfaz.establecerCompletadorEntrada( "EntradaNombreConductorInterno", completadorNombresConductor );
-        interfaz.establecerCompletadorEntrada( "EntradaNumeroPlacasInterno", completadorNumerosPlaca );
-
         // Establece la hora
         g_timeout_add( 1000, G_SOURCE_FUNC( actualizarTiempo ), nullptr );
 
         // Conecta la señales base
         conectarSenalesBase();
 
-        // Carga la configuración de la bascula
-        lectorBascula.cargarConfiguracion();
-        cargarOpcionesImpresion();
-        
-        if( !esInicio ){
-            irHacia( nullptr, (void *)"IniciarSesion" );
-        }
+        // Redirige hacia la interfaz de inicio de sesión
+        irHacia( nullptr, (void *)"IniciarSesion" );
+
+        // Revisa si hay usuarios registrados, de otra forma redirigirá a la vista de registro
+        consultarExistenciaUsuarios();
     }
     catch( runtime_error &excepcion ){
         cerr << excepcion.what() << endl;
     }
+}
+
+// Carga la información necesaria
+void cargarInformacion()
+{
+    // Carga el nombre de la empresa
+    cargarNombreEmpresa();
+
+    // Obtiene las empresas y los productos registrados en la base de datos
+    productos.establecerNombrePlural( "productos" );
+    productos.establecerNombreSingular( "producto" );
+    productos.obtenerRegistros();
+    
+    empresas.establecerNombrePlural( "empresas" );
+    empresas.establecerNombreSingular( "empresa" );
+    empresas.obtenerRegistros();
+    
+    // Obtiene los tickets registrados y pendientes
+    obtenerFolioActualInterno();
+    obtenerFolioActualPublico();
+    obtenerRegistrosInternosPendientes();
+    obtenerRegistrosPublicosPendientes();
+
+    // Obtine los registros de completado de conductor y numero de placas
+    actualizarElementosLista( &listaNombresConductor, &completadorNombresConductor, "nombre_conductor" );
+    actualizarElementosLista( &listaNumerosPlaca, &completadorNumerosPlaca, "numero_placas" ); 
+    interfaz.establecerCompletadorEntrada( "EntradaNombreConductorInterno", completadorNombresConductor );
+    interfaz.establecerCompletadorEntrada( "EntradaNumeroPlacasInterno", completadorNumerosPlaca );
+
+    // Carga la configuración de la bascula
+    lectorBascula.cargarConfiguracion();
+    cargarOpcionesImpresion();    
 }
 
 // Muestra la vista solicitada
@@ -172,6 +178,10 @@ void conectarSenales()
 //
 void conectarSenalesAdministrador()
 {
+    // Habilita los botones de consulta de registros
+    interfaz.mostrarElemento( "BotonRegistros" );
+	interfaz.mostrarElemento( "BotonUsuarios" );
+
     // Vista de registro de empresa (primer inicio)
     interfaz.conectarSenal( "BotonRegistrarEmpresaPropia", "clicked", G_CALLBACK( registrarEmpresa ), nullptr );
 
@@ -277,34 +287,6 @@ string obtenerFecha( unsigned int dia, unsigned int mes, unsigned int anio )
 
     // Retorna la fecha creada
     return fecha.str();
-}
-
-void primerInicio()
-{
-    ifstream archivo;
-
-    // Intenta abrir el archivo
-    archivo.open( nombreArchivo );
-    if( archivo.is_open() ){
-        archivo.close();
-        esInicio = false;
-        return; // Regresa no hay que establecer opciones adicionales
-    }
-
-    // Es primer inicio
-    esInicio = true;
-
-    // Creamos el archivo
-    database.open( nombreArchivo );
-
-    // Creamos las tablas
-    database.query( desencriptar( databaseTables, numeroMagico ) );
-
-    // Cerramos la base de datos
-    database.close();
-
-    // Redirigimos a la página de registro
-    irHacia( nullptr, (void *)"RegistrarUsuario" );
 }
 
 // Actualiza el tiempo cada segundo

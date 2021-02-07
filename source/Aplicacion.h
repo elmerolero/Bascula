@@ -23,7 +23,10 @@ void irHacia( GtkWidget *widget, gpointer ptr );
 
 // Inicializa la aplicacion
 void iniciar();
-       
+
+// Carga la información necesaria para funcionar
+void cargarInformacion();
+
 // Conecta las señales necesarias para funcionar cuando no se ha iniciado sesión
 void conectarSenalesBase();
 

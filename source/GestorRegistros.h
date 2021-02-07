@@ -76,7 +76,7 @@ void guardarConfiguracion();
 
 // Realiza operaciones con el nombre de la empresa
 void registrarNombreEmpresa( std::string nombre );
-bool cargarNombreEmpresa();
+void cargarNombreEmpresa();
 void cargarOpcionesImpresion();
 
 // Limpia la lista de tickets dada

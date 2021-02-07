@@ -372,21 +372,21 @@ void finalizarRegistroPublico( TicketPublico *registroPublico )
 	     << ", tipo_viaje = " << registroPublico -> obtenerTipoViaje() << " where folio = " << registroPublico -> obtenerFolio();
 	    
     try{
-	// Inserta el nuevo ticket
-	database.query( consulta.str() );
-	
-	// Imprime el ticket
-	registroPublico -> imprimir( nombreEmpresa );
-	
-	// Remueve el ticket de los registros pendientes
-	registrosPublicosPendientes.remove( registroPublico );
-	
-	// Elimina el ticket
-	delete registroPublico;
-	registroPublico = nullptr;
+        // Inserta el nuevo ticket
+        database.query( consulta.str() );
+        
+        // Imprime el ticket
+        registroPublico -> imprimir( nombreEmpresa );
+        
+        // Remueve el ticket de los registros pendientes
+        registrosPublicosPendientes.remove( registroPublico );
+        
+        // Elimina el ticket
+        delete registroPublico;
+        registroPublico = nullptr;
     }
     catch( runtime_error &re ){
-	cerr << re.what() << endl;
+	    cerr << re.what() << endl;
     }
     
     // Cierra la conexion
@@ -413,7 +413,7 @@ void crearRegistroPublicoPendiente( TicketPublico *registroPublico )
 	    
     // Inserta el nuevo ticket
     try{
-	   database.query( consulta.str() );
+	    database.query( consulta.str() );
     	if( registroPublico -> estaPendiente() ){
     	    registrosPublicosPendientes.push_back( registroPublico );
     	}
@@ -431,9 +431,7 @@ void crearRegistroPublicoPendiente( TicketPublico *registroPublico )
 
 void registrarNombreEmpresa( std::string nombre )
 {
-    // Archivo HTML con la información del ticket
-    ofstream archivo;
-    
+    // Formato para validar la información
     regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ.\\s]*" );
 
     if( nombre.empty() ){
@@ -448,36 +446,49 @@ void registrarNombreEmpresa( std::string nombre )
         throw invalid_argument( "El nombre introducido no es válido." );
     }
 
-    // Se abre el archivo
-    archivo.open( "../resources/data/empresa.dat", ios_base::out );
-    if( !archivo ){
-        throw runtime_error( "Error" );
+    try{
+        // Abre la base de datos
+        database.open( nombreArchivo );
+
+        // Realiza la consulta
+        database.query( "insert into empresa values ( '" + nombre + "' )" );
+
+        // Cierra la conexión
+        database.close();
     }
-
-    archivo << nombre << endl;
-
-    archivo.close();
+    catch( runtime_error &re ){
+        cerr << re.what();
+    }
 
     cargarNombreEmpresa();
     actualizarNombreEmpresa();
 }
 
-bool cargarNombreEmpresa()
+void cargarNombreEmpresa()
 {
-    ifstream archivo;
+    try{
+        // Abre la base de datos
+        database.open( nombreArchivo );
 
-    // Intenta abrir el archivo
-    archivo.open( "../resources/data/empresa.dat" );
-    if( !archivo.is_open() ){
-        return false; // Regresa no hay que establecer opciones adicionales
+        // Realiza la consulta
+        database.query( "select * from empresa" );
+        if( rows.size() > 0 ){
+            // Establece el nombre de la empresa
+            nombreEmpresa = rows.at( 0 ) -> columns.at( 0 );
+
+            // Actualiza el nombre de la empresa
+            actualizarNombreEmpresa();
+        }
+        else{
+            irHacia( nullptr, (void *)"RegistrarEmpresa" );
+        }
+
+        // Cierra la conexión
+        database.close();
     }
-
-    // Lee el nombre de la empresa
-    getline( archivo, nombreEmpresa );
-
-    archivo.close();
-
-    return true;
+    catch( exception &e ){
+        cerr << e.what() << endl;
+    }
 }
 
 void cargarOpcionesImpresion()

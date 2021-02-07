@@ -132,11 +132,13 @@ void internoRegistrarPendiente()
 		// Crea o actualiza el ticket pendiente
 		if( esRegistroNuevo ){
 			crearRegistroPendiente( ticket );
-			mostrarMensaje( "Registro creado correctamente." );
+			interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro creado correctamente." );
+			interfaz.mostrarElemento( "MensajeTicketsPendientes" );
 		}
 		else{
 			actualizarRegistroPendiente( ticket );
-			mostrarMensaje( "Registro actualizado correctamente." );
+			interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro actualizado correctamente." );
+			interfaz.mostrarElemento( "MensajeTicketsPendientes" );
 		}
 
 		// Actualiza la lista de registros
@@ -273,7 +275,8 @@ void internoFinalizarPendiente()
 		internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
 
 		// Muestra un mensaje que indica que finalizó adecuadamente
-		mostrarMensaje( "Registro finalizado. Creando formato de impresión." );
+		interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro finalizado. Se creó formato de impresión." );
+		interfaz.mostrarElemento( "MensajeTicketsPendientes" );
 
 		// Redirige hacia la vista de tickets
 		irHacia( nullptr, (void *)"Tickets" );

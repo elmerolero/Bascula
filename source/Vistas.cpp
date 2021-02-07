@@ -303,6 +303,9 @@ void vistaBasculaInterna( GtkWidget *widget, gpointer ptr )
 	// Obtiene los tickets pendiente
 	internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
 	
+	// Oculta la barra de mensajes
+	interfaz.ocultarElemento( "MensajeTicketsPendientes" );
+
 	// Desconecta las señales correspondientes
 	interfaz.desconectarSenal( "BotonBasculaNuevo", botonBasculaNuevoId );
 	interfaz.desconectarSenal( "EntradaSeguimiento", entradaSeguimientoId );

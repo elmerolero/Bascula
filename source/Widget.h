@@ -3,6 +3,13 @@
 #include <string>
 #include <gtk/gtk.h>
 
+struct Signal
+{
+    std::string object;
+    std::string type;
+    guint id;
+};
+
 class Widget
 {
     public:
@@ -24,8 +31,14 @@ class Widget
         // Conecta un evento al elemento e indica una función que ejecutará
         guint conectarSenal( std::string id, std::string tipoSenal, GCallback funcion, gpointer data );
 
+        // Conecta un evento al elemento e indica una función que ejecutará
+        void conectarSenal( Signal &senal, GCallback funcion, gpointer data );
+
         // Desconecta la señal del elemento indicado
         void desconectarSenal( std::string idElemento, guint &idSenal );
+
+        // Desconecta la señal del elemento indicado
+        void desconectarSenal( Signal &senal );
 
         // Permite obtener el objeto de un widget indicando su ID
         GObject * obtenerObjeto( std::string id ) const;

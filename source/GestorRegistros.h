@@ -67,9 +67,10 @@ void obtenerRegistrosInternosDiarios();
 // Realiza un registro del ticket
 void crearRegistroPendiente( Ticket *ticket );
 void actualizarRegistroPendiente( Ticket *ticket );
-
-// finaliza un registro
 void finalizarRegistro( Ticket *ticket );
+
+void crearRegistroPublicoPendiente( TicketPublico *registroPublico );
+void actualizarRegistroPublicoPendiente( TicketPublico *registroPublico );
 void finalizarRegistroPublico( TicketPublico *registroPublico );
 
 void guardarConfiguracion(); 

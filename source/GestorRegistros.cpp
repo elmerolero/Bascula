@@ -359,74 +359,96 @@ void finalizarRegistro( Ticket *ticket )
     database.close();
 }
 
-void finalizarRegistroPublico( TicketPublico *registroPublico )
-{
-    // Conecta con la base de datos
-    database.open( nombreArchivo );
-    
-    // Consulta para el registro en la base de datos
-    stringstream consulta;
-    consulta << "update registros_publicos set peso_tara = " << registroPublico -> obtenerPesoTara() << ", tara_establecido = " << registroPublico -> estaPesoTaraEstablecido() 
-	     << ", hora_salida = '" << registroPublico -> obtenerHoraSalida() << "', pendiente = 0"
-	     << ", peso_neto = " << registroPublico -> obtenerPesoNeto() << ", neto_establecido = " << registroPublico -> estaPesoNetoEstablecido()
-	     << ", tipo_viaje = " << registroPublico -> obtenerTipoViaje() << " where folio = " << registroPublico -> obtenerFolio();
-	    
-    try{
-        // Inserta el nuevo ticket
-        database.query( consulta.str() );
-        
-        // Imprime el ticket
-        registroPublico -> imprimir( nombreEmpresa );
-        
-        // Remueve el ticket de los registros pendientes
-        registrosPublicosPendientes.remove( registroPublico );
-        
-        // Elimina el ticket
-        delete registroPublico;
-        registroPublico = nullptr;
-    }
-    catch( runtime_error &re ){
-	    cerr << re.what() << endl;
-    }
-    
-    // Cierra la conexion
-    database.close();
-}
-
 void crearRegistroPublicoPendiente( TicketPublico *registroPublico )
-{
-    // Conecta con la base de datos
-    database.open( nombreArchivo );
-    
+{    
     // Consulta para el registro en la base de datos
     stringstream consulta;
     consulta << "insert into registros_publicos values( " << registroPublico -> obtenerFolio() << ", '" << registroPublico -> obtenerFecha() << "', " << registroPublico -> obtenerTipoViaje() << ", " 
              << registroPublico -> obtenerProducto() -> obtenerClave() << ", '" << registroPublico -> obtenerNumeroPlacas() << "', '" 
-             << registroPublico -> obtenerNombreConductor() << "', " << ( registroPublico -> estaPesoBrutoEstablecido() ? "'" + registroPublico -> obtenerHoraEntrada() + "'" : "null" ) << ", "
-             << ( registroPublico -> estaPesoTaraEstablecido() ? "'" + registroPublico -> obtenerHoraSalida() + "'" : "null" ) << ", "
-             << ( registroPublico -> estaPesoBrutoEstablecido() ? registroPublico -> obtenerPesoBruto() : 0 ) << ", " 
-             << ( registroPublico -> estaPesoTaraEstablecido() ? registroPublico -> obtenerPesoTara() : 0 ) << ", "
-             << ( registroPublico -> estaPesoNetoEstablecido() ? registroPublico -> obtenerPesoNeto() : 0 ) << ", " 
-	     << registroPublico -> estaPesoBrutoEstablecido() << ", " << registroPublico -> estaPesoTaraEstablecido() << ", " << registroPublico -> estaPesoNetoEstablecido() << ", '"
-	     << registroPublico -> obtenerNombreBasculista() << "', " << registroPublico -> estaPendiente() << ", " << registroPublico -> esEntradaManual() << ")";
-            
-	    
-    // Inserta el nuevo ticket
-    try{
-	    database.query( consulta.str() );
-    	if( registroPublico -> estaPendiente() ){
-    	    registrosPublicosPendientes.push_back( registroPublico );
-    	}
-    	else{
-    	    registroPublico -> imprimir( nombreEmpresa );
-    	}
-    }
-    catch( runtime_error &re ){
-    	cerr << re.what() << endl;
-    }
+             << registroPublico -> obtenerNombreConductor() << "', '" << registroPublico -> obtenerHoraEntrada() << "', '"
+             << registroPublico -> obtenerHoraSalida() << "', "
+             << registroPublico -> obtenerPesoBruto() << ", " 
+             << registroPublico -> obtenerPesoTara() << ", "
+             << registroPublico -> obtenerPesoNeto() << ", " 
+             << registroPublico -> estaPesoBrutoEstablecido() << ", " 
+             << registroPublico -> estaPesoTaraEstablecido() << ", " 
+             << registroPublico -> estaPesoNetoEstablecido() << ", '"
+             << registroPublico -> obtenerNombreBasculista() << "', " 
+             << registroPublico -> estaPendiente() << ", " << registroPublico -> esEntradaManual() << ")";
     
-    // Cierra la conexion
+    // Realiza la consulta definida anteriormente en la base de datos
+    database.open( nombreArchivo );
+    database.query( consulta.str() );
     database.close();
+
+    // Se agrega el registro a los registros publicos pendientes
+    registrosPublicosPendientes.push_back( registroPublico );
+}
+
+void actualizarRegistroPublicoPendiente( TicketPublico *registroPublico )
+{
+    // Consulta para el registro en la base de datos
+    stringstream consulta;
+    consulta << "update registros_publicos set "
+             << "tipo_viaje = " << registroPublico -> obtenerTipoViaje() << ", "
+             << "clave_producto = " << registroPublico -> obtenerProducto() -> obtenerClave() << ", "
+             << "numero_placas = '" << registroPublico -> obtenerNumeroPlacas() << "', "
+             << "nombre_conductor = '" << registroPublico -> obtenerNombreConductor() << "', "
+             << "hora_entrada = '" << registroPublico -> obtenerHoraEntrada() << "', "
+             << "hora_salida = '" << registroPublico -> obtenerHoraSalida() << "', "
+             << "peso_bruto = " << registroPublico -> obtenerPesoBruto() << ", " 
+             << "peso_tara = " << registroPublico -> obtenerPesoTara() << ", "
+             << "peso_neto = " << registroPublico -> obtenerPesoNeto() << ", " 
+             << "bruto_establecido = " << registroPublico -> estaPesoBrutoEstablecido() << ", " 
+             << "tara_establecido = " << registroPublico -> estaPesoTaraEstablecido() << ", " 
+             << "neto_establecido = " << registroPublico -> estaPesoNetoEstablecido() << ", "
+             << "nombre_basculista = '" << registroPublico -> obtenerNombreBasculista() << "', "
+             << "pendiente = " << registroPublico -> estaPendiente() << ", "
+             << "entrada_manual = " << registroPublico -> esEntradaManual() << " "
+             << "where folio = " << registroPublico -> obtenerFolio();
+    
+    // Realiza la consulta definida anteriormente en la base de datos
+    database.open( nombreArchivo );
+    database.query( consulta.str() );
+    database.close();
+}
+
+void finalizarRegistroPublico( TicketPublico *registroPublico )
+{
+    // Consulta para el registro en la base de datos
+    stringstream consulta;
+    consulta << "update registros_publicos set "
+             << "tipo_viaje = " << registroPublico -> obtenerTipoViaje() << ", "
+             << "clave_producto = " << registroPublico -> obtenerProducto() -> obtenerClave() << ", "
+             << "numero_placas = '" << registroPublico -> obtenerNumeroPlacas() << "', "
+             << "nombre_conductor = '" << registroPublico -> obtenerNombreConductor() << "', "
+             << "hora_entrada = '" << registroPublico -> obtenerHoraEntrada() << "', "
+             << "hora_salida = '" << registroPublico -> obtenerHoraSalida() << "', "
+             << "peso_bruto = " << registroPublico -> obtenerPesoBruto() << ", " 
+             << "peso_tara = " << registroPublico -> obtenerPesoTara() << ", "
+             << "peso_neto = " << registroPublico -> obtenerPesoNeto() << ", " 
+             << "bruto_establecido = " << registroPublico -> estaPesoBrutoEstablecido() << ", " 
+             << "tara_establecido = " << registroPublico -> estaPesoTaraEstablecido() << ", " 
+             << "neto_establecido = " << registroPublico -> estaPesoNetoEstablecido() << ", "
+             << "nombre_basculista = '" << registroPublico -> obtenerNombreBasculista() << "', "
+             << "pendiente = " << registroPublico -> estaPendiente() << ", "
+             << "entrada_manual = " << registroPublico -> esEntradaManual() << " "
+             << "where folio = " << registroPublico -> obtenerFolio();
+    
+    // Realiza la consulta definida anteriormente en la base de datos
+    database.open( nombreArchivo );
+    database.query( consulta.str() );
+    database.close();
+    
+    // Imprime el ticket
+    registroPublico -> imprimir( nombreEmpresa );
+    
+    // Remueve el ticket de los registros pendientes
+    registrosPublicosPendientes.remove( registroPublico );
+    
+    // Elimina el ticket
+    delete registroPublico;
+    registroPublico = nullptr;
 }
 
 void registrarNombreEmpresa( std::string nombre )
@@ -839,47 +861,26 @@ void establecerRegistroInternoDesdeRenglon( Ticket *registroInterno, Row *row )
 
     // Se establece los datos del registro interno
     registroInterno -> establecerFolio( static_cast< unsigned int >( stoi( row -> columns.at( 0 ) ) ) );
-    cout << "Folio ";
     registroInterno -> establecerFecha( row -> columns.at( 1 ) );
-    cout << "Fecha ";
     registroInterno -> establecerTipoRegistro( stoi( row -> columns.at( 2 ) ) );
-    cout << "Tipo ";
     registroInterno -> establecerEmpresa( empresas.buscarRegistroPorClave( stoi( row -> columns.at( 3 ) ) ) );
-    cout << "Empresa ";
     registroInterno -> establecerProducto( productos.buscarRegistroPorClave( stoi( row -> columns.at( 4 ) ) ) );
-    cout << "Producto ";
     registroInterno -> establecerNumeroPlacas( row -> columns.at( 5 ) );
-    cout << "Placas ";
     registroInterno -> establecerNombreConductor( row -> columns.at( 6 ) );
-    cout << "Conductor ";
     registroInterno -> establecerHoraEntrada( row -> columns.at( 7 ) );
-    cout << "Entrada ";
     registroInterno -> establecerHoraSalida( row -> columns.at( 8 ) );
-    cout << "Salida ";
     registroInterno -> establecerPesoBruto( row -> columns.at( 9 ) );
-    cout << "Bruto ";
     registroInterno -> establecerPesoBrutoEstablecido( stoi( row -> columns.at( 10 ) ) );
-    cout << "Besta ";
     registroInterno -> establecerPesoTara( row -> columns.at( 11 ) );
-    cout << "Tara ";
     registroInterno -> establecerPesoTaraEstablecido( stoi( row -> columns.at( 12 ) ) );
-    cout << "Testa ";
     registroInterno -> permitirDescuento( stoi( row -> columns.at( 15 ) ) );
-    cout << "PDescu ";
     registroInterno -> establecerDescuento( row -> columns.at( 13 ) );
-    cout << "Descuento ";
     registroInterno -> establecerDescuentoEstablecido( stoi( row -> columns.at( 14 ) ) );
-    cout << "Desta ";
     registroInterno -> establecerPesoNeto( row -> columns.at( 16 ) );
-    cout << "Neto ";
     registroInterno -> establecerPesoNetoEstablecido( stoi( row -> columns.at( 17 ) ) );
-    cout << "Nesta ";
     registroInterno -> establecerObservaciones( row -> columns.at( 18 ) );
-    cout << "Observaciones ";
     registroInterno -> establecerEntradaManual( stoi( row -> columns.at( 19 ) ) );
-    cout << "Manual ";
     registroInterno -> establecerPendiente( stoi( row -> columns.at( 20 ) ) );
-    cout << "Basculista " << endl;
     registroInterno -> establecerNombreBasculista( row -> columns.at( 21 ) );
 }
 

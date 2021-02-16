@@ -1,5 +1,4 @@
 #include "Aplicacion.h"
-#include <gtk/gtk.h>
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
@@ -13,6 +12,7 @@
 #include "RegistrosInternos.h"
 #include "RegistrosPublicos.h"
 #include "Database.h"
+#include "Senales.h"
 #include "Sesion.h"
 using namespace std;
 
@@ -23,8 +23,6 @@ string vistaActual;
 // Aplicacion activa
 bool aplicacionActiva;
 
-int numeroMagico = 5;
-
 void irHacia( GtkWidget *widget, gpointer ptr )
 {
 	mostrarVista( (char *)ptr );
@@ -33,26 +31,23 @@ void irHacia( GtkWidget *widget, gpointer ptr )
 // Inicializa la aplicacion
 void iniciar()
 {
-    try{
-        // Carga la ventana principal y conecta la función para cerrar la ventana y finalizar el programa
-        interfaz.cargarWidget( "../resources/interfaces/Principal.glade" );
-        interfaz.conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_main_quit ), nullptr );
-        actualizarTiempo( nullptr, nullptr );
+    // Carga la ventana principal y conecta la función para cerrar la ventana y finalizar el programa
+    interfaz.cargarWidget( "../resources/interfaces/Principal.glade" );
+    interfaz.conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_main_quit ), nullptr );
 
-        // Establece la hora
-        g_timeout_add( 1000, G_SOURCE_FUNC( actualizarTiempo ), nullptr );
+    // Establece la hora
+    actualizarTiempo( nullptr, nullptr );
+    g_timeout_add( 1000, G_SOURCE_FUNC( actualizarTiempo ), nullptr );
 
-        // Conecta la señales base
-        conectarSenalesBase();
+    // Conecta la señales base
+    conectarSenalesBase();
 
-        // Redirige hacia la interfaz de inicio de sesión
-        irHacia( nullptr, (void *)"IniciarSesion" );
+    // Redirige hacia la interfaz de inicio de sesión
+    irHacia( nullptr, (void *)"IniciarSesion" );
 
-        // Revisa si hay usuarios registrados, de otra forma redirigirá a la vista de registro
-        consultarExistenciaUsuarios();
-    }
-    catch( runtime_error &excepcion ){
-        cerr << excepcion.what() << endl;
+    // Si no existen usuarios registrados, se dirige a la sección para registrar uno
+    if( !existenUsuariosRegistrados() ){
+        irHacia( nullptr, (void *)"RegistrarUsuario" );
     }
 }
 
@@ -159,6 +154,10 @@ void conectarSenales()
 
     // Nuevo para ticket publico
     interfaz.conectarSenal( "EntradaNumeroPlacasPublico", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.conectarSenal( "BotonLeerPesoBrutoPublico", "clicked", G_CALLBACK( vistaLeerPesoBrutoPublico ), nullptr );
+    interfaz.conectarSenal( "BotonLeerPesoTaraPublico", "clicked", G_CALLBACK( vistaLeerPesoTaraPublico ), nullptr );
+    interfaz.conectarSenal( "BotonRegistrarPendientePublico", "clicked", G_CALLBACK( publicoRegistrarPendiente ), nullptr );
+    interfaz.conectarSenal( "BotonFinalizarPendientePublico", "clicked", G_CALLBACK( publicoFinalizarPendiente ), nullptr );
 
     // Vista de registro de peso
     interfaz.conectarSenal( "BotonCancelarLectura", "clicked", G_CALLBACK( lectorBasculaCerrar ), nullptr );
@@ -210,6 +209,14 @@ void conectarSenalesAdministrador()
     // Vista de ticket interno
     interfaz.conectarSenal( "RegresarPublico", "activate-link", G_CALLBACK( irHacia ), (void *)"Pesajes" );
     interfaz.conectarSenal( "EliminarRegistroPublico", "clicked", G_CALLBACK( internoAlertaEliminar ), nullptr );
+
+    // Vista de administración de usuarios
+    interfaz.conectarSenal( enlaceConsultarUsuariosRegresar, G_CALLBACK( regresarInicio ), nullptr );
+    interfaz.conectarSenal( enlaceConsultarUsuarioRegresar, G_CALLBACK( regresarUsuarios ), nullptr );
+	interfaz.conectarSenal( entradaConsultarUsuario, G_CALLBACK( vistaConsultarUsuario ), nullptr );
+	interfaz.conectarSenal( botonConsultarUsuario, G_CALLBACK( vistaConsultarUsuario ), nullptr );
+    interfaz.conectarSenal( botonObtenerCodigoRecuperacion, G_CALLBACK( generarCodigoRecuperacion ), nullptr );
+    interfaz.conectarSenal( usuarioAdministrador, G_CALLBACK( actualizarEstadoAdministrador ), nullptr );
 }
 
 // Muestra una alerta con el mensaje indicado

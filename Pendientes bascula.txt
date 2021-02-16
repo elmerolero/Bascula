@@ -1,3 +1,0 @@
-El programa se cierra. Guardar excepciones generadas por el programa.
-Libertad de editar los campos en caso de pendiente, añadir boton de finalizar con confirmación.
-Guardar báscula por defecto.

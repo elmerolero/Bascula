@@ -4,18 +4,6 @@
 #include <gtk/gtk.h>
 #include "Registro.h"
 
-extern guint botonBasculaNuevoId;
-extern guint botonSeguimientoId;
-extern guint entradaSeguimientoId;
-extern guint botonLeerPesoBrutoId;
-
-extern guint botonRegistrarTicketId;
-extern guint botonCancelarInternoId;
-
-extern guint entradaConsultarNombreId;
-extern guint botonConsultarNombreId;
-extern guint botonRegresarRegistrosId;
-
 void vistaCuenta( GtkWidget *widget, gpointer ptr );
 void vistaNuevoRegistro( GtkWidget *widget, gpointer ptr );
 void vistaNuevoProducto( GtkWidget *widget, gpointer ptr );

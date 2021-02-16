@@ -18,6 +18,6 @@ std::string crearHash( std::string contrasena, std::string sal );
 void compararContrasenas( const std::string &contrasena, const std::string &confirmacion );
 void verificarContrasena( std::string contrasena, std::string sal, std::string hash );
 void cambiarContrasenaUsuario();
-void consultarExistenciaUsuarios();
+bool existenUsuariosRegistrados();
 
 #endif

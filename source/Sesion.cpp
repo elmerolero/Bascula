@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <string>
+#include <fstream>
 #include "Vistas.h"
 using namespace std;
 
@@ -35,11 +36,13 @@ void registrarUsuario()
 		string sal = crearSal();
 		string contrasenaFinal = crearHash( contrasena, sal );
 		
+		// Comando de consulta para el registro
+		string consulta = "insert into usuarios values( '" + nombreUsuario + "', '" +  contrasenaFinal + "', '" + sal + "', '" + nombre + "', '" + apellidos + "', " + ( !existenUsuariosRegistrados() ? "1" : "0" ) + " )";
+		
 		// Conecta con la base de datos
 		database.open( nombreArchivo );
-		
-		// Intenta realizar el registro
-		string consulta = "insert into usuarios values( '" + nombreUsuario + "', '" +  contrasenaFinal + "', '" + sal + "', '" + nombre + "', '" + apellidos + "', " + ( esInicio ? "1" : "0" ) + " )";
+
+		// Realiza la consulta
 		database.query( consulta );
 		
 		// Cierra la base de datos
@@ -299,22 +302,14 @@ void cambiarContrasenaUsuario()
 	}
 }
 
-void consultarExistenciaUsuarios()
+// Indica si se han registrado usuarios en el programa
+bool existenUsuariosRegistrados()
 {
-	try{
-		// Abre la base de datos
-		database.open( nombreArchivo );
+	// Consulta los usuarios registrados cuyo nombre de usuario no sea 'admin'
+	database.open( nombreArchivo );
+	database.query( "select * from usuarios where nombre_usuario != 'admin'" );
+	database.close();
 
-		// Consulta todos los usuarios registrados
-		database.query( "select * from usuarios where nombre_usuario != 'admin'" );
-		if( rows.size() <= 0 ){
-			irHacia( nullptr, (void *)"RegistrarUsuario" );
-		}
-
-		// Cierra la conexión
-		database.close();
-	}
-	catch( exception &e ){
-		cerr << e.what() << endl;
-	}
+	// Retorna si hubo resultados
+	return rows.size() > 0;
 }

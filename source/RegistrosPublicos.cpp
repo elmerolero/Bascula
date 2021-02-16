@@ -12,43 +12,36 @@ using namespace std;
 TicketPublico *registroPublico = nullptr;
 bool publicoPendiente = true;
 
-TicketPublico *crearRegistroPublico()
-{
-	// Crea el ticket publico
-	TicketPublico *ticket = new TicketPublico();
-	if( ticket == nullptr ){
-		throw runtime_error( "Hubo un error al crear el ticket." );
-	}
-
-	return ticket;
-}
-
 void publicoRegistrarPendiente()
 {
+	// Bandera que indica si se va a actualizar o registrar el nuevo ticket
+	bool esRegistroNuevo = false;
+
 	// Crea el nuevo registro
 	TicketPublico *registroPublico;
 
 	try{
-		// Crea el nuevo registro
-		registroPublico = crearRegistroPublico();
+		// Revisa si el ticket con el folio indicado existe como pendiente, si no, se crea uno nuevo
+		registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioPublico" ) ), registrosPublicosPendientes );
+		if( registroPublico == nullptr ){
+			++folioActualPublico;
+			esRegistroNuevo = true;
+			registroPublico = new TicketPublico();
+			registroPublico -> establecerFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioPublico" ) ) );
+		}
 
 		// Obtiene el producto introducido
    		string nombreProducto = interfaz.obtenerTextoEntrada( "EntradaNombreProductoPublico" );
     	Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
 
     	// Establece los datos obligatorios
-    	registroPublico -> establecerFolio( ++folioActualPublico );
 		registroPublico -> establecerFecha( interfaz.obtenerTextoEtiqueta( "EntradaFechaPublico" ) );
 		registroPublico -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
 		registroPublico -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorPublico" ) );
 		registroPublico -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasPublico" ) );
 		registroPublico -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
 		registroPublico -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
-
-		// Registra el peso bruto
-		registroPublico -> establecerPesoBruto( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoPublico" ) );
-		registroPublico -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaPublico" ) );
-		registroPublico -> establecerPesoBrutoEstablecido( true );
+		registroPublico -> establecerPendiente( true );
 
 		// Registra el tipo de registro
 		if( interfaz.obtenerEstadoBotonToggle( "ViajeLocal" ) ){
@@ -58,14 +51,60 @@ void publicoRegistrarPendiente()
 	    	registroPublico -> establecerTipoViaje( VIAJE_FORANEO );
 		}
 
-		// Registra si está pendiente
-		registroPublico -> establecerPendiente( true );
-		
-		// Crea el registro publico pendiente
-		crearRegistroPublicoPendiente( registroPublico );
+		// Registra el peso bruto
+		try{
+			registroPublico -> establecerPesoBruto( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoPublico" ) );
+			registroPublico -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaPublico" ) );
+			registroPublico -> establecerPesoBrutoEstablecido( true );
+		}
+		catch( invalid_argument &ia ){
+			registroPublico -> establecerPesoBruto( 0.f );
+			registroPublico -> establecerHoraEntrada( "" );
+			registroPublico -> establecerPesoBrutoEstablecido( false );
+		}
 
-		// Muestra mensaje de que el registro fue correctamente registrado
-		mostrarMensaje( "Registro creado\ncorrectamente." );
+		// Registra el peso tara
+		try{
+			registroPublico -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraPublico" ) );
+			registroPublico -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaPublico" ) );
+			registroPublico -> establecerPesoTaraEstablecido( true );
+		}
+		catch( invalid_argument &ia ){
+			registroPublico -> establecerPesoTara( 0.f );
+			registroPublico -> establecerHoraSalida( "" );
+			registroPublico -> establecerPesoTaraEstablecido( false );
+		}
+
+		// Registra el peso neto
+		try{
+			// ¿Están establecidos el peso bruto y el peso tara?
+			if( registroPublico -> estaPesoBrutoEstablecido() && registroPublico -> estaPesoTaraEstablecido() ){
+				registroPublico -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoPublico" ) );
+				registroPublico -> establecerPesoNetoEstablecido( true );
+			}
+			else{
+				// No registra un peso neto
+				registroPublico -> establecerPesoNeto( 0.f );
+				registroPublico -> establecerPesoNetoEstablecido( false );
+			}
+		}
+		catch( invalid_argument &ia ){
+			// No registra un peso neto
+			registroPublico -> establecerPesoNeto( 0.f );
+			registroPublico -> establecerPesoNetoEstablecido( false );
+		}
+
+		// Crea o registra el registro según corresponda
+		if( esRegistroNuevo ){
+			crearRegistroPublicoPendiente( registroPublico );
+			interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro creado correctamente." );
+			interfaz.mostrarElemento( "MensajeTicketsPendientes" );
+		}
+		else{
+			actualizarRegistroPublicoPendiente( registroPublico );
+			interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro actualizado correctamente." );
+			interfaz.mostrarElemento( "MensajeTicketsPendientes" );
+		}
 	
 		// Actualiza la vista de tickets
 		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorRegistros" );
@@ -74,16 +113,13 @@ void publicoRegistrarPendiente()
 		irHacia( nullptr, (void *)"Tickets" );
 	}
 	catch( invalid_argument &ia ){
-		delete registroPublico;
-		registroPublico = nullptr;
 		folioActualPublico--;
 		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
 		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
-	}
-	catch( runtime_error &re ){
-		folioActualPublico--;
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", re.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+		if( esRegistroNuevo ){
+			delete registroPublico;
+			registroPublico = nullptr;
+		}
 	}
 }
 

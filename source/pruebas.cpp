@@ -1,4 +1,7 @@
 #include <iostream>
+#include <Windows.h>
+#include <shlobj.h>
+#include <stringapiset.h>
 #include "Database.h"
 using namespace std;
 
@@ -7,7 +10,11 @@ int main()
     Database database;
     string comando;
 
-    database.open( "noc" );
+	PWSTR path[256];
+	SHGetKnownFolderPath( FOLDERID_RoamingAppData, 0, NULL, path );
+	CW2A( path );
+	string databasePath = 
+    database.open( databasePath );
 
     while( true ){
     	cout << "?: ";

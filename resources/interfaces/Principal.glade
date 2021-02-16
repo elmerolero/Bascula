@@ -2019,6 +2019,22 @@ aquí para reestablecer tu contraseña.</property>
                                 <property name="position">1</property>
                               </packing>
                             </child>
+                            <child>
+                              <object class="GtkLabel" id="NombreEmpresa3">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="label" translatable="yes">Nombre de la Empresa S. A. de C. V.</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 12"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">2</property>
+                              </packing>
+                            </child>
                           </object>
                           <packing>
                             <property name="left-attach">0</property>
@@ -2026,13 +2042,12 @@ aquí para reestablecer tu contraseña.</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkLabel" id="NombreEmpresa3">
-                            <property name="visible">True</property>
+                          <object class="GtkLabel" id="MensajeTicketsPendientes">
+                            <property name="name">MensajeTicketsPendientes</property>
                             <property name="can-focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="label" translatable="yes">Nombre de la Empresa S. A. de C. V.</property>
+                            <property name="label" translatable="yes">Mensaje</property>
                             <attributes>
-                              <attribute name="font-desc" value="Sans Bold 12"/>
+                              <attribute name="foreground" value="#2e2ec2c27e7e"/>
                             </attributes>
                           </object>
                           <packing>
@@ -4009,14 +4024,39 @@ Interno</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkButton" id="BotonRegistrarPublico">
-                                <property name="label" translatable="yes">Pendiente</property>
+                              <object class="GtkBox">
                                 <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="receives-default">True</property>
+                                <property name="can-focus">False</property>
                                 <property name="halign">center</property>
-                                <property name="valign">center</property>
-                                <property name="vexpand">True</property>
+                                <property name="spacing">20</property>
+                                <child>
+                                  <object class="GtkButton" id="BotonRegistrarPendientePublico">
+                                    <property name="label" translatable="yes">Pendiente</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="halign">center</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="BotonFinalizarPendientePublico">
+                                    <property name="label" translatable="yes"> Finalizar </property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="halign">center</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
                               </object>
                               <packing>
                                 <property name="expand">False</property>
@@ -4155,7 +4195,7 @@ Interno</property>
                                     <property name="can-focus">False</property>
                                     <property name="halign">start</property>
                                     <property name="margin-top">10</property>
-                                    <property name="label" translatable="yes">Configuración de línea</property>
+                                    <property name="label" translatable="yes">Empresa</property>
                                     <attributes>
                                       <attribute name="font-desc" value="Sans Bold 10"/>
                                     </attributes>
@@ -4164,6 +4204,64 @@ Interno</property>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="hexpand">True</property>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Nombre de la empresa:</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkEntry" id="OpcionesNombreEmpresa">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="tooltip-text" translatable="yes">Nombre que aparecerá en los formatos y en algunas partes de la interfaz del programa.</property>
+                                        <property name="halign">end</property>
+                                        <property name="max-length">50</property>
+                                        <property name="width-chars">50</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin-top">10</property>
+                                    <property name="label" translatable="yes">Configuración de línea</property>
+                                    <attributes>
+                                      <attribute name="font-desc" value="Sans Bold 10"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">3</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4219,7 +4317,7 @@ Interno</property>
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
-                                    <property name="position">2</property>
+                                    <property name="position">4</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4258,7 +4356,7 @@ Interno</property>
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
-                                    <property name="position">3</property>
+                                    <property name="position">5</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4297,7 +4395,7 @@ Interno</property>
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
-                                    <property name="position">4</property>
+                                    <property name="position">6</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4343,7 +4441,7 @@ Interno</property>
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
-                                    <property name="position">5</property>
+                                    <property name="position">7</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4382,7 +4480,7 @@ Interno</property>
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
-                                    <property name="position">6</property>
+                                    <property name="position">8</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -4399,7 +4497,7 @@ Interno</property>
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
-                                    <property name="position">7</property>
+                                    <property name="position">9</property>
                                   </packing>
                                 </child>
                               </object>
@@ -7042,8 +7140,10 @@ al programa identificarla y poder establecer su nombre en los registros.</proper
                             <property name="hexpand">True</property>
                             <property name="label" translatable="yes">Desarrollado por Mayra Elizabeth Barbosa Salas e Ismael Salas López para Básculas Bisa S.A. de C.V.
 
-Queda prohibida su reproducción parcial o total sin el consentimiento previo del autor, su uso sin la adquisión de una licencia previa
-así como su modificación y/o manipulación con el uso de los medios proporcionados por el programa en sí mismo.
+Queda prohibida su reproducción parcial o total sin el consentimiento previo del autor, su uso sin la adquisión de una
+licencia previa así como la modificación y/o manipulación del programa y los datos que registra con el uso de medios
+no proporcionados por el programa en sí mismo. Al hacer uso de este programa se están aceptando los términos
+y condiciones indicados en la página web mencionada a continuación.
 </property>
                             <property name="justify">center</property>
                           </object>

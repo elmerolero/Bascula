@@ -14,15 +14,19 @@ Ticket *ticket;
 
 void internoRegistrarPendiente()
 {
-	try{
-		// Bandera que indica si actualizar o registrar el nuevo ticket
-		bool esRegistroNuevo = false;
+	// Bandera que indica si actualizar o registrar el nuevo ticket
+	bool esRegistroNuevo = false;
+	
+	// Ticket que será creado
+	Ticket * ticket = nullptr;
 
+	try{
 		// Busca el ticket como pendiente, si no lo encuentra, crea uno
-		Ticket * ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioInterno" ) ), registrosInternosPendientes );
+		ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioInterno" ) ), registrosInternosPendientes );
 		if( ticket == nullptr ){
-			esRegistroNuevo = true;
+			folioActual++;
 			ticket = new Ticket();
+			esRegistroNuevo = true;
 			ticket -> establecerFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioInterno" ) ) );
 		}
 
@@ -148,8 +152,17 @@ void internoRegistrarPendiente()
 		irHacia( nullptr, (void *)"Tickets" );
 	}
 	catch( invalid_argument &ia ){
+		// Regresa al folio anterior
+		folioActual--;
+	
+		// Muestra un mensaje de error al usuario
 		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
 		interfaz.mostrarElemento( "MensajeErrorCampo" );
+
+		// Si se estaba creando un ticket erróneo se elimina
+		if( esRegistroNuevo && ticket != nullptr ){
+			delete ticket;
+		}
 	}
 }
 
@@ -470,7 +483,11 @@ void internoObtenerPorFecha( list< Ticket * > &registros, std::string fecha )
 // Cancela el registro
 void internoCancelar()
 {
+	// Redirige hacia la vista de tickets
 	irHacia( nullptr, (void *)"Tickets" );
+
+	// Oculta la barra de mensajes
+	interfaz.ocultarElemento( "MensajeTicketsPendientes" );
 }
 
 // Manda a imprimir el registro interno seleccionado

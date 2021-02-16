@@ -30,13 +30,13 @@ int main( int argc, char * argv[] )
         ofstream log;
 
         // Se abre el archivo
-        log.open( "../resources/log.txt", ios_base::out );
+        log.open( "../resources/log.txt", ios_base::out | ios_base::app );
         if( !log ){
             throw runtime_error( "Error" );
         }
 
         // Indica el tipo de error generado
-        log << e.what() << endl;
+        log << "[Fecha: " << obtenerFecha() << " Hora: " << obtenerHora() << "]: " << e.what() << endl;
 
         // Cierra gtk
         gtk_main_quit();

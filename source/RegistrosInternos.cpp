@@ -85,6 +85,9 @@ void internoRegistrarPendiente()
 				ticket -> permitirDescuento( true );
 				ticket -> establecerDescuento( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
 				ticket -> establecerDescuentoEstablecido( true );
+
+				// Actualiza el peso neto
+				internoActualizarPesoNeto();
 			}
 			catch( invalid_argument &ia ){
 				ticket -> establecerDescuento( 0.f );
@@ -239,6 +242,9 @@ void internoFinalizarPendiente()
 			// Establece el descuento
 			ticket -> establecerDescuento( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
 			ticket -> establecerDescuentoEstablecido( true );
+
+			// Intenta actualizar el peso neto
+			internoActualizarPesoNeto();
 		}
 		else{
 			// No permite descuento

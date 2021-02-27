@@ -345,12 +345,19 @@ void publicoObtenerRegistrosRango()
         return;
     }
 
+	// Agrega el caracter BOM para archivos UTF-8
+	const char *bom = "\xef\xbb\xbf";
+    archivo << bom;
+
+	// Consulta 
     string consulta = "select folio, fecha, tipo_viaje, nombre_producto, numero_placas, nombre_conductor, hora_entrada, "
     				  "hora_salida, peso_bruto, peso_tara, peso_neto, entrada_manual, nombre_basculista "
     				  "from registros_publicos join productos on registros_publicos.clave_producto = productos.clave_producto "
     				  "where pendiente = 0 and fecha between '" + obtenerFecha( diaInicio, mesInicio + 1, anioInicio ) + 
     				  "' and '" + obtenerFecha( diaFin, mesFin + 1, anioFin ) + "' " + "order by fecha";	
-    database.open( nombreArchivo );
+    
+	// Realiza la consulta y envía los resultados al archivos
+	database.open( nombreArchivo );
     database.query( consulta );
     if( rows.size() > 0 ){
     	archivo << "Folio, Fecha, Viaje, Producto, No. Placas, Conductor, Hora entrada, Hora salida, Peso bruto, Peso tara, Peso neto, Manual, Basculista" << endl;

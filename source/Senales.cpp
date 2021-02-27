@@ -40,7 +40,8 @@ Signal botonBasculaPublica{ "BotonBasculaPublica", "clicked", 0 };
 Signal botonBasculaInterna{ "BotonBasculaInterna", "clicked", 0 };
     
 // Uso bascula de uso interno
-Signal entradaSeguimiento{ "EntradaSeguimiento", "insert-text", 0 };
+Signal entradaSeguimientoMayusculas{ "EntradaSeguimiento", "insert-text", 0 };
+Signal entradaSeguimiento{ "EntradaSeguimiento", "activate", 0 };
 Signal enlaceBasculaRegresar{ "EnlaceBasculaRegresar", "activate-link", 0 };
     
 // Nuevo para ticket interno

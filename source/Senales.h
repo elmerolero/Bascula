@@ -41,6 +41,7 @@ extern Signal botonBasculaInterna;
     
 // Uso bascula de uso interno
 extern Signal entradaSeguimiento;
+extern Signal entradaSeguimientoMayusculas;
 extern Signal enlaceBasculaRegresar;
     
 // Nuevo para ticket interno

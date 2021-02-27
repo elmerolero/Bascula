@@ -139,7 +139,7 @@ void conectarSenales()
     interfaz.conectarSenal( botonBasculaInterna, G_CALLBACK( vistaBasculaInterna ), nullptr );
     
     // Uso bascula de uso interno
-    interfaz.conectarSenal( entradaSeguimiento, G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.conectarSenal( entradaSeguimientoMayusculas, G_CALLBACK( convertirMayusculas ), nullptr );
     interfaz.conectarSenal( enlaceBasculaRegresar, G_CALLBACK( irHacia ), (void*)"Bascula" );
     
     // Nuevo para ticket interno

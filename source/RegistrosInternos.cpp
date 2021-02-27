@@ -597,6 +597,11 @@ void internoObtenerRegistrosRango()
         return;
     }
 
+	// Agrega el caracter BOM para archivos UTF-8
+	const char *bom = "\xef\xbb\xbf";
+    archivo << bom;
+
+	// Consulta de la base de datos
     string consulta = "select folio, fecha, tipo_registro, nombre_empresa, nombre_producto, numero_placas, nombre_conductor, hora_entrada, "
     				  "hora_salida, peso_bruto, peso_tara, descuento, peso_neto, manual_activado, observaciones, nombre_basculista "
     				  "from registros_internos join productos on registros_internos.clave_producto = productos.clave_producto "
@@ -638,6 +643,10 @@ void internoGenerarInforme()
         				"de tener espacio en el disco duro e inténtalo de nuevo." );
         return;
     }
+	
+	// Agrega el caracter BOM para archivos UTF-8
+	const char *bom = "\xef\xbb\xbf";
+    archivo << bom;
 
     // Establece el nombre de la empresa
     archivo << nombreEmpresa << endl
@@ -651,6 +660,7 @@ void internoGenerarInforme()
 					  "join productos on registros_internos.clave_producto = productos.clave_producto "
 					  "where tipo_registro = 0 and pendiente = 0 group by registros_internos.clave_empresa, "
 					  "registros_internos.clave_producto order by nombre_empresa;";
+
     // Conecta con la base de datos
     database.open( nombreArchivo );
     database.query( consulta );

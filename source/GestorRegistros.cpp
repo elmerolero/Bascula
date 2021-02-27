@@ -314,8 +314,13 @@ void actualizarRegistroPendiente( Ticket *ticket )
     database.close();
 }
 
-void finalizarRegistro( Ticket *ticket )
+void finalizarRegistro( Ticket *ticket, bool esNuevo )
 {
+    // Si es nuevo
+    if( esNuevo ){
+        crearRegistroPendiente( ticket );
+    }
+
     // Conecta con la base de datos
     database.open( nombreArchivo );
     
@@ -413,8 +418,14 @@ void actualizarRegistroPublicoPendiente( TicketPublico *registroPublico )
     database.close();
 }
 
-void finalizarRegistroPublico( TicketPublico *registroPublico )
+void finalizarRegistroPublico( TicketPublico *registroPublico, bool esNuevo )
 {
+    // ¿Es en registro nuevo?
+    if( esNuevo ){
+        // Se registra como pendiente
+        crearRegistroPublicoPendiente( registroPublico );
+    }
+
     // Consulta para el registro en la base de datos
     stringstream consulta;
     consulta << "update registros_publicos set "

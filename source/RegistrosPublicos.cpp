@@ -126,48 +126,93 @@ void publicoRegistrarPendiente()
 // Finalizar ticket
 void publicoFinalizarPendiente()
 {
+	// Bandera que indica si se va a actualizar o registrar el nuevo ticket
+	bool esRegistroNuevo = false;
+
+	// Crea el nuevo registro
+	TicketPublico *registroPublico;
+
 	try{
-		// Registra el nuevo peso tara
+		// Revisa si el ticket con el folio indicado existe como pendiente, si no, se crea uno nuevo
+		registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioPublico" ) ), registrosPublicosPendientes );
+		if( registroPublico == nullptr ){
+			++folioActualPublico;
+			esRegistroNuevo = true;
+			registroPublico = new TicketPublico();
+			registroPublico -> establecerFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioPublico" ) ) );
+		}
+
+		// Obtiene el producto introducido
+   		string nombreProducto = interfaz.obtenerTextoEntrada( "EntradaNombreProductoPublico" );
+    	Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
+
+    	// Establece los datos obligatorios
+		registroPublico -> establecerFecha( interfaz.obtenerTextoEtiqueta( "EntradaFechaPublico" ) );
+		registroPublico -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
+		registroPublico -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorPublico" ) );
+		registroPublico -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasPublico" ) );
+		registroPublico -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
+		registroPublico -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
+
+		// Registra el tipo de registro
+		if( interfaz.obtenerEstadoBotonToggle( "ViajeLocal" ) ){
+	    	registroPublico -> establecerTipoViaje( VIAJE_LOCAL );
+		}
+		else{
+	    	registroPublico -> establecerTipoViaje( VIAJE_FORANEO );
+		}
+
+		// Registra el peso bruto
+		registroPublico -> establecerPesoBruto( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoPublico" ) );
+		registroPublico -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaPublico" ) );
+		registroPublico -> establecerPesoBrutoEstablecido( true );
+
+		// Registra el peso tara
 		registroPublico -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraPublico" ) );
 		registroPublico -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaPublico" ) );
 		registroPublico -> establecerPesoTaraEstablecido( true );
 
-		// Registra el nuevo peso neto
-		if( registroPublico -> estaPesoBrutoEstablecido() && registroPublico -> estaPesoTaraEstablecido() && registroPublico -> estaPendiente() ){
+		// Registra el peso neto
+		// ¿Están establecidos el peso bruto y el peso tara?
+		if( registroPublico -> estaPesoBrutoEstablecido() && registroPublico -> estaPesoTaraEstablecido() ){
 			registroPublico -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoPublico" ) );
 			registroPublico -> establecerPesoNetoEstablecido( true );
 		}
 		else{
-			interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario registrar todos los campos adecuadamente para calcular el peso neto." );
-			interfaz.mostrarElemento( "MensajeErrorCampo" );
+			interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", "No se han establecido todos los campos necesarios para\nregistrar este dato." );
+			interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+			if( esRegistroNuevo ){
+				delete registroPublico;
+				registroPublico = nullptr;
+				folioActualPublico--;
+			}
 			return;
 		}
 
-		// Actualiza el tipo de viaje en caso de que hubiera cambiado
-	    if( interfaz.obtenerEstadoBotonToggle( "ViajeLocal" ) ){
-			registroPublico -> establecerTipoViaje( VIAJE_LOCAL );
-	    }
-	    else{
-			registroPublico -> establecerTipoViaje( VIAJE_FORANEO );
-	    }
-	    
-	    registroPublico -> establecerPendiente( false );
-	    
-	    finalizarRegistroPublico( registroPublico );
-	    
-	    // Actualiza la vista de tickets
-	    publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
-			
-	    // Establece las vistas
-	    irHacia( nullptr, (void *)"Tickets" );
-		
-	    // Muestra un mensaje de que fue finalizado correctamente
-	    mostrarMensaje( "Registro realizado correctamente." );
+		// Registro correcto, ya no es un registro pendiente
+		registroPublico -> establecerPendiente( false );
 
+		// Finaliza el registro
+		finalizarRegistroPublico( registroPublico, esRegistroNuevo );
+
+		// Actualiza la vista de tickets
+		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorRegistros" );
+		
+		// Indica que se creo correctamente el registro
+		interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro finalizado. Se creó formato de impresión." );
+		interfaz.mostrarElemento( "MensajeTicketsPendientes" );
+
+		// Establece las vistas
+		irHacia( nullptr, (void *)"Tickets" );
 	}
 	catch( invalid_argument &ia ){
 		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
 		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+		if( esRegistroNuevo ){
+			delete registroPublico;
+			registroPublico = nullptr;
+			folioActualPublico--;
+		}
 	}
 }
 
@@ -482,6 +527,8 @@ void publicoEliminarSeleccionado()
 // Manda a imprimir el registro interno seleccionado
 void publicoImprimirSeleccionado()
 {
+	// Busca el ticket publico y lo imprime
+	TicketPublico *registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "FolioPublico" ) ), registrosPublicosConsultados );
 	if( registroPublico != nullptr ){
 		registroPublico -> imprimir( nombreEmpresa );
 

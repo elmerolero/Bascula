@@ -172,15 +172,16 @@ void internoRegistrarPendiente()
 void internoFinalizarPendiente()
 {
 	// Bandera que indica si actualizar o registrar el nuevo ticket
-		bool esRegistroNuevo = false;
+	bool esRegistroNuevo = false;
 
 	// Busca el ticket como pendiente, si no lo encuentra, crea uno
 	Ticket * ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioInterno" ) ), registrosInternosPendientes );
 
 	try{
 		if( ticket == nullptr ){
-			esRegistroNuevo = true;
+			folioActual++;
 			ticket = new Ticket();
+			esRegistroNuevo = true;
 			ticket -> establecerFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioInterno" ) ) );
 		}
 
@@ -213,6 +214,7 @@ void internoFinalizarPendiente()
 		ticket -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaInterno" ) );
 		ticket -> establecerPesoBrutoEstablecido( true );
 
+		// Registra el peso tara
 		ticket -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraInterno" ) );
 		ticket -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaInterno" ) );
 		ticket -> establecerPesoTaraEstablecido( true );
@@ -279,6 +281,7 @@ void internoFinalizarPendiente()
 			if( esRegistroNuevo ){
 				delete ticket;
 				ticket = nullptr;
+				folioActual--;
 			}
 
 			return;
@@ -288,7 +291,7 @@ void internoFinalizarPendiente()
 		ticket -> establecerPendiente( false );
 
 		// Finaliza el ticket pendiente
-		finalizarRegistro( ticket );
+		finalizarRegistro( ticket, esRegistroNuevo );
 
 		// Actualiza la lista de registros
 		internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
@@ -309,6 +312,7 @@ void internoFinalizarPendiente()
 		if( esRegistroNuevo ){
 			delete ticket;
 			ticket = nullptr;
+			folioActual--;
 		}
 	}
 }
@@ -499,6 +503,9 @@ void internoCancelar()
 // Manda a imprimir el registro interno seleccionado
 void internoImprimirSeleccionado()
 {
+	// Obtiene el ticket que se desea consultar
+	Ticket *ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "FolioInterno" ) ), registrosInternosConsultados );
+
 	if( ticket != nullptr ){
 		ticket -> imprimir( nombreEmpresa, numeroFormatos, numeroCopias );
 

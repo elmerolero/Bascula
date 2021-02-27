@@ -1,0 +1,25 @@
+MAINICON ICON "../resources/images/icons/Camioneta.ico"
+
+1 VERSIONINFO
+FILEVERSION     1,0,0,0
+PRODUCTVERSION  1,0,0,0
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "080904E4"
+    BEGIN
+      VALUE "CompanyName", "Mini+ Software"
+      VALUE "FileDescription", "Aplicacion"
+      VALUE "FileVersion", "0.7"
+      VALUE "InternalName", "control_bascula"
+      VALUE "LegalCopyright", "Ismael Salas Lopez"
+      VALUE "OriginalFilename", "aplicacion.exe"
+      VALUE "ProductName", "Sistama de Control de Bascula Publica"
+      VALUE "ProductVersion", "1.0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x080A, 1252
+  END
+END

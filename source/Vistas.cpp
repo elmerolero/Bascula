@@ -11,10 +11,10 @@
 #include "GestorRegistros.h"
 #include "RegistrosInternos.h"
 #include "RegistrosPublicos.h"
+#include "Senales.h"
 using namespace std;
 
 Signal botonBasculaNuevo{ "BotonBasculaNuevo", "clicked", 0 };
-Signal entradaSeguimiento{ "EntradaSeguimiento", "activate", 0 };
 Signal botonSeguimiento{ "BotonSeguimiento", "clicked", 0 };
 
 guint botonCancelarPublicoId = 0;

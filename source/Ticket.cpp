@@ -406,6 +406,11 @@ void Ticket::imprimir( std::string nombreEmpresa, unsigned int numeroFormatos, u
 		throw runtime_error( "Intento de impresión de un ticket que está pendiente." );
 	}
 	
+	// Si la cantidad de formatos es menor o igual que cero
+	if( numeroFormatos <= 0 && numeroCopias <= 0 ){
+		return;	// Regresa (no hay nada que hacer)
+	}
+
 	// Archivo HTML con la información del ticket
 	ofstream pesajeInterno;
 	
@@ -438,7 +443,7 @@ void Ticket::imprimir( std::string nombreEmpresa, unsigned int numeroFormatos, u
 					  << "</td></tr><tr>"
 					  << "<th>Placas: </th><td>" << obtenerNumeroPlacas()
 					  << "</td></tr><tr>"
-					  << "<th>Conductor: </th><td>" << obtenerNombreBasculista()
+					  << "<th>Conductor: </th><td>" << obtenerNombreConductor()
 					  << "</td></tr></table></div><div style='display: flex; align-items: space-between;'>"
 					  << "<table style='border: 0; text-align: left;'><tr>"
 					  << "<th>Hora entrada:</th><td>" << obtenerHoraEntrada()
@@ -476,7 +481,7 @@ void Ticket::imprimir( std::string nombreEmpresa, unsigned int numeroFormatos, u
 					  << "</td></tr><tr>"
 					  << "<th>Placas: </th><td>" << obtenerNumeroPlacas()
 					  << "</td></tr><tr>"
-					  << "<th>Conductor: </th><td>" << obtenerNombreBasculista()
+					  << "<th>Conductor: </th><td>" << obtenerNombreConductor()
 					  << "</td></tr></table></div><div style='display: flex; align-items: space-between;'>"
 					  << "<table style='border: 0; text-align: left;'><tr>"
 					  << "<th>Hora entrada:</th><td>" << obtenerHoraEntrada()

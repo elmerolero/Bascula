@@ -1,0 +1,1 @@
+[Fecha: 2021-02-27 Hora: 11:43:11]: basic_string::_M_construct null not valid

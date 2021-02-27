@@ -48,6 +48,13 @@ void Widget::establecerIconoVentana( string idVentana, string archivo )
     gtk_window_set_icon_from_file( GTK_WINDOW( objeto ), archivo.c_str(), NULL );
 }
 
+string Widget::obtenerNombreWidget( string idWidget )
+{
+    GObject *objeto = obtenerObjeto( idWidget );
+
+    return gtk_widget_get_name( GTK_WIDGET( objeto ) );
+}
+
 // Obtiene el objeto del Widget de acuero al id indicado
 GObject *Widget::obtenerObjeto( string id ) const
 {

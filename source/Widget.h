@@ -28,6 +28,9 @@ class Widget
         // Establece el icon de la aplicacion
         void establecerIconoVentana( std::string idVentana, std::string archivo );
 
+        // Obtiene el nombre de un widget 
+        std::string obtenerNombreWidget( std::string idWidget );
+
         // Conecta un evento al elemento e indica una función que ejecutará
         guint conectarSenal( std::string id, std::string tipoSenal, GCallback funcion, gpointer data );
 

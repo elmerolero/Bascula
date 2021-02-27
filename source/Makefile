@@ -1,5 +1,5 @@
 CC=g++
-CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3`
+CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3` -mwindows
 LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
 OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o LectorBascula.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o Senales.o aplicacion.res
 

@@ -6,6 +6,7 @@
 #include <iomanip>
 #include "Widget.h"
 #include "Funciones.h"
+#include "Senales.h"
 #include "Vistas.h"
 #include "LectorBascula.h"
 #include "GestorRegistros.h"
@@ -98,80 +99,80 @@ void mostrarVista( string idVista )
 void conectarSenalesBase()
 {
     // Señales de la vista de inicio de sesion
-    interfaz.conectarSenal( "EnlaceRegistrarNuevoUsuario", "activate-link", G_CALLBACK( irHacia ), (void *)"RegistrarUsuario" );
-    interfaz.conectarSenal( "EnlaceRecuperarContrasena", "activate-link", G_CALLBACK( irHacia ), (void *)"RecuperarContrasena" );
-    interfaz.conectarSenal( "BotonIniciarSesion", "clicked", iniciarSesion, nullptr );
-    interfaz.conectarSenal( "EntradaContrasena", "activate", iniciarSesion, nullptr );
+    interfaz.conectarSenal( enlaceRegistrarNuevoUsuario, G_CALLBACK( irHacia ), (void *)"RegistrarUsuario" );
+    interfaz.conectarSenal( enlaceRecuperarContrasena, G_CALLBACK( irHacia ), (void *)"RecuperarContrasena" );
+    interfaz.conectarSenal( botonIniciarSesion, iniciarSesion, nullptr );
+    interfaz.conectarSenal( entradaContrasena, iniciarSesion, nullptr );
     
     // Señales de la vista de registro de usuario
-    interfaz.conectarSenal( "BotonRegistrarUsuario", "clicked", G_CALLBACK( registrarUsuario ), nullptr );
-    interfaz.conectarSenal( "EnlaceRegistrarUsuarioRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"IniciarSesion" );
+    interfaz.conectarSenal( botonRegistrarUsuario, registrarUsuario, nullptr );
+    interfaz.conectarSenal( enlaceRegistrarUsuarioRegresar, G_CALLBACK( irHacia ), (void *)"IniciarSesion" );
     
     // Señales de recuperacion de contraseña
-    interfaz.conectarSenal( "EnlaceRecuperarContrasenaRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"IniciarSesion" );
-    interfaz.conectarSenal( "BotonReemplazarContrasena", "clicked", G_CALLBACK( validarCodigoRecuperacion ), nullptr );
-    interfaz.conectarSenal( "EntradaRecuperacionCodigoSeguridad", "activate", G_CALLBACK( validarCodigoRecuperacion ), nullptr );
+    interfaz.conectarSenal( enlaceRecuperarContrasenaRegresar, G_CALLBACK( irHacia ), (void *)"IniciarSesion" );
+    interfaz.conectarSenal( botonReemplazarContrasena, G_CALLBACK( validarCodigoRecuperacion ), nullptr );
+    interfaz.conectarSenal( entradaRecuperacionCodigoSeguridad, G_CALLBACK( validarCodigoRecuperacion ), nullptr );
 
     // Ventana que contiene un mensaje
-    interfaz.conectarSenal( "BotonAceptar", "clicked", G_CALLBACK( aceptar ), nullptr );
+    interfaz.conectarSenal( botonAceptar, G_CALLBACK( aceptar ), nullptr );
 }
 
 // Conecta las señales de cada una de las vistas
 void conectarSenales()
 {   
     // Vista Inicio
-    interfaz.conectarSenal( "BotonBascula", "clicked", G_CALLBACK( irHacia ), (void *)"Bascula" );
-    interfaz.conectarSenal( "BotonConfiguracion", "clicked", G_CALLBACK( vistaConfiguracion ), nullptr );
+    interfaz.conectarSenal( botonBascula, G_CALLBACK( irHacia ), (void *)"Bascula" );
+    interfaz.conectarSenal( botonConfiguracion, G_CALLBACK( vistaConfiguracion ), nullptr );
 
     // Enlace hacia los créditos
-    interfaz.conectarSenal( "EnlaceCreditos", "activate-link", G_CALLBACK( irHacia ), (void *)"Creditos" );
-    interfaz.conectarSenal( "EnlaceCreditosRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
+    interfaz.conectarSenal( enlaceCreditos, G_CALLBACK( irHacia ), (void *)"Creditos" );
+    interfaz.conectarSenal( enlaceCreditosRegresar, G_CALLBACK( irHacia ), (void *)"Inicio" );
     
     // Barra de usuario
-    interfaz.conectarSenal( "EnlaceCuenta", "activate-link", G_CALLBACK( vistaCuenta ), nullptr );
-    interfaz.conectarSenal( "EnlaceCuentaRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
-    interfaz.conectarSenal( "BotonActualizarCuenta", "clicked", G_CALLBACK( autorizarCambios ), nullptr );
+    interfaz.conectarSenal( enlaceCuenta, G_CALLBACK( vistaCuenta ), nullptr );
+    interfaz.conectarSenal( enlaceCuentaRegresar, G_CALLBACK( irHacia ), (void *)"Inicio" );
+    interfaz.conectarSenal( botonActualizarCuenta, G_CALLBACK( autorizarCambios ), nullptr );
 
     // Vista seleccion servicio
-    interfaz.conectarSenal( "EnlaceTipoBasculaRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
-    interfaz.conectarSenal( "BotonBasculaPublica", "clicked", G_CALLBACK( vistaBasculaPublica ), nullptr );
-    interfaz.conectarSenal( "BotonBasculaInterna", "clicked", G_CALLBACK( vistaBasculaInterna ), nullptr );
+    interfaz.conectarSenal( enlaceTipoBasculaRegresar, G_CALLBACK( irHacia ), (void *)"Inicio" );
+    interfaz.conectarSenal( botonBasculaPublica, G_CALLBACK( vistaBasculaPublica ), nullptr );
+    interfaz.conectarSenal( botonBasculaInterna, G_CALLBACK( vistaBasculaInterna ), nullptr );
     
     // Uso bascula de uso interno
-    interfaz.conectarSenal( "EntradaSeguimiento", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
-    interfaz.conectarSenal( "EnlaceBasculaRegresar", "activate-link", G_CALLBACK( irHacia ), (void*)"Bascula" );
+    interfaz.conectarSenal( entradaSeguimiento, G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.conectarSenal( enlaceBasculaRegresar, G_CALLBACK( irHacia ), (void*)"Bascula" );
     
     // Nuevo para ticket interno
-    interfaz.conectarSenal( "EnlaceRegresarInterno", "activate-link", G_CALLBACK( internoCancelar ), nullptr );
-    interfaz.conectarSenal( "BotonLeerPesoBrutoInterno", "clicked", G_CALLBACK( vistaLeerPesoBruto ), nullptr );
-    interfaz.conectarSenal( "BotonLeerPesoTaraInterno", "clicked", G_CALLBACK( vistaLeerPesoTara ), nullptr);
-    interfaz.conectarSenal( "BotonRegistrarPendienteInterno", "clicked", G_CALLBACK( internoRegistrarPendiente ), nullptr );
-    interfaz.conectarSenal( "BotonFinalizarPendienteInterno", "clicked", G_CALLBACK( internoFinalizarPendiente ), nullptr );
-    interfaz.conectarSenal( "EntradaNumeroPlacasInterno", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
-    interfaz.conectarSenal( "BotonCalcularDescuento", "clicked", G_CALLBACK( internoActualizarPesoNeto ), nullptr );
-    interfaz.conectarSenal( "NoDescuentoInterno", "toggled", G_CALLBACK( internoHabilitarDescuento ), nullptr );
-    interfaz.conectarSenal( "RegistraEntrada", "toggled", G_CALLBACK( internoSeleccionarTipo ), nullptr );
+    interfaz.conectarSenal( enlaceRegresarInterno, G_CALLBACK( internoCancelar ), nullptr );
+    interfaz.conectarSenal( botonLeerPesoBrutoInterno, G_CALLBACK( vistaLeerPesoBruto ), nullptr );
+    interfaz.conectarSenal( botonLeerPesoTaraInterno, G_CALLBACK( vistaLeerPesoTara ), nullptr);
+    interfaz.conectarSenal( botonRegistrarPendienteInterno, G_CALLBACK( internoRegistrarPendiente ), nullptr );
+    interfaz.conectarSenal( botonFinalizarPendienteInterno, G_CALLBACK( internoFinalizarPendiente ), nullptr );
+    interfaz.conectarSenal( entradaNumeroPlacasInterno, G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.conectarSenal( botonCalcularDescuento, G_CALLBACK( internoActualizarPesoNeto ), nullptr );
+    interfaz.conectarSenal( opcionDescuentoInterno, G_CALLBACK( internoHabilitarDescuento ), nullptr );
+    interfaz.conectarSenal( opcionRegistraEntrada, G_CALLBACK( internoSeleccionarTipo ), nullptr );
 
     // Nuevo para ticket publico
-    interfaz.conectarSenal( "EntradaNumeroPlacasPublico", "insert-text", G_CALLBACK( convertirMayusculas ), nullptr );
-    interfaz.conectarSenal( "BotonLeerPesoBrutoPublico", "clicked", G_CALLBACK( vistaLeerPesoBrutoPublico ), nullptr );
-    interfaz.conectarSenal( "BotonLeerPesoTaraPublico", "clicked", G_CALLBACK( vistaLeerPesoTaraPublico ), nullptr );
-    interfaz.conectarSenal( "BotonRegistrarPendientePublico", "clicked", G_CALLBACK( publicoRegistrarPendiente ), nullptr );
-    interfaz.conectarSenal( "BotonFinalizarPendientePublico", "clicked", G_CALLBACK( publicoFinalizarPendiente ), nullptr );
+    interfaz.conectarSenal( entradaNumeroPlacasPublico, G_CALLBACK( convertirMayusculas ), nullptr );
+    interfaz.conectarSenal( botonLeerPesoBrutoPublico, G_CALLBACK( vistaLeerPesoBrutoPublico ), nullptr );
+    interfaz.conectarSenal( botonLeerPesoTaraPublico, G_CALLBACK( vistaLeerPesoTaraPublico ), nullptr );
+    interfaz.conectarSenal( botonRegistrarPendientePublico, G_CALLBACK( publicoRegistrarPendiente ), nullptr );
+    interfaz.conectarSenal( botonFinalizarPendientePublico, G_CALLBACK( publicoFinalizarPendiente ), nullptr );
 
     // Vista de registro de peso
-    interfaz.conectarSenal( "BotonCancelarLectura", "clicked", G_CALLBACK( lectorBasculaCerrar ), nullptr );
-    interfaz.conectarSenal( "VentanaLectorPeso", "destroy", G_CALLBACK( lectorBasculaCerrar ), nullptr );
+    interfaz.conectarSenal( botonCancelarLectura, G_CALLBACK( lectorBasculaCerrar ), nullptr );
+    interfaz.conectarSenal( ventanaLectorPeso, G_CALLBACK( lectorBasculaCerrar ), nullptr );
     
     // Vista que solicita la contrasena
-    interfaz.conectarSenal( "BotonPermitirCambios", "clicked", G_CALLBACK( actualizarDatosUsuario ), nullptr );
+    interfaz.conectarSenal( botonPermitirCambios, G_CALLBACK( actualizarDatosUsuario ), nullptr );
 
     // Vista de configuración
-    interfaz.conectarSenal( "EnlaceConfiguracionRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
-    interfaz.conectarSenal( "BotonGuardarConfiguracion", "clicked", G_CALLBACK( guardarConfiguracion ), nullptr );
+    interfaz.conectarSenal( enlaceConfiguracionRegresar, G_CALLBACK( irHacia ), (void *)"Inicio" );
+    interfaz.conectarSenal( botonGuardarConfiguracion, G_CALLBACK( guardarConfiguracion ), nullptr );
 
     // Consultar registro interno
-    interfaz.conectarSenal( "ImprimirRegistroInterno", "clicked", G_CALLBACK( internoImprimirSeleccionado ), nullptr );
+    interfaz.conectarSenal( imprimirRegistroInterno, G_CALLBACK( internoImprimirSeleccionado ), nullptr );
 }
 
 //

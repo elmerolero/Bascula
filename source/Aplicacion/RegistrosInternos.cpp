@@ -136,31 +136,28 @@ void internoRegistrarPendiente()
 			ticket -> establecerPesoNetoEstablecido( false );
 		}
 
+		// Redirige hacia la vista de tickets
+		regresarVista();
+
 		// Crea o actualiza el ticket pendiente
 		if( esRegistroNuevo ){
 			crearRegistroPendiente( ticket );
-			interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro creado correctamente." );
-			interfaz.mostrarElemento( "MensajeTicketsPendientes" );
+			mostrarMensajeError( "Registro creado correctamente." );
 		}
 		else{
 			actualizarRegistroPendiente( ticket );
-			interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro actualizado correctamente." );
-			interfaz.mostrarElemento( "MensajeTicketsPendientes" );
+			mostrarMensajeError( "Registro actualizado correctamente." );
 		}
 
 		// Actualiza la lista de registros
 		internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
-
-		// Redirige hacia la vista de tickets
-		irHacia( nullptr, (void *)"Tickets" );
 	}
 	catch( invalid_argument &ia ){
 		// Regresa al folio anterior
 		folioActual--;
 	
 		// Muestra un mensaje de error al usuario
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		mostrarMensajeError( ia.what() );
 
 		// Si se estaba creando un ticket erróneo se elimina
 		if( esRegistroNuevo && ticket != nullptr ){
@@ -225,8 +222,7 @@ void internoFinalizarPendiente()
 			string descuento = interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" );
 			if( descuento.empty() ){
 				// Indica un error
-				interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario establecer un descuento." );
-				interfaz.mostrarElemento( "MensajeErrorCampo" );
+				mostrarMensajeError( "Es necesario establecer un descuento." );
 
 				// Establece los parámetros para descuento
 				ticket -> establecerDescuento( 0.f );
@@ -274,8 +270,7 @@ void internoFinalizarPendiente()
 		}
 		else{
 			// No registra un peso neto
-			interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", "Es necesario que el peso bruto, el peso tara se encuentren establecidos." );
-			interfaz.mostrarElemento( "MensajeErrorCampo" );
+			mostrarMensajeError( "Es necesario que el peso bruto y el peso tara se encuentren establecidos." );
 
 			// Si es registro nuevo elimina el ticket
 			if( esRegistroNuevo ){
@@ -296,17 +291,15 @@ void internoFinalizarPendiente()
 		// Actualiza la lista de registros
 		internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
 
-		// Muestra un mensaje que indica que finalizó adecuadamente
-		interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro finalizado. Se creó formato de impresión." );
-		interfaz.mostrarElemento( "MensajeTicketsPendientes" );
-
 		// Redirige hacia la vista de tickets
-		irHacia( nullptr, (void *)"Tickets" );
+		regresarVista();
+
+		// Muestra un mensaje que indica que finalizó adecuadamente
+		mostrarMensajeError( "Registro finalizado. Se creará formato de impresión si la opción se encuentra habilitada." );
 	}
 	catch( invalid_argument &ia ){
-		/// Muetra un mensaje de error
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		/// Muestra un mensaje de error
+		mostrarMensajeError( ia.what() );
 
 		// Si es registro nuevo elimina el ticket
 		if( esRegistroNuevo ){
@@ -329,8 +322,7 @@ void internoRegistrarPesoBruto()
 		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", obtenerHora() );
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		mostrarMensajeError( ia.what() );
 		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", "No establecido" );
 		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", "No establecida" );
 	}
@@ -351,8 +343,7 @@ void internoRegistrarPesoTara()
 		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", obtenerHora() );
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		mostrarMensajeError( ia.what() );
 		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );
 		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", "No establecida" );
 	}

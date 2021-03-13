@@ -1,9 +1,9 @@
 #include "Aplicacion.h"
 #include <stdexcept>
 #include <iostream>
-#include <fstream>
 #include <string>
 #include <iomanip>
+#include <vector>
 #include "Widget.h"
 #include "Funciones.h"
 #include "Senales.h"
@@ -19,22 +19,20 @@ using namespace std;
 
 // Interfaz principal 
 Widget interfaz;
-string vistaActual;
 
 // Aplicacion activa
 bool aplicacionActiva;
 
-void irHacia( GtkWidget *widget, gpointer ptr )
-{
-	mostrarVista( (char *)ptr );
-}
+// Pila de vistas
+vector< string > pilaVistas;
 
-// Inicializa la aplicacion
-void iniciar()
+void iniciar( GtkApplication *aplicacion, gpointer informacion )
 {
     // Carga la ventana principal y conecta la función para cerrar la ventana y finalizar el programa
-    interfaz.cargarWidget( "../resources/interfaces/Principal.glade" );
-    interfaz.conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_main_quit ), nullptr );
+    interfaz.cargarWidget( "../resources/interfaces/Principal2.glade" );
+    gtk_application_add_window( aplicacion, GTK_WINDOW( interfaz.obtenerObjeto( "VentanaPrincipal" ) ) );
+    interfaz.mostrarElemento( "VentanaPrincipal" );
+    interfaz.conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_widget_destroy ), nullptr );
 
     // Establece la hora
     actualizarTiempo( nullptr, nullptr );
@@ -84,20 +82,18 @@ void cargarInformacion()
     cargarOpcionesImpresion();    
 }
 
-// Muestra la vista solicitada
-void mostrarVista( string idVista )
+void mostrarMensajeError( string mensajeError )
 {
-    if( !vistaActual.empty() ){
-        interfaz.ocultarElemento( vistaActual );
-    }
-
-    vistaActual = idVista;
-    interfaz.mostrarElemento( vistaActual );
+    interfaz.establecerTextoEtiqueta( "MensajeError", mensajeError );
+    interfaz.mostrarElemento( "MensajeError" );
 }
 
 // Son necesarias para que funcione el inicio de sesión
 void conectarSenalesBase()
 {
+    // Enlace regresar
+    interfaz.conectarSenal( enlaceRegresar, G_CALLBACK( regresarVista ), nullptr );
+
     // Señales de la vista de inicio de sesion
     interfaz.conectarSenal( enlaceRegistrarNuevoUsuario, G_CALLBACK( irHacia ), (void *)"RegistrarUsuario" );
     interfaz.conectarSenal( enlaceRecuperarContrasena, G_CALLBACK( irHacia ), (void *)"RecuperarContrasena" );
@@ -106,12 +102,12 @@ void conectarSenalesBase()
     
     // Señales de la vista de registro de usuario
     interfaz.conectarSenal( botonRegistrarUsuario, registrarUsuario, nullptr );
-    interfaz.conectarSenal( enlaceRegistrarUsuarioRegresar, G_CALLBACK( irHacia ), (void *)"IniciarSesion" );
     
     // Señales de recuperacion de contraseña
-    interfaz.conectarSenal( enlaceRecuperarContrasenaRegresar, G_CALLBACK( irHacia ), (void *)"IniciarSesion" );
     interfaz.conectarSenal( botonReemplazarContrasena, G_CALLBACK( validarCodigoRecuperacion ), nullptr );
     interfaz.conectarSenal( entradaRecuperacionCodigoSeguridad, G_CALLBACK( validarCodigoRecuperacion ), nullptr );
+    interfaz.conectarSenal( botonCambiarContrasena, G_CALLBACK( cambiarContrasenaUsuario ), nullptr );
+	interfaz.conectarSenal( entradaReemplazarConfirmacion, G_CALLBACK( cambiarContrasenaUsuario ), nullptr );
 
     // Ventana que contiene un mensaje
     interfaz.conectarSenal( botonAceptar, G_CALLBACK( aceptar ), nullptr );
@@ -126,24 +122,19 @@ void conectarSenales()
 
     // Enlace hacia los créditos
     interfaz.conectarSenal( enlaceCreditos, G_CALLBACK( irHacia ), (void *)"Creditos" );
-    interfaz.conectarSenal( enlaceCreditosRegresar, G_CALLBACK( irHacia ), (void *)"Inicio" );
     
     // Barra de usuario
     interfaz.conectarSenal( enlaceCuenta, G_CALLBACK( vistaCuenta ), nullptr );
-    interfaz.conectarSenal( enlaceCuentaRegresar, G_CALLBACK( irHacia ), (void *)"Inicio" );
     interfaz.conectarSenal( botonActualizarCuenta, G_CALLBACK( autorizarCambios ), nullptr );
 
     // Vista seleccion servicio
-    interfaz.conectarSenal( enlaceTipoBasculaRegresar, G_CALLBACK( irHacia ), (void *)"Inicio" );
     interfaz.conectarSenal( botonBasculaPublica, G_CALLBACK( vistaBasculaPublica ), nullptr );
     interfaz.conectarSenal( botonBasculaInterna, G_CALLBACK( vistaBasculaInterna ), nullptr );
     
     // Uso bascula de uso interno
     interfaz.conectarSenal( entradaSeguimientoMayusculas, G_CALLBACK( convertirMayusculas ), nullptr );
-    interfaz.conectarSenal( enlaceBasculaRegresar, G_CALLBACK( irHacia ), (void*)"Bascula" );
     
     // Nuevo para ticket interno
-    interfaz.conectarSenal( enlaceRegresarInterno, G_CALLBACK( internoCancelar ), nullptr );
     interfaz.conectarSenal( botonLeerPesoBrutoInterno, G_CALLBACK( vistaLeerPesoBruto ), nullptr );
     interfaz.conectarSenal( botonLeerPesoTaraInterno, G_CALLBACK( vistaLeerPesoTara ), nullptr);
     interfaz.conectarSenal( botonRegistrarPendienteInterno, G_CALLBACK( internoRegistrarPendiente ), nullptr );
@@ -168,7 +159,6 @@ void conectarSenales()
     interfaz.conectarSenal( botonPermitirCambios, G_CALLBACK( actualizarDatosUsuario ), nullptr );
 
     // Vista de configuración
-    interfaz.conectarSenal( enlaceConfiguracionRegresar, G_CALLBACK( irHacia ), (void *)"Inicio" );
     interfaz.conectarSenal( botonGuardarConfiguracion, G_CALLBACK( guardarConfiguracion ), nullptr );
 
     // Consultar registro interno
@@ -190,7 +180,6 @@ void conectarSenalesAdministrador()
     interfaz.conectarSenal( "BotonUsuarios", "clicked", G_CALLBACK( vistaConsultarUsuarios ), nullptr );
 
     // Vista Registros
-    interfaz.conectarSenal( "EnlaceRegresarRegistros", "activate-link", G_CALLBACK( irHacia ), (void *)"Inicio" );
     interfaz.conectarSenal( "BotonRegistrosEmpresas", "clicked", G_CALLBACK( vistaRegistrosEmpresas ), nullptr );
     interfaz.conectarSenal( "BotonRegistrosProductos", "clicked", G_CALLBACK( vistaRegistrosProductos ), nullptr );
     interfaz.conectarSenal( "BotonRegistrosPesajesInternos", "clicked", G_CALLBACK( vistaConsultarPesajesInternos ), nullptr );
@@ -199,21 +188,16 @@ void conectarSenalesAdministrador()
     // Vista de consulta de registros
     interfaz.conectarSenal( "BotonEditarRegistro", "clicked", G_CALLBACK( vistaRegistroEditar ), nullptr );
     interfaz.conectarSenal( "BotonCancelarEdicionRegistro", "clicked", G_CALLBACK( registroCancelarEdicion ), nullptr );
-    interfaz.conectarSenal( "EnlaceConsultarRegistrosRegresar", "activate-link", G_CALLBACK( irHacia ), (void *)"Registros" );
     interfaz.conectarSenal( "BotonNo", "clicked", G_CALLBACK( cancelarOperacion ), nullptr );
     interfaz.conectarSenal( "BotonEliminarRegistro", "clicked", G_CALLBACK( alertaEliminarRegistro ), nullptr );
 
     // Vista de ticket interno
-    interfaz.conectarSenal( "RegresarInterno", "activate-link", G_CALLBACK( irHacia ), (void *)"Pesajes" );
     interfaz.conectarSenal( "EliminarRegistroInterno", "clicked", G_CALLBACK( internoAlertaEliminar ), nullptr );
 
     // Vista de ticket interno
-    interfaz.conectarSenal( "RegresarPublico", "activate-link", G_CALLBACK( irHacia ), (void *)"Pesajes" );
     interfaz.conectarSenal( "EliminarRegistroPublico", "clicked", G_CALLBACK( internoAlertaEliminar ), nullptr );
 
     // Vista de administración de usuarios
-    interfaz.conectarSenal( enlaceConsultarUsuariosRegresar, G_CALLBACK( regresarInicio ), nullptr );
-    interfaz.conectarSenal( enlaceConsultarUsuarioRegresar, G_CALLBACK( regresarUsuarios ), nullptr );
 	interfaz.conectarSenal( entradaConsultarUsuario, G_CALLBACK( vistaConsultarUsuario ), nullptr );
 	interfaz.conectarSenal( botonConsultarUsuario, G_CALLBACK( vistaConsultarUsuario ), nullptr );
     interfaz.conectarSenal( botonObtenerCodigoRecuperacion, G_CALLBACK( generarCodigoRecuperacion ), nullptr );
@@ -238,21 +222,6 @@ void mostrarMensaje( string mensaje )
 void aceptar( GtkWidget *widget, gpointer ptr )
 {
 	interfaz.ocultarElemento( "VentanaMensaje" );
-}
-
-// Actualiza el nombre de la empresa
-void actualizarNombreEmpresa()
-{
-    // Establece los nombres de la empresa
-    interfaz.establecerTextoEtiqueta( "NombreEmpresa", nombreEmpresa );
-    interfaz.establecerTextoEtiqueta( "NombreEmpresa1", nombreEmpresa );
-    interfaz.establecerTextoEtiqueta( "NombreEmpresa2", nombreEmpresa );
-    interfaz.establecerTextoEtiqueta( "NombreEmpresa3", nombreEmpresa );
-    interfaz.establecerTextoEtiqueta( "NombreEmpresa4", nombreEmpresa );
-    interfaz.establecerTextoEtiqueta( "NombreEmpresa5", nombreEmpresa );
-    interfaz.establecerTextoEtiqueta( "NombreEmpresa6", nombreEmpresa );
-    interfaz.establecerTextoEtiqueta( "NombreEmpresa7", nombreEmpresa );
-    interfaz.establecerTextoEtiqueta( "NombreEmpresa8", nombreEmpresa );
 }
 
 // Obtiene la hora en un formato válido para la base de datos
@@ -347,4 +316,78 @@ void actualizarTiempo( GtkWidget *widget, gpointer ptr )
     interfaz.establecerTextoEtiqueta( "Saludo", saludo );
 }
 
+void irHacia( GtkWidget *widget, gpointer vista )
+{
+    // Oculta cualquier mensaje de error creado
+    interfaz.ocultarElemento( "MensajeError" );
 
+    // Redirige hacia la vista dada
+	mostrarVista( (char *)vista );
+}
+
+void irA( string vista, bool reiniciarPila )
+{
+    // Oculta cualquier mensaje de error dado
+    interfaz.ocultarElemento( "MensajeError" );
+
+    // Reinicia la pila si así se indica
+    if( reiniciarPila ){
+        reiniciarPilaVistas();
+    }
+
+    // Redirige hacia la vista dada
+    mostrarVista( vista );
+}
+
+// Limpiar pila vistas
+void reiniciarPilaVistas( void )
+{
+    // Oculta cada una de las vistas registradas en la pila
+    for( string vista : pilaVistas ){
+        interfaz.ocultarElemento( vista );
+    }
+
+    // Limpia la pila de vistas
+    pilaVistas.clear();
+
+    // Oculta el enlace para regresar a la vista anterior
+    interfaz.ocultarElemento( "EnlaceRegresar" );
+}
+
+// Regresa hacia la vista anterior
+void regresarVista( void )
+{
+    // ¿Hay elementos en la pila de vistas?
+    if( pilaVistas.size() > 1 ){
+        // Oculta el elemento actual
+        interfaz.ocultarElemento( pilaVistas.back() );
+
+        // Lo retira de la pila
+        pilaVistas.pop_back();
+    }
+
+    // Se dirige hacia la vista anterior
+    string vista = pilaVistas.back();
+    pilaVistas.pop_back();
+    mostrarVista( vista );
+}
+
+// 
+void mostrarVista( string idVista )
+{
+    if( !pilaVistas.empty() ){
+        interfaz.ocultarElemento( pilaVistas.back() );
+    }
+
+    pilaVistas.push_back( idVista );
+
+    interfaz.mostrarElemento( idVista );
+    interfaz.establecerTextoEtiqueta( "Titulo", interfaz.obtenerNombreWidget( idVista ) );
+    
+    if( pilaVistas.size() <= 1 ){
+        interfaz.ocultarElemento( "EnlaceRegresar" );
+    }
+    else{
+        interfaz.mostrarElemento( "EnlaceRegresar" );
+    }
+}

@@ -8,7 +8,6 @@
 
 // Interfaz
 extern Widget interfaz;
-extern std::string vistaActual;
 
 // Meses para mostrar la fecha en formato humano
 const std::array< std::string, 12 > meses{ "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
@@ -16,13 +15,14 @@ const std::array< std::string, 12 > meses{ "enero", "febrero", "marzo", "abril",
 // Aplicacion
 extern bool aplicacionActiva;
 
-extern int numeroMagico;
-
 // Permite mostrar la vista que se desee
 void irHacia( GtkWidget *widget, gpointer ptr );
 
+// Permite mostrar la vista que se desea
+void irA( std::string idVista, bool reiniciarPila );
+
 // Inicializa la aplicacion
-void iniciar();
+void iniciar( GtkApplication *aplicacion, gpointer informacion );
 
 // Carga la información necesaria para funcionar
 void cargarInformacion();
@@ -42,14 +42,18 @@ void mostrarVista( std::string idVista );
 // Abre el cuadro de mensaje con el mensaje indicado
 void mostrarMensaje( std::string mensaje );
 
+// Limpiar pila vistas
+void reiniciarPilaVistas( void );
+
+void regresarVista( void );
+
 // Muestra una alerta
 void alerta( GtkWidget *widget, gpointer data );
 
 // Cierra el cuadro de mensaje
 void aceptar( GtkWidget *widget, gpointer ptr );
 
-// Actualiza el nombre de la empresa
-void actualizarNombreEmpresa();
+void mostrarMensajeError( std::string mensajeError );
 
 // Obtiene la hora
 std::string obtenerHora();

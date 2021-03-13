@@ -32,7 +32,7 @@ void ContenedorRegistros::obtenerRegistros()
 {
     // Se asegura que fue establecido el nombre de los registros a consultar
     if( obtenerNombrePlural().empty() || obtenerNombreSingular().empty() ){
-	throw runtime_error( "¡Se intenta obtener registros de una tabla desconocida!" );
+	    throw runtime_error( "¡Se intenta obtener registros de una tabla desconocida!" );
     };
 	
     // Conecta con la base de datos
@@ -135,7 +135,7 @@ void ContenedorRegistros::actualizarRegistro( Registro * registro )
 {
     // Verifica que el registro dado no sea nulo
     if( registro == nullptr ){
-	throw invalid_argument( "Error, intento de establecer un registro nulo." );
+	    throw invalid_argument( "Error, intento de establecer un registro nulo." );
     }
     
     // Obtiene el nombre introducido
@@ -168,7 +168,7 @@ void ContenedorRegistros::eliminarRegistro( Registro *registro )
 {
     // Verifica que el registro dado no sea nulo
     if( registro == nullptr ){
-	throw invalid_argument( "Error, intento de establecer un registro nulo." );
+	    throw invalid_argument( "Error, intento de establecer un registro nulo." );
     }
     
     database.open( nombreArchivo );

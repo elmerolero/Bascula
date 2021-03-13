@@ -2,6 +2,8 @@
 #include "Widget.h"
 
 /* SEÑALES BASE (son necesarias para iniciar en el programa */
+Signal enlaceRegresar{ "EnlaceRegresar", "activate-link", 0 };
+
 // Registro de usuarios e inicio de sesión
 Signal enlaceRegistrarNuevoUsuario{ "EnlaceRegistrarNuevoUsuario", "activate-link", 0 };
 Signal enlaceRecuperarContrasena{ "EnlaceRecuperarContrasena", "activate-link", 0 };
@@ -40,12 +42,12 @@ Signal botonBasculaPublica{ "BotonBasculaPublica", "clicked", 0 };
 Signal botonBasculaInterna{ "BotonBasculaInterna", "clicked", 0 };
     
 // Uso bascula de uso interno
+Signal botonBasculaNuevo{ "BotonBasculaNuevo", "clicked", 0 };
+Signal botonSeguimiento{ "BotonSeguimiento", "clicked", 0 };
 Signal entradaSeguimientoMayusculas{ "EntradaSeguimiento", "insert-text", 0 };
 Signal entradaSeguimiento{ "EntradaSeguimiento", "activate", 0 };
-Signal enlaceBasculaRegresar{ "EnlaceBasculaRegresar", "activate-link", 0 };
     
 // Nuevo para ticket interno
-Signal enlaceRegresarInterno{ "EnlaceRegresarInterno", "activate-link", 0 };
 Signal botonLeerPesoBrutoInterno{ "BotonLeerPesoBrutoInterno", "clicked", 0 };
 Signal botonLeerPesoTaraInterno{ "BotonLeerPesoTaraInterno", "clicked", 0 };
 Signal botonRegistrarPendienteInterno{ "BotonRegistrarPendienteInterno", "clicked", 0 };
@@ -70,7 +72,6 @@ Signal ventanaLectorPeso{ "VentanaLectorPeso", "destroy", 0 };
 Signal botonPermitirCambios{ "BotonPermitirCambios", "clicked", 0 };
 
 // Vista de configuración
-Signal enlaceConfiguracionRegresar{ "EnlaceConfiguracionRegresar", "activate-link", 0 };
 Signal botonGuardarConfiguracion{ "BotonGuardarConfiguracion", "clicked", 0 };
 
 // Consultar registro interno
@@ -83,3 +84,29 @@ Signal enlaceConsultarUsuariosRegresar{ "EnlaceConsultarUsuariosRegresar", "acti
 Signal enlaceConsultarUsuarioRegresar{ "EnlaceConsultarUsuarioRegresar", "activate-link", 0 };
 Signal botonObtenerCodigoRecuperacion{ "BotonObtenerCodigoRecuperacion", "clicked", 0 };
 Signal usuarioAdministrador{ "UsuarioAdministrador", "toggled", 0 };
+
+// Noc
+Signal imprimirRegistroPublico{ "ImprimirRegistroPublico", "clicked", 0 };
+Signal eliminarRegistro{ "EliminarRegistroInterno", "clicked", 0 };
+Signal botonNuevoRegistro{ "BotonNuevoRegistro", "clicked", 0 };
+Signal botonNuevoRegistro2{ "BotonNuevoRegistro2", "clicked", 0 };
+Signal entradaConsultarNombre{ "EntradaConsultarNombre", "activate", 0 };
+Signal botonConsultarNombre{ "BotonConsultarNombre", "clicked", 0 };
+
+Signal botonGuardarEdicionRegistro{ "BotonGuardarEdicionRegistro", "clicked", 0 };
+Signal botonGuardarNuevoRegistro{ "BotonGuardarNuevoRegistro", "clicked", 0 };
+Signal botonCancelarNuevoRegistro{ "BotonCancelarNuevoRegistro", "clicked", 0 };
+Signal botonSi{ "BotonSi", "clicked", 0 };
+
+Signal botonRegistrosPesajeSeleccionarDia{ "BotonRegistrosPesajeSeleccionarDia", "clicked", 0 };
+Signal botonRegistrosPesajeObtenerInforme{ "BotonRegistrosPesajeObtenerInforme", "clicked", 0 };
+Signal entradaRegistrosPesajeFolio{ "EntradaRegistrosPesajeFolio", "activate", 0 };
+Signal botonRegistrosPesajeConsultarRegistro{ "BotonRegistrosPesajeConsultarRegistro", "clicked" };
+
+Signal botonConsultarDia{ "BotonConsultarDia", "clicked", 0 };
+Signal botonObtenerRegistrosRango{ "BotonObtenerRegistrosRango", "clicked", 0 };
+Signal botonObtenerRegistros{ "BotonObtenerRegistros", "clicked", 0 };
+
+Signal botonEliminarUsuario{ "BotonEliminarUsuario", "clicked", 0 };
+Signal botonCambiarContrasena{ "BotonCambiarContrasena", "clicked", 0 };
+Signal entradaReemplazarConfirmacion{ "EntradaReemplazarConfirmacion", "activate", 0 };

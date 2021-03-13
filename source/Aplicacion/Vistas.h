@@ -32,7 +32,6 @@ void vistaConsultarRegistroInterno();
 void vistaConsultarRegistroPublico();
 void vistaConsultarUsuarios();
 void vistaConsultarUsuario();
-void vistaReemplazarContrasena();
 
 void internoLimpiarFormulario();
 

@@ -93,29 +93,26 @@ void publicoRegistrarPendiente()
 			registroPublico -> establecerPesoNeto( 0.f );
 			registroPublico -> establecerPesoNetoEstablecido( false );
 		}
+	
+		// Actualiza la vista de tickets
+		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
+		
+		// Establece las vistas
+		regresarVista();
 
 		// Crea o registra el registro según corresponda
 		if( esRegistroNuevo ){
 			crearRegistroPublicoPendiente( registroPublico );
-			interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro creado correctamente." );
-			interfaz.mostrarElemento( "MensajeTicketsPendientes" );
+			mostrarMensajeError( "Registro creado correctamente." );
 		}
 		else{
 			actualizarRegistroPublicoPendiente( registroPublico );
-			interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro actualizado correctamente." );
-			interfaz.mostrarElemento( "MensajeTicketsPendientes" );
+			mostrarMensajeError( "Registro actualizado correctamente." );
 		}
-	
-		// Actualiza la vista de tickets
-		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorRegistros" );
-		
-		// Establece las vistas
-		irHacia( nullptr, (void *)"Tickets" );
 	}
 	catch( invalid_argument &ia ){
 		folioActualPublico--;
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+		mostrarMensajeError( ia.what() );
 		if( esRegistroNuevo ){
 			delete registroPublico;
 			registroPublico = nullptr;
@@ -179,8 +176,7 @@ void publicoFinalizarPendiente()
 			registroPublico -> establecerPesoNetoEstablecido( true );
 		}
 		else{
-			interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", "No se han establecido todos los campos necesarios para\nregistrar este dato." );
-			interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+			mostrarMensajeError( "No se han establecido todos los campos necesarios para\nregistrar el peso neto." );
 			if( esRegistroNuevo ){
 				delete registroPublico;
 				registroPublico = nullptr;
@@ -196,18 +192,16 @@ void publicoFinalizarPendiente()
 		finalizarRegistroPublico( registroPublico, esRegistroNuevo );
 
 		// Actualiza la vista de tickets
-		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorRegistros" );
+		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
 		
 		// Indica que se creo correctamente el registro
-		interfaz.establecerTextoEtiqueta( "MensajeTicketsPendientes", "Registro finalizado. Se creó formato de impresión." );
-		interfaz.mostrarElemento( "MensajeTicketsPendientes" );
+		mostrarMensajeError( "Registro finalizado. Se creará formato de impresión si se encuentra habilitado." );
 
 		// Establece las vistas
-		irHacia( nullptr, (void *)"Tickets" );
+		regresarVista();
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+		mostrarMensajeError( ia.what() );
 		if( esRegistroNuevo ){
 			delete registroPublico;
 			registroPublico = nullptr;
@@ -228,8 +222,7 @@ void publicoRegistrarPesoBruto()
 		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", obtenerHora() );
     }
     catch( invalid_argument &ia ){
-    	interfaz.establecerTextoEtiqueta( "MensajeErrorCampo", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampo" );
+		mostrarMensajeError( ia.what() );
 		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", "No establecido" );
 		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", "No establecida" );
     }
@@ -254,8 +247,7 @@ void publicoRegistrarPesoTara()
     }
     catch( invalid_argument &ia ){
     	// Muestra el error sucedido
-		interfaz.establecerTextoEtiqueta( "MensajeErrorCampoPublico", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorCampoPublico" );
+		mostrarMensajeError( ia.what() );
 		
 		// Reestablece el campo de la hora y el peso de entrada
 		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", "No establecido" );
@@ -298,7 +290,7 @@ void publicoActualizarPesoNeto()
 
 	// Intenta calculara el peso neto
 	if( completo ){
-		interfaz.ocultarElemento( "MensajeErrorCampoPublico" );
+		interfaz.ocultarElemento( "MensajeError" );
 		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", pesoString( publicoCalcularPesoNeto( pesoBruto, pesoTara ), 2 ) );
 	}
 	else{
@@ -308,36 +300,12 @@ void publicoActualizarPesoNeto()
 	}
 }
 
-// Selecciona el tipo de registro publico
-void publicoSeleccionarTipo()
-{
-     if( registroPublico != nullptr ){
-	if( interfaz.obtenerEstadoBotonToggle( "ViajeLocal" ) ){
-	     registroPublico -> establecerTipoViaje( VIAJE_LOCAL );
-	}
-	else{
-	     registroPublico -> establecerTipoViaje( VIAJE_FORANEO );
-	}
-     }
-}
-
-// Cancela el registro de un ticket publico
-void publicoCancelarRegistro()
-{
-     if( registroPublico != nullptr ){
-	delete registroPublico;
-	registroPublico = nullptr;
-     }
-	
-     irHacia( nullptr, (void *)"Tickets" );
-}
-
 // Cancela la finalización publico
 void publicoCancelarFinalizacion()
 {
     registroPublico = nullptr;
 	
-    irHacia( nullptr, (void *)"Tickets" );
+    regresarVista();
 }
 
 // Obtiene los tickets del día seleccionado
@@ -362,7 +330,7 @@ void publicoSeleccionarDia()
 	publicoActualizarRegistros( registrosPublicosConsultados, "ContenedorRegistrosPesaje" );
 
 	// Regresa a la vista anterior
-	irHacia( nullptr, (void *)"Pesajes" );
+	regresarVista();
 }
 
 void publicoObtenerRegistrosRango()
@@ -399,7 +367,7 @@ void publicoObtenerRegistrosRango()
     				  "hora_salida, peso_bruto, peso_tara, peso_neto, entrada_manual, nombre_basculista "
     				  "from registros_publicos join productos on registros_publicos.clave_producto = productos.clave_producto "
     				  "where pendiente = 0 and fecha between '" + obtenerFecha( diaInicio, mesInicio + 1, anioInicio ) + 
-    				  "' and '" + obtenerFecha( diaFin, mesFin + 1, anioFin ) + "' " + "order by fecha";	
+    				  "' and '" + obtenerFecha( diaFin, mesFin + 1, anioFin ) + "' " + "order by fecha";
     
 	// Realiza la consulta y envía los resultados al archivos
 	database.open( nombreArchivo );
@@ -417,7 +385,7 @@ void publicoObtenerRegistrosRango()
     archivo.close();
 
     ShellExecute(NULL, "open", "../resources/data/Registros.csv", NULL, NULL, SW_HIDE );
-	irHacia( nullptr, (void *)"Pesajes" );
+	regresarVista();
 }
 
 // Obtiene los registros de la fecha seleccionada

@@ -30,6 +30,10 @@ class Usuario
         void establecerHash( std::string hash );
         std::string obtenerHash() const;
         
+        // Aspectos relacionados a la contraseña
+        static std::string validarContrasena( std::string contrasena );
+        static void compararContrasenas( std::string contrasena, std::string confirmacion );
+        
         // Sal de contrasena
         void establecerSal( std::string sal );
         std::string obtenerSal() const;
@@ -37,9 +41,6 @@ class Usuario
         // Permisos de administrador
         void establecerAdministrador( bool permiso );
         bool esAdministrador() const;
-        
-        // Valida la contrasena del usuario
-        static std::string validarContrasena( std::string contrasena );
 
     private:
         std::string nombreUsuario;

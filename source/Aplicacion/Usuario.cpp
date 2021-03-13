@@ -162,6 +162,15 @@ string Usuario::obtenerHash() const
     return hash;
 }
 
+// Compara las contraseñas
+void Usuario::compararContrasenas( string contrasena, string confirmacion )
+{
+    // Realiza la comparativa de las contraseñas y lanza una excepción si no son iguales
+	if( contrasena.compare( confirmacion ) != 0 ){
+		throw invalid_argument( "Las contraseñas introducidas no coinciden." );
+	}
+}
+
 // Establece la sal
 void Usuario::establecerSal( string sal )
 {

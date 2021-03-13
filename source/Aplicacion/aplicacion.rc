@@ -1,4 +1,4 @@
-MAINICON ICON "../resources/images/icons/Camioneta.ico"
+MAINICON ICON "../../resources/images/icons/Camioneta.ico"
 
 1 VERSIONINFO
 FILEVERSION     1,0,0,0

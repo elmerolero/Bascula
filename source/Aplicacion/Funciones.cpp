@@ -25,8 +25,7 @@ void nuevoEmpresa( GtkWidget *widget, gpointer ptr )
 	// Verifica que no exista un registro con ese nombre
 	Registro *empresa = empresas.buscarRegistroPorNombre( empresaNueva );
 	if( empresa != nullptr ){
-		interfaz.establecerTextoEtiqueta( "MensajeConsultarRegistroError", "El registro que desea agregar ya existe." );
-		interfaz.mostrarElemento( "MensajeConsultarRegistroError" );
+		mostrarMensajeError( "El registro que desea agregar ya existe." );
 		return;
 	}
 	
@@ -36,8 +35,7 @@ void nuevoEmpresa( GtkWidget *widget, gpointer ptr )
 		
 		// Verifica que se hubiera creado
 		if( empresa == nullptr ){
-			interfaz.establecerTextoEtiqueta( "MensajeConsultarRegistroError", "Ha ocurrido un error." );
-			interfaz.mostrarElemento( "MensajeConsultarRegistroError" );
+			mostrarMensajeError( "Ha ocurrido un error al crear la empresa." );
 			return;
 		}
 		
@@ -46,8 +44,7 @@ void nuevoEmpresa( GtkWidget *widget, gpointer ptr )
 		vistaRegistrosEmpresas( nullptr, nullptr );
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "MensajeConsultarRegistroError", ia.what() );
-		interfaz.mostrarElemento( "MensajeConsultarRegistroError" );
+		mostrarMensajeError( ia.what() );
 	}
 }
 
@@ -59,8 +56,7 @@ void nuevoProducto( GtkWidget *widget, gpointer ptr )
 	// Verifica que no exista un registro con ese nombre
 	Registro *producto = productos.buscarRegistroPorNombre( productoNuevo );
 	if( producto != nullptr ){
-		interfaz.establecerTextoEtiqueta( "MensajeConsultarRegistroError", "El registro que desea agregar ya existe." );
-		interfaz.mostrarElemento( "MensajeConsultarRegistroError" );
+		mostrarMensajeError( "El registro que desea agregar ya existe." );
 		return;
 	}
 	
@@ -70,8 +66,7 @@ void nuevoProducto( GtkWidget *widget, gpointer ptr )
 		
 		// Verifica que se hubiera creado
 		if( producto == nullptr ){
-			interfaz.establecerTextoEtiqueta( "MensajeConsultarRegistroError", "Ha ocurrido un error." );
-			interfaz.mostrarElemento( "MensajeConsultarRegistroError" );
+			mostrarMensajeError( "Ha ocurrido un error al intentar agregar el producto." );
 			return;
 		}
 		
@@ -80,8 +75,7 @@ void nuevoProducto( GtkWidget *widget, gpointer ptr )
 		vistaRegistrosProductos( nullptr, nullptr );
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "MensajeConsultarRegistroError", ia.what() );
-		interfaz.mostrarElemento( "MensajeConsultarRegistroError" );
+		mostrarMensajeError( ia.what() );
 	}
 }
 
@@ -101,8 +95,7 @@ void actualizarEmpresa( GtkWidget *widget, gpointer ptr )
 		mostrarMensaje( "Registro editado correctamente." );
 	}
 	catch( invalid_argument ia ){
-		interfaz.establecerTextoEtiqueta( "MensajeConsultarRegistroError", ia.what() );
-		interfaz.mostrarElemento( "MensajeConsultarRegistroError" );
+		mostrarMensajeError( ia.what() );
 	}
 }
 
@@ -122,8 +115,7 @@ void actualizarProducto( GtkWidget *widget, gpointer ptr )
 		mostrarMensaje( "Registro editado correctamente." );
 	}
 	catch( invalid_argument ia ){
-		interfaz.establecerTextoEtiqueta( "MensajeConsultarRegistroError", ia.what() );
-		interfaz.mostrarElemento( "MensajeConsultarRegistroError" );
+		mostrarMensajeError( ia.what() );
 	}
 }
 
@@ -189,8 +181,7 @@ void registrarEmpresa()
 		irHacia( nullptr, (void *)"Inicio" );
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "MensajeErrorRegistrarNombreEmpresa", ia.what() );
-		interfaz.mostrarElemento( "MensajeErrorRegistrarNombreEmpresa" );
+		mostrarMensajeError( ia.what() );
 	}
 }
 

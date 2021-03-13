@@ -9,21 +9,18 @@ using namespace std;
 void actualizarTiempo( GtkWidget *widget, gpointer ptr );
 void establecerUsuario( GtkWidget *widget, gpointer ptr );
 
-int main( int argc, char * argv[] )
+int main( int argc, char *argv[] )
 {
     // Activa la aplicacion
     aplicacionActiva = true;
     thread lectorBascula( lectorBasculaActualizarPeso );
 
     try{
-        // Inicializa gtk
-        gtk_init( &argc, &argv );
-
-        // Inicia la ventana principal
-        iniciar();
-
-        // Bucle principal
-        gtk_main();
+        // Crea la aplicación 
+        GtkApplication *aplicacion = gtk_application_new( "mx.com.minipluss.scb", G_APPLICATION_FLAGS_NONE );
+        g_signal_connect( aplicacion, "activate", G_CALLBACK( iniciar ), nullptr );
+        g_application_run( G_APPLICATION( aplicacion ), argc, argv ); 
+        g_object_unref( aplicacion );
     }
     catch( exception &e ){
         // Crea un archivo de error
@@ -37,9 +34,6 @@ int main( int argc, char * argv[] )
 
         // Indica el tipo de error generado
         log << "[Fecha: " << obtenerFecha() << " Hora: " << obtenerHora() << "]: " << e.what() << endl;
-
-        // Cierra gtk
-        gtk_main_quit();
 
         // Cierra el archivo
         log.close();

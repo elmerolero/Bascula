@@ -494,7 +494,6 @@ void registrarNombreEmpresa( std::string nombre )
     }
 
     cargarNombreEmpresa();
-    actualizarNombreEmpresa();
 }
 
 void cargarNombreEmpresa()
@@ -510,7 +509,8 @@ void cargarNombreEmpresa()
             nombreEmpresa = rows.at( 0 ) -> columns.at( 0 );
 
             // Actualiza el nombre de la empresa
-            actualizarNombreEmpresa();
+            interfaz.establecerTextoEtiqueta( "NombreEmpresa", nombreEmpresa );
+            interfaz.mostrarElemento( "NombreEmpresa" );
         }
         else{
             irHacia( nullptr, (void *)"RegistrarEmpresa" );
@@ -582,8 +582,7 @@ void guardarConfiguracion()
         lectorBasculaActualizarOpciones();
     }
     catch( exception &ia ){
-        interfaz.establecerTextoEtiqueta( "MensajeErrorConfiguracion", ia.what() );
-        interfaz.mostrarElemento( "MensajeErrorConfiguracion" );
+        mostrarMensajeError( ia.what() );
     }
 
     mostrarMensaje( "Configuración actualizada." );
@@ -802,6 +801,9 @@ void generarCodigoRecuperacion()
     default_random_engine motor( static_cast< unsigned int >( time( 0 ) ) );
     uniform_int_distribution< unsigned int > intAleatorio( 65, 90 );
 
+    // Nombre de usuario
+    string usuario = Usuario::validarNombreUsuario( interfaz.obtenerTextoEntrada( "NombreUsuarioConsultado" ) );
+
     // Código
     stringstream codigo;
     for( size_t contador = 0; contador < 6; ++contador ){
@@ -817,7 +819,8 @@ void generarCodigoRecuperacion()
 
     // Registra el código en la base de datos
     database.open( nombreArchivo );
-    database.query( "insert into codigos_recuperacion values( '" + inputHash + "', '" + usuarioConsultado -> obtenerNombreUsuario() + "')" );
+    database.query( "delete from codigos_recuperacion where nombre_usuario = '" + usuario + "'" );
+    database.query( "insert into codigos_recuperacion values( '" + inputHash + "', '" + usuario + "')" );
 
     // Cierra la base de datos
     database.close();
@@ -833,6 +836,7 @@ void validarCodigoRecuperacion()
         // Obtiene el código en base el nombre de usuario
         database.open( nombreArchivo );
         database.query( "select codigo from codigos_recuperacion where nombre_usuario = '" + entradaUsuario + "';" );
+        database.close();
         if( rows.size() > 0 ){
             // Obtiene el código dado
             string codigo = rows.at( 0 ) -> columns.at( 0 );
@@ -840,25 +844,26 @@ void validarCodigoRecuperacion()
             // Crea el hash para el código de recuperación introducido y lo compara
             SHA256 hashTool;
             codigoSeguridad = hashTool( codigoSeguridad );
-
+            
             // Compara el hash del código introducido con el hash de la base de datos
-            compararContrasenas( codigoSeguridad, codigo );
+            if( codigoSeguridad.compare( codigo ) != 0 ){
+                mostrarMensajeError( "El código introducido no coincide con ningún código de\nrecuperación asignado al usuario indicado." );
+                return;
+            }
 
             // Obtiene el usuario del que se desea reemplazar la contraseña
             nombreUsuario = entradaUsuario;
             codigoRecuperacion = codigoSeguridad;
 
             // Redirige a la vista para el reemplazo de contraseña
-            vistaReemplazarContrasena();
+            irA( "ReemplazarContrasena", false );
         }
         else{
-            interfaz.establecerTextoEtiqueta( "MensajeErrorRecuperarContrasena", "No se encontró un código de recuperación." );
-            interfaz.mostrarElemento( "MensajeErrorRecuperarContrasena" );
+            mostrarMensajeError( "No se encontró un código de recuperación." );
         }
     }
     catch( invalid_argument &ia ){
-        interfaz.establecerTextoEtiqueta( "MensajeErrorRecuperarContrasena", ia.what() );
-        interfaz.mostrarElemento( "MensajeErrorRecuperarContrasena" );
+        mostrarMensajeError( ia.what() );
     }
 }
 

@@ -29,11 +29,11 @@ void vistaCuenta( GtkWidget *widget, gpointer ptr )
 
 void vistaRegistrosEmpresas( GtkWidget *widget, gpointer ptr )
 {	
+	// Establece la vista para consultar registros
+	irA( "ConsultarRegistros", false );
+
 	// Establece el nombre de los registros que se estan consultando
-	interfaz.establecerTextoEtiqueta( "TituloRegistros", "Empresas" );
-	
-	// Establece el nombre de los registros que se estan consultando
-	interfaz.establecerTextoEtiqueta( "TituloRegistro", "Empresa" );
+	interfaz.establecerTextoEtiqueta( "Titulo", "Empresas" );
 	
 	// Establece la imagen de registro
 	interfaz.establecerImagen( "ImagenRegistro", "../resources/images/icons/Empresas.png" );
@@ -43,27 +43,23 @@ void vistaRegistrosEmpresas( GtkWidget *widget, gpointer ptr )
 	
 	// Conecta las señales de la vista 
 	interfaz.conectarSenal( botonNuevoRegistro, G_CALLBACK( vistaNuevoRegistro ), nullptr );
-	interfaz.conectarSenal( entradaConsultarNombre, G_CALLBACK( vistaRegistroEmpresa ), nullptr );
-	interfaz.conectarSenal( botonConsultarNombre, G_CALLBACK( vistaRegistroEmpresa ), nullptr );
+	interfaz.conectarSenal( contenedorRegistros, G_CALLBACK( vistaRegistroEmpresa ), nullptr );
 
 	interfaz.conectarSenal( botonNuevoRegistro2, G_CALLBACK( vistaNuevoRegistro ), nullptr );
     interfaz.conectarSenal( botonGuardarEdicionRegistro, G_CALLBACK( actualizarEmpresa ), nullptr );
     interfaz.conectarSenal( botonGuardarNuevoRegistro, G_CALLBACK( nuevoEmpresa ), nullptr );
     interfaz.conectarSenal( botonCancelarNuevoRegistro, G_CALLBACK( vistaRegistrosEmpresas ), nullptr );
     interfaz.conectarSenal( botonSi, G_CALLBACK( eliminarEmpresa ), nullptr );
-    
-    // Establece el completador de empresas
-    interfaz.establecerCompletadorEntrada( "EntradaNombreEmpresaInterno", NULL );
-    interfaz.establecerCompletadorEntrada( "EntradaConsultarNombre", empresas.obtenerCompletador() );
-
-	// Establece la vista para consultar registros
-	irA( "ConsultarRegistros", false );
 }
 
-void vistaRegistroEmpresa( GtkWidget *widget, gpointer ptr )
+void vistaRegistroEmpresa( GtkListBox *box, GtkListBoxRow *row, gpointer data )
 {
+	// Obtiene la clave del nombre del elemento seleccionado
+	GtkWidget *item = gtk_bin_get_child( GTK_BIN( row ) );
+	string clave = gtk_widget_get_name( item );
+	
 	// Obtiene el nombre del registro a consultar
-	registro = empresas.buscarRegistroPorNombre( interfaz.obtenerTextoEntrada( "EntradaConsultarNombre" ) );
+	registro = empresas.buscarRegistroPorClave( stoi( clave ) );
 	if( registro == nullptr ){
 		mostrarMensaje( "Registro no encontrado." );
 		return;
@@ -79,10 +75,7 @@ void vistaRegistrosProductos( GtkWidget *widget, gpointer ptr )
 	irHacia( nullptr, (void *)"ConsultarRegistros" );
 	
 	// Establece el nombre de los registros que se estan consultando
-	interfaz.establecerTextoEtiqueta( "TituloRegistros", "Productos" );
-
-	// Establece el nombre de los registros que se estan consultando
-	interfaz.establecerTextoEtiqueta( "TituloRegistro", "Producto" );
+	interfaz.establecerTextoEtiqueta( "Titulo", "Productos" );
 	
 	// Establece la imagen de registro
 	interfaz.establecerImagen( "ImagenRegistro", "../resources/images/icons/Producto.png" );
@@ -92,24 +85,22 @@ void vistaRegistrosProductos( GtkWidget *widget, gpointer ptr )
 	
 	// Conecta las señales de la vista
 	interfaz.conectarSenal( botonNuevoRegistro, G_CALLBACK( vistaNuevoRegistro ), nullptr );
-	interfaz.conectarSenal( entradaConsultarNombre, G_CALLBACK( vistaRegistroProducto ), nullptr );
-	interfaz.conectarSenal( botonConsultarNombre, G_CALLBACK( vistaRegistroProducto ), nullptr );
+	interfaz.conectarSenal( contenedorRegistros, G_CALLBACK( vistaRegistroProducto ), nullptr );
     interfaz.conectarSenal( botonNuevoRegistro2, G_CALLBACK( vistaNuevoRegistro ), nullptr );
     interfaz.conectarSenal( botonGuardarEdicionRegistro, G_CALLBACK( actualizarProducto ), nullptr );
     interfaz.conectarSenal( botonGuardarNuevoRegistro, G_CALLBACK( nuevoProducto ), nullptr );
     interfaz.conectarSenal( botonCancelarNuevoRegistro, G_CALLBACK( vistaRegistrosProductos ), nullptr );
     interfaz.conectarSenal( botonSi, G_CALLBACK( eliminarProducto ), nullptr );
-
-	// Establece el completador de empresas
-    interfaz.establecerCompletadorEntrada( "EntradaNombreProductoInterno", NULL );
-    interfaz.establecerCompletadorEntrada( "EntradaNombreProductoPublico", NULL );
-    interfaz.establecerCompletadorEntrada( "EntradaConsultarNombre", productos.obtenerCompletador() );
 }
 
-void vistaRegistroProducto( GtkWidget *widget, gpointer ptr )
+void vistaRegistroProducto( GtkListBox *box, GtkListBoxRow *row, gpointer data )
 {
+	// Obtiene la clave del nombre del elemento seleccionado
+	GtkWidget *item = gtk_bin_get_child( GTK_BIN( row ) );
+	string clave = gtk_widget_get_name( item );
+
 	// Obtiene el nombre del registro a consultar
-	registro = productos.buscarRegistroPorNombre( interfaz.obtenerTextoEntrada( "EntradaConsultarNombre" ) );
+	registro = productos.buscarRegistroPorClave( stoi( clave ) );
 	if( registro == nullptr ){
 		mostrarMensaje( "Registro no encontrado." );
 		return;
@@ -122,21 +113,7 @@ void vistaRegistroProducto( GtkWidget *widget, gpointer ptr )
 void vistaRegistro( Registro *registro )
 {
 	// Establece la vista de registro
-	irHacia( nullptr, (void *)"ConsultarRegistro" );
-	
-	// Muestra el control de registros
-	interfaz.mostrarElemento( "ControlesGestionRegistros" );
-	
-	// Oculta los datos que tendría un registro seleccionado y muestra el formulario de nuevo registro
-	interfaz.ocultarElemento( "NuevoRegistro" );
-	interfaz.mostrarElemento( "Registro" );
-	
-	// Oculta el campo de entrada del nombre y los controles de edición
-	interfaz.ocultarElemento( "EntradaNombreRegistro" );
-	interfaz.ocultarElemento( "ControlesEdicionRegistro" );
-	
-	// Muestra la etiqueta con el nombre del registro
-	interfaz.mostrarElemento( "EtiquetaNombreRegistro" );
+	irHacia( nullptr, (void *)"Registro" );
 	
 	// Establece la clave del registro
 	stringstream clave;
@@ -145,7 +122,6 @@ void vistaRegistro( Registro *registro )
 	
 	// Establece el nombre del registro
 	interfaz.establecerTextoEtiqueta( "EtiquetaNombreRegistro", registro -> obtenerNombre() );
-	interfaz.establecerTextoEntrada( "EntradaNombreRegistro", registro -> obtenerNombre() );
 }
 
 void vistaNuevoRegistro( GtkWidget *widget, gpointer ptr )
@@ -171,27 +147,12 @@ void vistaRegistroEditar( GtkWidget *widget, gpointer ptr )
 
 void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
 {
-	// Establece el baudrate establecido
-	interfaz.establecerActivoComboBoxText( "OpcionesBaudrate", "CBR_" + to_string( lectorBascula.obtenerBaudRate() ) );
-
-	// Establece los bits de datos
-	interfaz.establecerTextoEntrada( "OpcionesBitsDatos", to_string( lectorBascula.obtenerByteSize() ) );
-
-	// Establece los bits de stop
-	interfaz.establecerTextoEntrada( "OpcionesBitsStop", to_string( lectorBascula.obtenerStopBits() ) );
-
-	// Establecer parity
-	interfaz.establecerActivoComboBoxText( "OpcionesParidad", parityOptions[ lectorBascula.obtenerParity() ] );
-
-	// Bits a ignorar
-	interfaz.establecerTextoEntrada( "OpcionesBytesIgnorados", to_string( lectorBascula.obtenerBytesIgnorados() ) );
-
 	// Numero copias
 	interfaz.establecerTextoEntrada( "OpcionesImpresionFormatos", to_string( numeroFormatos ) );
 	interfaz.establecerTextoEntrada( "OpcionesImpresionCopias", to_string( numeroCopias ) );
 
 	// Se dirige a la vista
-	irHacia( nullptr, (void *)"Configuracion" );
+	irA( "Configuracion", false );
 }
 
 void vistaBasculaPublica( GtkWidget *widget, gpointer ptr )
@@ -201,8 +162,7 @@ void vistaBasculaPublica( GtkWidget *widget, gpointer ptr )
 	
 	// Conecta las señales correspondientes
     interfaz.conectarSenal( botonBasculaNuevo, G_CALLBACK( vistaCrearRegistroPublico ), nullptr );
-    interfaz.conectarSenal( entradaSeguimiento, G_CALLBACK( vistaFinalizarRegistroPublico ), nullptr );
-    interfaz.conectarSenal( botonSeguimiento, G_CALLBACK( vistaFinalizarRegistroPublico ), nullptr );
+	interfaz.conectarSenal( ticketsPendientesSeleccionados, G_CALLBACK( vistaPublicoEditarRegistro ), nullptr );
 
 	// Establece las vistas
 	irA( "Tickets", false );
@@ -213,13 +173,9 @@ void vistaBasculaInterna( GtkWidget *widget, gpointer ptr )
 	// Obtiene los tickets pendiente
 	internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
 	
-	// Oculta la barra de mensajes
-	//interfaz.ocultarElemento( "MensajeTicketsPendientes" );
-	
 	// Conecta las señales correspondientes
     interfaz.conectarSenal( botonBasculaNuevo, G_CALLBACK( vistaCrearRegistro ), nullptr );
-    interfaz.conectarSenal( entradaSeguimiento, G_CALLBACK( vistaInternoEditarRegistro ), nullptr );
-    interfaz.conectarSenal( botonSeguimiento, G_CALLBACK( vistaInternoEditarRegistro ), nullptr );
+    interfaz.conectarSenal( ticketsPendientesSeleccionados, G_CALLBACK( vistaInternoEditarRegistro ), nullptr);
 
     // Establece las vistas
 	irHacia( nullptr, (void *)"Tickets" );
@@ -270,11 +226,11 @@ void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
 	irA( "NuevoTicketPublico", false );
 }
 
-void vistaFinalizarRegistroPublico()
+void vistaPublicoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data )
 {
 	try{
 		// Busca el ticket
-		TicketPublico *registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaSeguimiento" ) ), registrosPublicosPendientes );
+		TicketPublico *registroPublico = buscarRegistroPublicoPorFolio( obtenerFolioSelector( row ), registrosPublicosPendientes );
 		if( registroPublico == nullptr ){
 			interfaz.establecerTextoEtiqueta( "DialogoMensaje", "Registro no encontrado." );
 			interfaz.mostrarElemento( "VentanaMensaje" );
@@ -370,16 +326,9 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
 }
 
-void vistaInternoEditarRegistro()
+void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data )
 {
-	Ticket *ticket;
-	try{
-		ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaSeguimiento" ) ), registrosInternosPendientes );
-	}
-	catch( invalid_argument &ia ){
-		mostrarMensaje( "Introduzca un folio válido." );
-		return;
-	} 
+	Ticket *ticket = buscarRegistroInternoPorFolio( obtenerFolioSelector( row ), registrosInternosPendientes );
 	
 	// Si no encuentra el ticket
 	if( ticket == nullptr ){
@@ -496,11 +445,8 @@ void vistaConsultarPesajesInternos()
 	// Señal de obtener registros
 	interfaz.conectarSenal( botonObtenerRegistros, G_CALLBACK( irHacia ), (void *)"ObtenerRegistros" );
 
-	// Señal de selección de ticket (entrada)
-	interfaz.conectarSenal( entradaRegistrosPesajeFolio, G_CALLBACK( vistaConsultarRegistroInterno ), nullptr );
-
-	// Señal de selección de ticket (boton)
-	interfaz.conectarSenal( botonRegistrosPesajeConsultarRegistro, G_CALLBACK( vistaConsultarRegistroInterno ), nullptr );
+	// Señal de selección de ticket
+	interfaz.conectarSenal( ticketsConsultadosSeleccionados, G_CALLBACK( vistaInternoConsultarRegistro ), nullptr );
 
 	// Boton de seleccion dia
 	interfaz.conectarSenal( botonConsultarDia, G_CALLBACK( internoSeleccionarDia ), nullptr );
@@ -533,11 +479,8 @@ void vistaConsultarPesajesPublicos()
 	// Señal de obtener registros
 	interfaz.conectarSenal( botonObtenerRegistros, G_CALLBACK( irHacia ), (void *)"ObtenerRegistros" );	
 
-	// Señal de selección de ticket (entrada)
-	interfaz.conectarSenal( entradaRegistrosPesajeFolio, G_CALLBACK( vistaConsultarRegistroPublico ), nullptr );
-
-	// Señal de selección de ticket (boton)
-	interfaz.conectarSenal( botonRegistrosPesajeConsultarRegistro, G_CALLBACK( vistaConsultarRegistroPublico ), nullptr );
+	// Señal de selección de ticket
+	interfaz.conectarSenal( ticketsConsultadosSeleccionados, G_CALLBACK( vistaPublicoConsultarRegistro ), nullptr );
 
 	// Boton de seleccion dia
 	interfaz.conectarSenal( botonConsultarDia, G_CALLBACK( publicoSeleccionarDia ), nullptr );
@@ -549,22 +492,12 @@ void vistaConsultarPesajesPublicos()
 	irHacia( nullptr, (void *)"Pesajes" );
 }
 
-void vistaConsultarRegistroInterno()
+void vistaInternoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data )
 {
-	// Ticket para obtener la información
-	Ticket *ticket;
-
 	// Obtiene el ticket que se desea consultar
-	try{
-		ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaRegistrosPesajeFolio" ) ), registrosInternosConsultados );
-		// Si el ticket no es encontrado
-		if( ticket == nullptr ){
-			mostrarMensaje( "Registro no encontrado." );
-			return;
-		}
-	}
-	catch( invalid_argument &ia ){
-		mostrarMensaje( "Introduzca un folio válido." );
+	Ticket *ticket = buscarRegistroInternoPorFolio( obtenerFolioSelector( row ), registrosInternosConsultados );
+	if( ticket == nullptr ){
+		mostrarMensaje( "Registro no encontrado." );
 		return;
 	}
 
@@ -595,20 +528,12 @@ void vistaConsultarRegistroInterno()
 	irA( "PesajeInterno", false );
 }
 
-void vistaConsultarRegistroPublico()
+void vistaPublicoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data )
 {
 	// Obtiene el ticket que se desea consultar
-	try{
-		registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEntrada( "EntradaRegistrosPesajeFolio" ) ), registrosPublicosConsultados );
-	}
-	catch( invalid_argument &ia ){
-		mostrarMensaje( "Introduzca un folio válido." );
-		return;
-	}
-
-	// Si el ticket no es encontrado
+	registroPublico = buscarRegistroPublicoPorFolio( obtenerFolioSelector( row ), registrosPublicosConsultados );
 	if( registroPublico == nullptr ){
-		mostrarMensaje( "Registro no encontrado." );
+		mostrarMensaje( "Registro no encontrado o no disponible." );
 		return;
 	}
 	
@@ -634,7 +559,7 @@ void vistaConsultarRegistroPublico()
 	interfaz.conectarSenal( imprimirRegistroPublico, G_CALLBACK( publicoImprimirSeleccionado ), nullptr );
 
 	// Redirige a la vista
-	irA( "RegistroPublico", false );
+	irA( "PesajePublico", false );
 }
 
 void vistaConsultarUsuarios()

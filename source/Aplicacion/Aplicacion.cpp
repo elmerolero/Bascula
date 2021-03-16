@@ -15,6 +15,7 @@
 #include "Database.h"
 #include "Senales.h"
 #include "Sesion.h"
+#include "Windows.h"
 using namespace std;
 
 // Interfaz principal 
@@ -79,7 +80,7 @@ void cargarInformacion()
 
     // Carga la configuración de la bascula
     lectorBascula.cargarConfiguracion();
-    cargarOpcionesImpresion();    
+    cargarOpcionesImpresion();
 }
 
 void mostrarMensajeError( string mensajeError )

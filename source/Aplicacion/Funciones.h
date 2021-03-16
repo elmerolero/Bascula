@@ -23,5 +23,6 @@ std::string pesoString( double, int );
 std::string pesoString( double, int, bool );
 std::string encriptar( std::string cadena, int numero );
 std::string desencriptar( std::string cadena, int numero );
+unsigned int obtenerFolioSelector( GtkListBoxRow *row );
 
 #endif

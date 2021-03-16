@@ -228,3 +228,9 @@ string desencriptar( string texto, int numero )
 
 	return str;
 }
+
+unsigned int obtenerFolioSelector( GtkListBoxRow *row )
+{
+	GtkWidget *item = gtk_bin_get_child( GTK_BIN( row ) );
+	return stoi( gtk_widget_get_name( item ) );
+}

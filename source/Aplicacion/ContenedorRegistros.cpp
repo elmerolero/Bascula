@@ -243,11 +243,6 @@ void ContenedorRegistros::actualizarListaRegistros()
 	
 }
 
-GtkListStore *ContenedorRegistros::obtenerListaNombreRegistros()
-{
-    return listaNombresRegistros;
-}
-
 // Obtiene el objeto de autocompletado
 GtkEntryCompletion *ContenedorRegistros::obtenerCompletador() const
 {

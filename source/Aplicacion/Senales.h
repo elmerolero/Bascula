@@ -111,4 +111,8 @@ extern Signal botonEliminarUsuario;
 extern Signal botonCambiarContrasena;
 extern Signal entradaReemplazarConfirmacion;
 
+extern Signal ticketsPendientesSeleccionados;
+extern Signal ticketsConsultadosSeleccionados;
+extern Signal contenedorRegistros;
+
 #endif

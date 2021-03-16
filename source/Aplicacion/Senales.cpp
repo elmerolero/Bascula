@@ -110,3 +110,7 @@ Signal botonObtenerRegistros{ "BotonObtenerRegistros", "clicked", 0 };
 Signal botonEliminarUsuario{ "BotonEliminarUsuario", "clicked", 0 };
 Signal botonCambiarContrasena{ "BotonCambiarContrasena", "clicked", 0 };
 Signal entradaReemplazarConfirmacion{ "EntradaReemplazarConfirmacion", "activate", 0 };
+
+Signal ticketsPendientesSeleccionados{ "ContenedorTickets", "row-activated", 0 };
+Signal ticketsConsultadosSeleccionados{ "ContenedorRegistrosPesaje", "row-activated", 0 };
+Signal contenedorRegistros{ "ContenedorRegistros", "row-activated", 0 };

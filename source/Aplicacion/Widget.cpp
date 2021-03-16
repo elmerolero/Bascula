@@ -48,6 +48,13 @@ void Widget::establecerIconoVentana( string idVentana, string archivo )
     gtk_window_set_icon_from_file( GTK_WINDOW( objeto ), archivo.c_str(), NULL );
 }
 
+void Widget::establecerNombreWidget( string idWidget, string nombreWidget )
+{
+    GObject *objeto = obtenerObjeto( idWidget );
+
+    return gtk_widget_set_name( GTK_WIDGET( objeto ), nombreWidget.c_str() );
+}
+
 string Widget::obtenerNombreWidget( string idWidget )
 {
     GObject *objeto = obtenerObjeto( idWidget );
@@ -139,6 +146,20 @@ void Widget::insertarElementoAGrid( const Widget *elemento, string idFuente, str
                 }
             }
         }
+    }
+}
+
+// Inserta el elemento de un Widget dado dentro de otro del uno de los elementos de este Widget
+void Widget::insertarElementoListBox( const Widget *elemento, string idFuente, string idDestino, gint position )
+{
+    // ¿El Widget no está vacío?
+    if( elemento != nullptr ){
+        // Obtiene el objeto con idFuente y el objeto con idDestino
+        GObject *objetoFuente = elemento -> obtenerObjeto( idFuente );
+        GObject *objetoDestino = obtenerObjeto( idDestino );
+        
+        // Se agrega
+        gtk_list_box_insert( GTK_LIST_BOX( objetoDestino ), GTK_WIDGET( objetoFuente ), position );
     }
 }
 
@@ -357,6 +378,12 @@ void Widget::removerElementosHijos( std::string idContenedor )
     
     // Libera las listas
     g_list_free( hijos );
+}
+
+void Widget::establecerModeloVistaArbol( std::string idVistaArbol, GtkListStore *lista )
+{
+    GObject *objeto = obtenerObjeto( idVistaArbol );
+    gtk_tree_view_set_model( GTK_TREE_VIEW( objeto ), GTK_TREE_MODEL( lista ) );
 }
 
 void Widget::destruir()

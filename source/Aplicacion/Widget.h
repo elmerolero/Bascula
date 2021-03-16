@@ -28,6 +28,9 @@ class Widget
         // Establece el icon de la aplicacion
         void establecerIconoVentana( std::string idVentana, std::string archivo );
 
+        // Establece el nombre de un widget
+        void establecerNombreWidget( std::string idWidget, std::string nombreWidget );
+
         // Obtiene el nombre de un widget 
         std::string obtenerNombreWidget( std::string idWidget );
 
@@ -48,6 +51,9 @@ class Widget
 
         // Inserta un Widget dentro de un Grid que se encuentre en el Widget
         void insertarElementoAGrid( const Widget *elemento, std::string idFuente, std::string idDestino, gint left, gint top, gint width, gint height );
+
+        // Inserta un widget a una lista de cajas
+        void insertarElementoListBox( const Widget *elemento, std::string idFuente, std::string idDestino, gint position );
         
         // Elimina el Widget dado
         void eliminarElemento( const Widget *elemento, std::string idElemento, std::string idContenedor );
@@ -117,6 +123,8 @@ class Widget
         
         // Remueve los elementos de un contenedor
         void removerElementosHijos( std::string idContenedor );
+
+        void establecerModeloVistaArbol( std::string idVistaArbol, GtkListStore *lista );
         
         // Destruye el widget
         void destruir();

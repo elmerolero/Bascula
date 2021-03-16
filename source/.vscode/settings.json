@@ -1,5 +1,11 @@
 {
     "files.associations": {
-        "array": "cpp"
+        "array": "cpp",
+        "xstring": "cpp",
+        "stdexcept": "cpp",
+        "string": "cpp",
+        "iosfwd": "cpp",
+        "iostream": "cpp",
+        "list": "cpp"
     }
 }

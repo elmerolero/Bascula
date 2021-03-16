@@ -3,6 +3,7 @@
 #include "LectorBascula.h"
 #include "Aplicacion.h"
 #include "Funciones.h"
+#include "Vistas.h"
 #include <stdexcept>
 #include <iostream>
 #include <fstream>
@@ -423,13 +424,14 @@ void internoActualizarRegistros( list< Ticket * > &tickets, std::string idConten
         
         try{
 			elemento -> cargarWidget( "../resources/interfaces/ElementoTicket.glade" );
+			elemento -> establecerNombreWidget( "Ticket", to_string( (* ticket) -> obtenerFolio() ).c_str() );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaFolioInterno", clave.str() );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaFechaInterno", (*ticket) -> obtenerFecha() );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaEmpresaInterno", (*ticket) -> obtenerEmpresa() -> obtenerNombre() );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaProductoInterno", (*ticket) -> obtenerProducto() -> obtenerNombre() );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaPlacaInterno", (*ticket) -> obtenerNumeroPlacas() );
 			
-			interfaz.insertarElementoAGrid( elemento, "Ticket", idContenedor, 0, (*ticket) -> obtenerFolio(), 1, 1 );
+			interfaz.insertarElementoListBox( elemento, "Ticket", idContenedor, (*ticket) -> obtenerFolio() );
 		}
 		catch( runtime_error &re ){
 			cerr << re.what() << endl;

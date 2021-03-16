@@ -144,19 +144,19 @@ void ContenedorRegistros::actualizarRegistro( Registro * registro )
     // Busca que no exista un producto que no se llame igual
     Registro *coincidencia = buscarRegistroPorNombre( nuevoNombre );
     if( coincidencia != nullptr ){
-	throw invalid_argument( "Ya existe un registro con ese nombre." );
+	    throw invalid_argument( "Ya existe un registro con ese nombre." );
     }
     
     try{
-	// Establece el nuevo nombre del programa
-	registro -> establecerNombre( interfaz.obtenerTextoEntrada( "EntradaNombreRegistro" ) );
-	    
-	// Conecta a la base de datos
-	database.open( nombreArchivo );
-	stringstream consulta;
-	consulta << "update " << obtenerNombrePlural() << " set nombre_" << obtenerNombreSingular() << " = '" << nuevoNombre << "' where clave_" << obtenerNombreSingular() << " = " << registro -> obtenerClave() << ";";
-	database.query( consulta.str() );
-	database.close();
+        // Establece el nuevo nombre del programa
+        registro -> establecerNombre( interfaz.obtenerTextoEntrada( "EntradaNombreRegistro" ) );
+            
+        // Conecta a la base de datos
+        database.open( nombreArchivo );
+        stringstream consulta;
+        consulta << "update " << obtenerNombrePlural() << " set nombre_" << obtenerNombreSingular() << " = '" << nuevoNombre << "' where clave_" << obtenerNombreSingular() << " = " << registro -> obtenerClave() << ";";
+        database.query( consulta.str() );
+        database.close();
     }
     catch( invalid_argument &ia ){
 	throw invalid_argument( ia.what() );
@@ -226,20 +226,26 @@ void ContenedorRegistros::actualizarListaRegistros()
         clave << setfill( '0' ) << setw( 7 ) << (*registro) -> obtenerClave();
         
         try{
-	    elemento -> cargarWidget( "../resources/interfaces/ItemRegistro.glade" );
-	    elemento -> establecerTextoEtiqueta( "ItemEntradaClave", clave.str() );
-	    elemento -> establecerTextoEtiqueta( "ItemEntradaNombre", (*registro) -> obtenerNombre() );
-	    elemento -> establecerImagen( "ImagenRegistro", "../resources/images/icons/" + obtenerNombreSingular() + "64.png" );
+	        elemento -> cargarWidget( "../resources/interfaces/ItemRegistro.glade" );
+            elemento -> establecerNombreWidget( "ItemRegistro", to_string( (*registro) -> obtenerClave() ) );
+	        elemento -> establecerTextoEtiqueta( "ItemEntradaClave", clave.str() );
+	        elemento -> establecerTextoEtiqueta( "ItemEntradaNombre", (*registro) -> obtenerNombre() );
+	        elemento -> establecerImagen( "ImagenRegistro", "../resources/images/icons/" + obtenerNombreSingular() + "64.png" );
 	    
-	    interfaz.insertarElementoAGrid( elemento, "ItemRegistro", "ContenedorRegistros", 0, (*registro) -> obtenerClave(), 1, 1 );
-	}
-	catch( runtime_error &re ){
-		cerr << re.what() << endl;
-	}
+	        interfaz.insertarElementoListBox( elemento, "ItemRegistro", "ContenedorRegistros", (*registro) -> obtenerClave());
+	    }
+	    catch( runtime_error &re ){
+		    cerr << re.what() << endl;
+	    }
 	
-	delete elemento;
+	    delete elemento;
     }
 	
+}
+
+GtkListStore *ContenedorRegistros::obtenerListaNombreRegistros()
+{
+    return listaNombresRegistros;
 }
 
 // Obtiene el objeto de autocompletado

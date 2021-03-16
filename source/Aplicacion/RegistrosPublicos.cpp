@@ -2,6 +2,7 @@
 #include "Aplicacion.h"
 #include "LectorBascula.h"
 #include "Funciones.h"
+#include "Vistas.h"
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -93,12 +94,6 @@ void publicoRegistrarPendiente()
 			registroPublico -> establecerPesoNeto( 0.f );
 			registroPublico -> establecerPesoNetoEstablecido( false );
 		}
-	
-		// Actualiza la vista de tickets
-		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
-		
-		// Establece las vistas
-		regresarVista();
 
 		// Crea o registra el registro según corresponda
 		if( esRegistroNuevo ){
@@ -109,6 +104,12 @@ void publicoRegistrarPendiente()
 			actualizarRegistroPublicoPendiente( registroPublico );
 			mostrarMensajeError( "Registro actualizado correctamente." );
 		}
+
+		// Obtiene los tickets pendientes
+		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
+
+		// Establece las vistas
+		regresarVista();
 	}
 	catch( invalid_argument &ia ){
 		folioActualPublico--;
@@ -445,11 +446,12 @@ void publicoActualizarRegistros( list< TicketPublico * > &ticketsPublicos, std::
 
 		try{
 		    elemento -> cargarWidget( "../resources/interfaces/ElementoTicketPublico.glade" );
+			elemento -> establecerNombreWidget( "Ticket", to_string( (*ticket) -> obtenerFolio() ) );
 		    elemento -> establecerTextoEtiqueta( "ItemEntradaFolioInterno", clave.str() );
 		    elemento -> establecerTextoEtiqueta( "ItemEntradaFechaInterno", (*ticket) -> obtenerFecha() );
 		    elemento -> establecerTextoEtiqueta( "ItemEntradaProductoInterno", (*ticket) -> obtenerProducto() -> obtenerNombre() );
 		    elemento -> establecerTextoEtiqueta( "ItemEntradaPlacaInterno", (*ticket) -> obtenerNumeroPlacas() );
-		    interfaz.insertarElementoAGrid( elemento, "Ticket", idContenedor, 0, (*ticket) -> obtenerFolio(), 1, 1 );
+		    interfaz.insertarElementoListBox( elemento, "Ticket", idContenedor, (*ticket) -> obtenerFolio() );
 	    }
 	    catch( runtime_error &re ){
 		    cerr << re.what() << endl;

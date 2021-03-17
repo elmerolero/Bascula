@@ -1,6 +1,6 @@
 Sistema de Control de Bascula v0.83
 
-NOTA: Esta nueva versión es completamente INESTABLE, debido a la eliminación de elementos en la interfaz que impide la realización de ciertas funcionalidades esenciales para la integración o evolución de funciones nuevas.
+NOTA: Esta nueva versión es INESTABLE (menos que ayer, eso si), debido a la eliminación de elementos en la interfaz que impide la realización de ciertas funcionalidades esenciales para la integración o evolución de funciones nuevas (que cada día van tomando su lugar de vuelta).
 
 Mejoras implementadas o por implementar:
  * Uso de selectores en lugar de tener que teclear folios, nombres o claves para consultar los registros. IMPLEMENTADA PARCIALMENTE

@@ -3,16 +3,13 @@
 
 #include <gtk/gtk.h>
 #include "Registro.h"
+#include "ContenedorRegistros.h"
 
 void vistaCuenta( GtkWidget *widget, gpointer ptr );
-void vistaNuevoRegistro( GtkWidget *widget, gpointer ptr );
-void vistaNuevoProducto( GtkWidget *widget, gpointer ptr );
+void vistaRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data );
+void vistaRegistroEditar( GtkWidget *widget, gpointer data );
 void vistaRegistrosEmpresas( GtkWidget *widget, gpointer ptr );
-void vistaRegistroEmpresa( GtkListBox *box, GtkListBoxRow *row, gpointer data );
 void vistaRegistrosProductos( GtkWidget *widget, gpointer ptr );
-void vistaRegistroProducto( GtkListBox *box, GtkListBoxRow *row, gpointer data );
-void vistaRegistro( Registro *registro );
-void vistaRegistroEditar( GtkWidget *widget, gpointer ptr );
 void vistaConfiguracion( GtkWidget *widget, gpointer ptr );
 void vistaBasculaPublica( GtkWidget *widget, gpointer ptr );
 void vistaBasculaInterna( GtkWidget *widget, gpointer ptr );

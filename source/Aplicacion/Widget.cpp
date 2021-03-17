@@ -163,6 +163,18 @@ void Widget::insertarElementoListBox( const Widget *elemento, string idFuente, s
     }
 }
 
+// Obtiene el nombre del Widget seleccionado de un ListBox
+std::string Widget::obtenerWidgetSeleccionadoListBox( std::string idListBox )
+{
+    GObject *listBox = obtenerObjeto( idListBox );
+    GtkListBoxRow *row = gtk_list_box_get_selected_row( GTK_LIST_BOX( listBox ) );
+    if( row == NULL ){
+        throw invalid_argument( "No se ha seleccionado ninguna opción." );
+    }
+    GtkWidget *item = gtk_bin_get_child( GTK_BIN( row ) );
+	return gtk_widget_get_name( item );
+}
+
 // Elimina el Widget dado
 void Widget::eliminarElemento( const Widget *elemento, string idElemento, string idContenedor )
 {

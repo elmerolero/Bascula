@@ -84,17 +84,25 @@ extern Signal botonConsultarUsuario;
 extern Signal botonObtenerCodigoRecuperacion; 
 extern Signal usuarioAdministrador;
 
+// Señales para la consulta de registros
+extern Signal contenedorRegistrosActivado;
+extern Signal contenedorRegistrosSeleccionado;
+extern Signal botonRegistroNuevo;
+extern Signal botonRegistroEditar;
+extern Signal botonRegistroEliminar;
+
+// Señales para la edición de un registro
+
+extern Signal botonRegistroGuardarEdicion;
+extern Signal botonRegistroCancelarEdicion;
+
 // Noc
 extern Signal imprimirRegistroPublico;
 extern Signal eliminarRegistro;
-extern Signal botonNuevoRegistro;
-extern Signal botonNuevoRegistro2;
-extern Signal entradaConsultarNombre;
-extern Signal botonConsultarNombre;
+extern Signal botonRegistroNuevo;
 
-extern Signal botonGuardarEdicionRegistro;
-extern Signal botonGuardarNuevoRegistro;
-extern Signal botonCancelarNuevoRegistro;
+extern Signal botonRegistroGuardarNuevo;
+extern Signal botonRegistroCancelarNuevo;
 extern Signal botonSi;
 
 extern Signal enlaceRegistrosPesajeRegresar;
@@ -113,6 +121,5 @@ extern Signal entradaReemplazarConfirmacion;
 
 extern Signal ticketsPendientesSeleccionados;
 extern Signal ticketsConsultadosSeleccionados;
-extern Signal contenedorRegistros;
 
 #endif

@@ -85,17 +85,22 @@ Signal enlaceConsultarUsuarioRegresar{ "EnlaceConsultarUsuarioRegresar", "activa
 Signal botonObtenerCodigoRecuperacion{ "BotonObtenerCodigoRecuperacion", "clicked", 0 };
 Signal usuarioAdministrador{ "UsuarioAdministrador", "toggled", 0 };
 
+// Señales para la consulta de registros
+Signal contenedorRegistrosActivado{ "ContenedorRegistros", "row-activated", 0 };
+Signal contenedorRegistrosSeleccionado{ "ContenedorRegistros", "row-selected", 0 };
+Signal botonRegistroNuevo{ "BotonRegistroNuevo", "clicked", 0 };
+Signal botonRegistroEditar{ "BotonRegistroEditar", "clicked", 0 };
+Signal botonRegistroEliminar{ "BotonRegistroEliminar", "clicked", 0 };
+
+// Boton de edición de registro
+Signal botonRegistroGuardarEdicion{ "BotonGuardarEdicionRegistro", "clicked", 0 };
+Signal botonRegistroCancelarEdicion{ "BotonCancelarEdicionRegistro", "clicked", 0 };
+
 // Noc
 Signal imprimirRegistroPublico{ "ImprimirRegistroPublico", "clicked", 0 };
 Signal eliminarRegistro{ "EliminarRegistroInterno", "clicked", 0 };
-Signal botonNuevoRegistro{ "BotonNuevoRegistro", "clicked", 0 };
-Signal botonNuevoRegistro2{ "BotonNuevoRegistro2", "clicked", 0 };
-Signal entradaConsultarNombre{ "EntradaConsultarNombre", "activate", 0 };
-Signal botonConsultarNombre{ "BotonConsultarNombre", "clicked", 0 };
-
-Signal botonGuardarEdicionRegistro{ "BotonGuardarEdicionRegistro", "clicked", 0 };
-Signal botonGuardarNuevoRegistro{ "BotonGuardarNuevoRegistro", "clicked", 0 };
-Signal botonCancelarNuevoRegistro{ "BotonCancelarNuevoRegistro", "clicked", 0 };
+Signal botonRegistroGuardarNuevo{ "BotonGuardarNuevoRegistro", "clicked", 0 };
+Signal botonRegistroCancelarNuevo{ "BotonCancelarNuevoRegistro", "clicked", 0 };
 Signal botonSi{ "BotonSi", "clicked", 0 };
 
 Signal botonRegistrosPesajeSeleccionarDia{ "BotonRegistrosPesajeSeleccionarDia", "clicked", 0 };
@@ -113,4 +118,3 @@ Signal entradaReemplazarConfirmacion{ "EntradaReemplazarConfirmacion", "activate
 
 Signal ticketsPendientesSeleccionados{ "ContenedorTickets", "row-activated", 0 };
 Signal ticketsConsultadosSeleccionados{ "ContenedorRegistrosPesaje", "row-activated", 0 };
-Signal contenedorRegistros{ "ContenedorRegistros", "row-activated", 0 };

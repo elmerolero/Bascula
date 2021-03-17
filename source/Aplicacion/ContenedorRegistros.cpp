@@ -132,35 +132,18 @@ Registro *ContenedorRegistros::agregarNuevoRegistro( string nombre )
 
 // Actualiza los datos de un registro en la base de datos
 void ContenedorRegistros::actualizarRegistro( Registro * registro )
-{
+{   
     // Verifica que el registro dado no sea nulo
     if( registro == nullptr ){
-	    throw invalid_argument( "Error, intento de establecer un registro nulo." );
+	    throw runtime_error( "Error, intento de establecer un registro nulo." );
     }
-    
-    // Obtiene el nombre introducido
-    string nuevoNombre = interfaz.obtenerTextoEntrada( "EntradaNombreRegistro" );
-    
-    // Busca que no exista un producto que no se llame igual
-    Registro *coincidencia = buscarRegistroPorNombre( nuevoNombre );
-    if( coincidencia != nullptr ){
-	    throw invalid_argument( "Ya existe un registro con ese nombre." );
-    }
-    
-    try{
-        // Establece el nuevo nombre del programa
-        registro -> establecerNombre( interfaz.obtenerTextoEntrada( "EntradaNombreRegistro" ) );
             
-        // Conecta a la base de datos
-        database.open( nombreArchivo );
-        stringstream consulta;
-        consulta << "update " << obtenerNombrePlural() << " set nombre_" << obtenerNombreSingular() << " = '" << nuevoNombre << "' where clave_" << obtenerNombreSingular() << " = " << registro -> obtenerClave() << ";";
-        database.query( consulta.str() );
-        database.close();
-    }
-    catch( invalid_argument &ia ){
-	throw invalid_argument( ia.what() );
-    }
+    // Conecta a la base de datos
+    database.open( nombreArchivo );
+    stringstream consulta;
+    consulta << "update " << obtenerNombrePlural() << " set nombre_" << obtenerNombreSingular() << " = '" << registro -> obtenerNombre() << "' where clave_" << obtenerNombreSingular() << " = " << registro -> obtenerClave() << ";";
+    database.query( consulta.str() );
+    database.close();
 }
 
 // Elimina los datos de un registro dado en la base de datos

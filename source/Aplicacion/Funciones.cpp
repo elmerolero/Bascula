@@ -17,104 +17,76 @@ bool descuentoCalculado = false;
 // Registro a crear
 Registro *registro;
 
-void nuevoEmpresa( GtkWidget *widget, gpointer ptr )
+void crearRegistro( GtkWidget *widget, gpointer data )
 {
-	// Lee el nombre de la nueva empresa
-	string empresaNueva = interfaz.obtenerTextoEntrada( "EntradaNombreNuevoRegistro" );
+	// Convierte el apuntador void a un apuntador ContenedorRegistros
+	ContenedorRegistros *contenedor = static_cast< ContenedorRegistros * >( data );
+
+	// Lee el nombre del nuevo registro
+	string nombreRegistro = interfaz.obtenerTextoEntrada( "EntradaNombreNuevoRegistro" );
 	
 	// Verifica que no exista un registro con ese nombre
-	Registro *empresa = empresas.buscarRegistroPorNombre( empresaNueva );
-	if( empresa != nullptr ){
+	Registro *registro = contenedor -> buscarRegistroPorNombre( nombreRegistro );
+	if( registro != nullptr ){
 		mostrarMensajeError( "El registro que desea agregar ya existe." );
 		return;
 	}
-	
+
 	try{
-		// Añade la nueva empresa
-		empresa = empresas.agregarNuevoRegistro( empresaNueva );
-		
-		// Verifica que se hubiera creado
-		if( empresa == nullptr ){
-			mostrarMensajeError( "Ha ocurrido un error al crear la empresa." );
+		// Añade el nuevo registro y e valida que hubiera sido creada satisfactoriamente
+		registro = contenedor -> agregarNuevoRegistro( nombreRegistro );
+		if( registro == nullptr ){
+			mostrarMensajeError( "Ha ocurrido un error al crear un nuevo registro en " + contenedor -> obtenerNombrePlural() );
 			return;
 		}
-		
-		// Muestra que el registro se creo correctamente y vuelve hacia la vista de registros de empresas
-		mostrarMensaje( "Empresa creada correctamente." );
-		vistaRegistrosEmpresas( nullptr, nullptr );
+
+		// Muestra qu el registro se creo correctamente y vuelve hacia la vista de registros
+		mostrarMensajeError( "Empresa creada correctamente." );
+		regresarVista();
 	}
 	catch( invalid_argument &ia ){
 		mostrarMensajeError( ia.what() );
 	}
 }
 
-void nuevoProducto( GtkWidget *widget, gpointer ptr )
+void actualizarRegistro( GtkWidget *widget, gpointer data )
 {
-	// Lee el nombre de la nueva empresa
-	string productoNuevo = interfaz.obtenerTextoEntrada( "EntradaNombreNuevoRegistro" );
-	
-	// Verifica que no exista un registro con ese nombre
-	Registro *producto = productos.buscarRegistroPorNombre( productoNuevo );
-	if( producto != nullptr ){
-		mostrarMensajeError( "El registro que desea agregar ya existe." );
-		return;
-	}
-	
 	try{
-		// Añade la nueva empresa
-		producto = productos.agregarNuevoRegistro( productoNuevo );
-		
-		// Verifica que se hubiera creado
-		if( producto == nullptr ){
-			mostrarMensajeError( "Ha ocurrido un error al intentar agregar el producto." );
-			return;
+		// Convierte el apuntador tipo void en apuntador tipo ContenedorRegistros
+		ContenedorRegistros *contenedor = static_cast< ContenedorRegistros * >( data );
+
+		// Obtenemos el nuevo nombre que se desea establecer
+		string nuevoNombre = interfaz.obtenerTextoEtiqueta( "EtiquetaClaveEditarRegistro" );
+
+		// Obtiene el registro que se desea actualizar a través de su clave
+		Registro *registro = contenedor -> buscarRegistroPorClave( stoi( nuevoNombre ) );
+		if( registro == nullptr ){
+			throw runtime_error( "Ha ocurrido un error al intentar recuperar el registro que se deseaba editar." );
 		}
+
+		// Verifica que no exista un registro con el nuevo nombre que desea establecer
+		Registro *coincidencia = contenedor -> buscarRegistroPorNombre( nuevoNombre );
+    	if( coincidencia != nullptr ){
+	    	mostrarMensajeError( "Ya existe un registro con ese nombre." );
+			return;
+    	}
+
+		// Establece el nuevo nombre del registro
+		registro -> establecerNombre( interfaz.obtenerTextoEntrada( "EntradaNombreEditarRegistro" ) );
+
+		// Actualiza el nombre en la base de datos
+		contenedor -> actualizarRegistro( registro );
+
+		// Actualizar la lista de registros
+		contenedor -> actualizarListaRegistros();
 		
-		// Muestra que el registro se creo correctamente y vuelve hacia la vista de registros de producto
-		mostrarMensaje( "Producto creado correctamente." );
-		vistaRegistrosProductos( nullptr, nullptr );
+		// Regresar
+		regresarVista();
+
+		// Muestra un mensaje de registro exitoso
+		mostrarMensajeError( "Registro actualizado correctamente." );
 	}
 	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
-	}
-}
-
-void actualizarEmpresa( GtkWidget *widget, gpointer ptr )
-{
-	try{
-		empresas.actualizarRegistro( registro );
-		
-		// Actualiza los datos de la etiqueta
-		interfaz.establecerTextoEtiqueta( "EtiquetaNombreRegistro", registro -> obtenerNombre() );
-		
-		// Oculta los controles de edicion
-		registroCancelarEdicion( nullptr, nullptr );
-		
-		// Muestra mensaje de registro exitoso
-		interfaz.ocultarElemento( "MensajeConsultarRegistroError" );
-		mostrarMensaje( "Registro editado correctamente." );
-	}
-	catch( invalid_argument ia ){
-		mostrarMensajeError( ia.what() );
-	}
-}
-
-void actualizarProducto( GtkWidget *widget, gpointer ptr )
-{
-	try{
-		productos.actualizarRegistro( registro );
-		
-		// Actualiza los datos de la etiqueta
-		interfaz.establecerTextoEtiqueta( "EtiquetaNombreRegistro", registro -> obtenerNombre() );
-		
-		// Oculta los controles de edicion
-		registroCancelarEdicion( nullptr, nullptr );
-		
-		// Muestra mensaje de registro exitoso
-		interfaz.ocultarElemento( "MensajeConsultarRegistroError" );
-		mostrarMensaje( "Registro editado correctamente." );
-	}
-	catch( invalid_argument ia ){
 		mostrarMensajeError( ia.what() );
 	}
 }
@@ -123,7 +95,7 @@ void alertaEliminarRegistro()
 {
 	interfaz.establecerTextoEtiqueta( "MensajeAlerta", "ALERTA: Si el existen registros de pesaje que hagan\n"
 													   "referencia a este registro, también serán eliminados.\n"
-													   "¿Estás seguro que deseas eliminarlo?" );
+													   "¿Estás seguro que deseas hacerlo?" );
 	interfaz.mostrarElemento( "VentanaSiNo" );
 }
 

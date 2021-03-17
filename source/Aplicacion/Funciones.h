@@ -8,10 +8,9 @@
 
 extern Registro *registro;
 
-void nuevoEmpresa( GtkWidget *widget, gpointer ptr );
-void nuevoProducto( GtkWidget *widget, gpointer ptr );
-void actualizarEmpresa( GtkWidget *widget, gpointer ptr );
-void actualizarProducto( GtkWidget *widget, gpointer ptr );
+void crearRegistro( GtkWidget *widget, gpointer data );
+void actualizarRegistro( GtkWidget *widget, gpointer data );
+
 void eliminarProducto( GtkWidget * widget, gpointer ptr );
 void eliminarEmpresa( GtkWidget *widget, gpointer ptr );
 void alertaEliminarRegistro();

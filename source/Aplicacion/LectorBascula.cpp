@@ -13,7 +13,7 @@ using namespace std;
 LectorBascula lectorBascula;
 
 // Elementos para poder ejecutar la báscula
-HANDLE dispositivo;
+//HANDLE dispositivo;
 BOOL status;
 stringstream data;
 DWORD dwEventMask;

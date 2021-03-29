@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.38.2 -->
 <interface>
-  <requires lib="gtk+" version="3.20"/>
+  <requires lib="gtk+" version="3.24"/>
   <!-- n-columns=3 n-rows=1 -->
-  <object class="GtkGrid" id="Ticket">
+  <object class="GtkGrid" id="ItemBascula">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="margin-top">10</property>
     <property name="margin-bottom">10</property>
     <property name="column-spacing">5</property>
     <child>
-      <object class="GtkImage" id="ImagenVehiculo">
+      <object class="GtkImage" id="ImagenBascula">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="halign">start</property>
-        <property name="pixbuf">..\images\icons\producto64.png</property>
+        <property name="pixbuf">..\images\icons\BasculaRegistro.png</property>
       </object>
       <packing>
         <property name="left-attach">0</property>
@@ -35,11 +35,11 @@
             <property name="can-focus">False</property>
             <property name="spacing">10</property>
             <child>
-              <object class="GtkLabel" id="ItemNumeroPlaca">
+              <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
-                <property name="label" translatable="yes">Producto:</property>
+                <property name="label" translatable="yes">Nombre:</property>
                 <attributes>
                   <attribute name="weight" value="bold"/>
                 </attributes>
@@ -51,10 +51,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="ItemEntradaProductoInterno">
+              <object class="GtkLabel" id="ItemBasculaNombre">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Nombre del producto</property>
+                <property name="label" translatable="yes">Nombre bascula</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -75,11 +75,11 @@
             <property name="can-focus">False</property>
             <property name="spacing">10</property>
             <child>
-              <object class="GtkLabel" id="ItemNumeroEconomico">
+              <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
-                <property name="label" translatable="yes">No. Placa:</property>
+                <property name="label" translatable="yes">Puerto:</property>
                 <attributes>
                   <attribute name="weight" value="bold"/>
                 </attributes>
@@ -91,10 +91,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="ItemEntradaPlacaInterno">
+              <object class="GtkLabel" id="ItemBasculaPuerto">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">XXXXXXX</property>
+                <property name="label" translatable="yes">nombrePuerto</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -119,7 +119,7 @@
       <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="halign">end</property>
+        <property name="halign">start</property>
         <property name="valign">center</property>
         <property name="hexpand">True</property>
         <property name="orientation">vertical</property>
@@ -127,16 +127,13 @@
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
-            <property name="halign">start</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
-            <property name="spacing">5</property>
+            <property name="spacing">10</property>
             <child>
-              <object class="GtkLabel" id="ItemNumeroPlaca2">
+              <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
-                <property name="label" translatable="yes">Folio:</property>
+                <property name="label" translatable="yes">Velocidad:</property>
                 <attributes>
                   <attribute name="weight" value="bold"/>
                 </attributes>
@@ -148,10 +145,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="ItemEntradaFolioInterno">
+              <object class="GtkLabel" id="ItemBasculaVelocidad">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">XXXXXX</property>
+                <property name="label" translatable="yes">XXXX bps</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -164,49 +161,6 @@
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">0</property>
-          </packing>
-        </child>
-        <child>
-          <object class="GtkBox">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="halign">end</property>
-            <property name="hexpand">True</property>
-            <property name="vexpand">True</property>
-            <property name="spacing">5</property>
-            <child>
-              <object class="GtkLabel" id="ItemNumeroPlaca1">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="halign">start</property>
-                <property name="label" translatable="yes">Fecha:</property>
-                <attributes>
-                  <attribute name="weight" value="bold"/>
-                </attributes>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">0</property>
-              </packing>
-            </child>
-            <child>
-              <object class="GtkLabel" id="ItemEntradaFechaInterno">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="label" translatable="yes">DD-MM-AAAA</property>
-              </object>
-              <packing>
-                <property name="expand">False</property>
-                <property name="fill">True</property>
-                <property name="position">1</property>
-              </packing>
-            </child>
-          </object>
-          <packing>
-            <property name="expand">False</property>
-            <property name="fill">True</property>
-            <property name="position">1</property>
           </packing>
         </child>
       </object>

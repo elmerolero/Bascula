@@ -85,11 +85,10 @@ extern Signal botonObtenerCodigoRecuperacion;
 extern Signal usuarioAdministrador;
 
 // Señales para la consulta de registros
-extern Signal contenedorRegistrosActivado;
-extern Signal contenedorRegistrosSeleccionado;
-extern Signal botonRegistroNuevo;
-extern Signal botonRegistroEditar;
-extern Signal botonRegistroEliminar;
+extern Signal botonRegistroVistaConsultar;
+extern Signal botonRegistroVistaNuevo;
+extern Signal botonRegistroVistaEditar;
+extern Signal botonRegistroVistaEliminar;
 
 // Señales para la edición de un registro
 
@@ -98,8 +97,7 @@ extern Signal botonRegistroCancelarEdicion;
 
 // Noc
 extern Signal imprimirRegistroPublico;
-extern Signal eliminarRegistro;
-extern Signal botonRegistroNuevo;
+extern Signal eliminarRegistroInterno;
 
 extern Signal botonRegistroGuardarNuevo;
 extern Signal botonRegistroCancelarNuevo;
@@ -121,5 +119,19 @@ extern Signal entradaReemplazarConfirmacion;
 
 extern Signal ticketsPendientesSeleccionados;
 extern Signal ticketsConsultadosSeleccionados;
+
+// Basculas configuración
+extern Signal basculaSeleccionada;
+extern Signal botonBasculaAgregar;
+extern Signal botonBasculaEditar;
+extern Signal botonBasculaEliminar;
+
+// Basculas Agregar/Editar
+extern Signal botonGuardarBascula;
+
+// Bascula Lector
+extern Signal comboBoxBasculasRegistradas;
+extern Signal botonCancelarPeso;
+extern Signal botonRegistrarPeso;
 
 #endif

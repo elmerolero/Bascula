@@ -63,10 +63,6 @@ Signal botonLeerPesoBrutoPublico{ "BotonLeerPesoBrutoPublico", "clicked", 0 };
 Signal botonLeerPesoTaraPublico{ "BotonLeerPesoTaraPublico", "clicked", 0 };
 Signal botonRegistrarPendientePublico{ "BotonRegistrarPendientePublico", "clicked", 0 };
 Signal botonFinalizarPendientePublico{ "BotonFinalizarPendientePublico", "clicked", 0 };
-
-// Vista de registro de peso
-Signal botonCancelarLectura{ "BotonCancelarLectura", "clicked", 0 };
-Signal ventanaLectorPeso{ "VentanaLectorPeso", "destroy", 0 };
     
 // Vista que solicita la contrasena
 Signal botonPermitirCambios{ "BotonPermitirCambios", "clicked", 0 };
@@ -86,21 +82,20 @@ Signal botonObtenerCodigoRecuperacion{ "BotonObtenerCodigoRecuperacion", "clicke
 Signal usuarioAdministrador{ "UsuarioAdministrador", "toggled", 0 };
 
 // Señales para la consulta de registros
-Signal contenedorRegistrosActivado{ "ContenedorRegistros", "row-activated", 0 };
-Signal contenedorRegistrosSeleccionado{ "ContenedorRegistros", "row-selected", 0 };
-Signal botonRegistroNuevo{ "BotonRegistroNuevo", "clicked", 0 };
-Signal botonRegistroEditar{ "BotonRegistroEditar", "clicked", 0 };
-Signal botonRegistroEliminar{ "BotonRegistroEliminar", "clicked", 0 };
+Signal botonRegistroVistaConsultar{ "ContenedorRegistros", "row-activated", 0 };
+Signal botonRegistroVistaNuevo{ "BotonRegistroNuevo", "clicked", 0 };
+Signal botonRegistroVistaEditar{ "BotonRegistroEditar", "clicked", 0 };
+Signal botonRegistroVistaEliminar{ "BotonRegistroEliminar", "clicked", 0 };
 
 // Boton de edición de registro
-Signal botonRegistroGuardarEdicion{ "BotonGuardarEdicionRegistro", "clicked", 0 };
-Signal botonRegistroCancelarEdicion{ "BotonCancelarEdicionRegistro", "clicked", 0 };
+Signal botonRegistroGuardarEdicion{ "BotonRegistroGuardarEdicion", "clicked", 0 };
+Signal botonRegistroCancelarEdicion{ "BotonRegistroCancelarEdicion", "clicked", 0 };
 
 // Noc
 Signal imprimirRegistroPublico{ "ImprimirRegistroPublico", "clicked", 0 };
-Signal eliminarRegistro{ "EliminarRegistroInterno", "clicked", 0 };
-Signal botonRegistroGuardarNuevo{ "BotonGuardarNuevoRegistro", "clicked", 0 };
-Signal botonRegistroCancelarNuevo{ "BotonCancelarNuevoRegistro", "clicked", 0 };
+Signal eliminarRegistroInterno{ "EliminarRegistroInterno", "clicked", 0 };
+Signal botonRegistroGuardarNuevo{ "BotonRegistroGuardarNuevo", "clicked", 0 };
+Signal botonRegistroCancelarNuevo{ "BotonRegistroCancelarNuevo", "clicked", 0 };
 Signal botonSi{ "BotonSi", "clicked", 0 };
 
 Signal botonRegistrosPesajeSeleccionarDia{ "BotonRegistrosPesajeSeleccionarDia", "clicked", 0 };
@@ -118,3 +113,19 @@ Signal entradaReemplazarConfirmacion{ "EntradaReemplazarConfirmacion", "activate
 
 Signal ticketsPendientesSeleccionados{ "ContenedorTickets", "row-activated", 0 };
 Signal ticketsConsultadosSeleccionados{ "ContenedorRegistrosPesaje", "row-activated", 0 };
+
+// Vista de las basculas
+Signal basculaSeleccionada{ "ContenedorBasculas", "row-activated", 0 };
+Signal botonBasculaAgregar{ "BotonBasculaAgregar", "clicked", 0 };
+Signal botonBasculaEditar{ "BotonBasculaEditar", "clicked", 0 };
+Signal botonBasculaEliminar{ "BotonBasculaEliminar", "clicked", 0 };
+
+// Basculas Agregar/Editar
+Signal botonGuardarBascula{ "BotonGuardarBascula", "clicked", 0 };
+
+// Ventana lector peso
+Signal ventanaLectorPeso{ "VentanaLectorPeso", "delete-event", 0 };
+Signal comboBoxBasculasRegistradas{ "BasculasRegistradas", "changed", 0 };
+Signal botonCancelarPeso{ "BotonCancelarLectura", "clicked", 0 };
+Signal botonRegistrarPeso{ "BotonRegistrarLectura", "clicked", 0 };
+

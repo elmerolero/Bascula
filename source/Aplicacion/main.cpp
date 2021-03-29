@@ -1,6 +1,5 @@
 #include "Aplicacion.h"
 #include <iostream>
-#include <thread>
 #include <fstream>
 #include <stdexcept>
 #include "LectorBascula.h"
@@ -13,7 +12,6 @@ int main( int argc, char *argv[] )
 {
     // Activa la aplicacion
     aplicacionActiva = true;
-    thread lectorBascula( lectorBasculaActualizarPeso );
 
     try{
         // Crea la aplicación 
@@ -38,11 +36,6 @@ int main( int argc, char *argv[] )
         // Cierra el archivo
         log.close();
     }
-
-    // Cierra el thread
-    aplicacionActiva = false;
-    CancelIoEx( dispositivo, NULL );
-    lectorBascula.join();
 
     return 0; 
 }

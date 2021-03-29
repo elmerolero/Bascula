@@ -8,7 +8,7 @@
 #include "Funciones.h"
 #include "Senales.h"
 #include "Vistas.h"
-#include "LectorBascula.h"
+#include "GestorBasculas.h"
 #include "GestorRegistros.h"
 #include "RegistrosInternos.h"
 #include "RegistrosPublicos.h"
@@ -30,7 +30,7 @@ vector< string > pilaVistas;
 void iniciar( GtkApplication *aplicacion, gpointer informacion )
 {
     // Carga la ventana principal y conecta la función para cerrar la ventana y finalizar el programa
-    interfaz.cargarWidget( "../resources/interfaces/Principal2.glade" );
+    interfaz.cargarWidget( "../resources/interfaces/Principal.glade" );
     gtk_application_add_window( aplicacion, GTK_WINDOW( interfaz.obtenerObjeto( "VentanaPrincipal" ) ) );
     interfaz.mostrarElemento( "VentanaPrincipal" );
     interfaz.conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_widget_destroy ), nullptr );
@@ -43,11 +43,11 @@ void iniciar( GtkApplication *aplicacion, gpointer informacion )
     conectarSenalesBase();
 
     // Redirige hacia la interfaz de inicio de sesión
-    irHacia( nullptr, (void *)"IniciarSesion" );
+    irA( "IniciarSesion", false );
 
     // Si no existen usuarios registrados, se dirige a la sección para registrar uno
     if( !existenUsuariosRegistrados() ){
-        irHacia( nullptr, (void *)"RegistrarUsuario" );
+        irA( "RegistrarUsuario", false );
     }
 }
 
@@ -79,8 +79,9 @@ void cargarInformacion()
     interfaz.establecerCompletadorEntrada( "EntradaNumeroPlacasInterno", completadorNumerosPlaca );
 
     // Carga la configuración de la bascula
-    lectorBascula.cargarConfiguracion();
     cargarOpcionesImpresion();
+    basculaObtenerPuertosDisponibles();
+    basculaObtenerRegistros();
 }
 
 void mostrarMensajeError( string mensajeError )
@@ -116,24 +117,19 @@ void conectarSenalesBase()
 
 // Conecta las señales de cada una de las vistas
 void conectarSenales()
-{   
+{
     // Vista Inicio
     interfaz.conectarSenal( botonBascula, G_CALLBACK( irHacia ), (void *)"Bascula" );
-    interfaz.conectarSenal( botonConfiguracion, G_CALLBACK( vistaConfiguracion ), nullptr );
-
-    // Enlace hacia los créditos
     interfaz.conectarSenal( enlaceCreditos, G_CALLBACK( irHacia ), (void *)"Creditos" );
+    interfaz.conectarSenal( enlaceCuenta, G_CALLBACK( vistaCuenta ), nullptr );
+    interfaz.conectarSenal( botonConfiguracion, G_CALLBACK( vistaConfiguracion ), nullptr );
     
     // Barra de usuario
-    interfaz.conectarSenal( enlaceCuenta, G_CALLBACK( vistaCuenta ), nullptr );
     interfaz.conectarSenal( botonActualizarCuenta, G_CALLBACK( autorizarCambios ), nullptr );
 
     // Vista seleccion servicio
     interfaz.conectarSenal( botonBasculaPublica, G_CALLBACK( vistaBasculaPublica ), nullptr );
     interfaz.conectarSenal( botonBasculaInterna, G_CALLBACK( vistaBasculaInterna ), nullptr );
-    
-    // Uso bascula de uso interno
-    interfaz.conectarSenal( entradaSeguimientoMayusculas, G_CALLBACK( convertirMayusculas ), nullptr );
     
     // Nuevo para ticket interno
     interfaz.conectarSenal( botonLeerPesoBrutoInterno, G_CALLBACK( vistaLeerPesoBruto ), nullptr );
@@ -151,10 +147,6 @@ void conectarSenales()
     interfaz.conectarSenal( botonLeerPesoTaraPublico, G_CALLBACK( vistaLeerPesoTaraPublico ), nullptr );
     interfaz.conectarSenal( botonRegistrarPendientePublico, G_CALLBACK( publicoRegistrarPendiente ), nullptr );
     interfaz.conectarSenal( botonFinalizarPendientePublico, G_CALLBACK( publicoFinalizarPendiente ), nullptr );
-
-    // Vista de registro de peso
-    interfaz.conectarSenal( botonCancelarLectura, G_CALLBACK( lectorBasculaCerrar ), nullptr );
-    interfaz.conectarSenal( ventanaLectorPeso, G_CALLBACK( lectorBasculaCerrar ), nullptr );
     
     // Vista que solicita la contrasena
     interfaz.conectarSenal( botonPermitirCambios, G_CALLBACK( actualizarDatosUsuario ), nullptr );
@@ -164,6 +156,16 @@ void conectarSenales()
 
     // Consultar registro interno
     interfaz.conectarSenal( imprimirRegistroInterno, G_CALLBACK( internoImprimirSeleccionado ), nullptr );
+
+    // Vista de configuración de báscula
+    interfaz.conectarSenal( botonGuardarBascula, G_CALLBACK( basculaGuardar ), nullptr );
+    interfaz.conectarSenal( basculaSeleccionada, G_CALLBACK( vistaBascula ), nullptr );
+    interfaz.conectarSenal( botonBasculaAgregar, G_CALLBACK( vistaBasculaEdicion ), nullptr );
+    interfaz.conectarSenal( botonBasculaEliminar, G_CALLBACK( vistaBasculaEliminar ), nullptr );
+
+    // Ventana lectora de peso
+    interfaz.conectarSenal( ventanaLectorPeso, G_CALLBACK( basculaCerrarLector ), nullptr );
+    interfaz.conectarSenal( botonCancelarPeso, G_CALLBACK( basculaCerrarLector ), nullptr );
 }
 
 //
@@ -186,11 +188,10 @@ void conectarSenalesAdministrador()
     interfaz.conectarSenal( "BotonRegistrosPesajesInternos", "clicked", G_CALLBACK( vistaConsultarPesajesInternos ), nullptr );
     interfaz.conectarSenal( "BotonRegistrosBasculaPublica", "clicked", G_CALLBACK( vistaConsultarPesajesPublicos ), nullptr );
 
-    // Vista de consulta de registros
-    interfaz.conectarSenal( "BotonEditarRegistro", "clicked", G_CALLBACK( vistaRegistroEditar ), nullptr );
-    interfaz.conectarSenal( "BotonCancelarEdicionRegistro", "clicked", G_CALLBACK( registroCancelarEdicion ), nullptr );
-    interfaz.conectarSenal( "BotonNo", "clicked", G_CALLBACK( cancelarOperacion ), nullptr );
-    interfaz.conectarSenal( "BotonEliminarRegistro", "clicked", G_CALLBACK( alertaEliminarRegistro ), nullptr );
+    // Vista de listado de registros
+    interfaz.conectarSenal( botonRegistroCancelarEdicion, G_CALLBACK( regresarVista ), nullptr );
+    interfaz.conectarSenal( botonRegistroCancelarNuevo, G_CALLBACK( regresarVista ), nullptr );
+    interfaz.conectarSenal( "BotonNo", "clicked", G_CALLBACK( cancelarAccion ), nullptr );
 
     // Vista de ticket interno
     interfaz.conectarSenal( "EliminarRegistroInterno", "clicked", G_CALLBACK( internoAlertaEliminar ), nullptr );
@@ -208,7 +209,7 @@ void conectarSenalesAdministrador()
 // Muestra una alerta con el mensaje indicado
 void alerta( GtkWidget *widget, gpointer data )
 {
-    interfaz.establecerTextoEtiqueta( "MensajeAlerta", (char *) data );
+    interfaz.establecerTextoEtiqueta( "MensajeAlerta", (char *)data );
     interfaz.mostrarElemento( "VentanaSiNo" );
 }
 

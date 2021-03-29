@@ -10,12 +10,9 @@ extern Registro *registro;
 
 void crearRegistro( GtkWidget *widget, gpointer data );
 void actualizarRegistro( GtkWidget *widget, gpointer data );
-
-void eliminarProducto( GtkWidget * widget, gpointer ptr );
-void eliminarEmpresa( GtkWidget *widget, gpointer ptr );
-void alertaEliminarRegistro();
+void eliminarRegistro( GtkWidget *widget, gpointer data );
 void registrarEmpresa();
-void cancelarOperacion();
+void cancelarAccion();
 void registroCancelarEdicion( GtkWidget *widget, gpointer ptr );
 void convertirMayusculas( GtkEditable *editable, const gchar *text, gint length, gint *position, gpointer data );
 std::string pesoString( double, int );

@@ -40,9 +40,14 @@ void crearRegistro( GtkWidget *widget, gpointer data )
 			return;
 		}
 
-		// Muestra qu el registro se creo correctamente y vuelve hacia la vista de registros
-		mostrarMensajeError( "Empresa creada correctamente." );
+		// Actualizar la lista de registros
+		contenedor -> actualizarListaRegistros();
+		
+		// Regresa hacia atrás
 		regresarVista();
+
+		// Muestra que el registro se creo correctamente y vuelve hacia la vista de registros
+		mostrarMensajeError( "Registro creado correctamente." );
 	}
 	catch( invalid_argument &ia ){
 		mostrarMensajeError( ia.what() );
@@ -91,29 +96,31 @@ void actualizarRegistro( GtkWidget *widget, gpointer data )
 	}
 }
 
-void alertaEliminarRegistro()
+void eliminarRegistro( GtkWidget *widget, gpointer data )
 {
-	interfaz.establecerTextoEtiqueta( "MensajeAlerta", "ALERTA: Si el existen registros de pesaje que hagan\n"
-													   "referencia a este registro, también serán eliminados.\n"
-													   "¿Estás seguro que deseas hacerlo?" );
-	interfaz.mostrarElemento( "VentanaSiNo" );
-}
+	// Obtiene el contenedor del que se desea eliminar el registro
+	ContenedorRegistros *contenedor = static_cast< ContenedorRegistros * >( data );
 
-void eliminarEmpresa( GtkWidget *widget, gpointer ptr )
-{
+	// Obtiene la clave del registro seleccionado
+	unsigned int clave = stoi( interfaz.obtenerWidgetSeleccionadoListBox( "ContenedorRegistros" ) );
+
+	// Recupera el registro por si clave
+	Registro *registro = contenedor -> buscarRegistroPorClave( clave );
+	if( registro == nullptr ){
+		throw runtime_error( "Ocurrió un problema al recuperar el registro seleccionado." );
+	}
+
+	// Elimina el registro obtenido
+	contenedor -> eliminarRegistro( registro );
+
+	// Actualiza la vista de registros
+	contenedor -> actualizarListaRegistros();
+
+	// Cierra el mensaje de alerta
 	interfaz.ocultarElemento( "VentanaSiNo" );
-	empresas.eliminarRegistro( registro );
-	vistaRegistrosEmpresas( nullptr, nullptr );
 }
 
-void eliminarProducto( GtkWidget *widget, gpointer ptr )
-{
-	interfaz.ocultarElemento( "VentanaSiNo" );
-	productos.eliminarRegistro( registro );
-	vistaRegistrosProductos( nullptr, nullptr );
-}
-
-void cancelarOperacion() 
+void cancelarAccion() 
 {
 	interfaz.ocultarElemento( "VentanaSiNo" );
 }

@@ -8,6 +8,7 @@
 #include "Funciones.h"
 #include "Sesion.h"
 #include "LectorBascula.h"
+#include "GestorBasculas.h"
 #include "GestorRegistros.h"
 #include "RegistrosInternos.h"
 #include "RegistrosPublicos.h"
@@ -42,15 +43,16 @@ void vistaRegistrosEmpresas( GtkWidget *widget, gpointer ptr )
 	// Actualiza la lista de registros de empresas
 	empresas.actualizarListaRegistros();
 	
-	// Conecta las señales de la vista 
-	interfaz.conectarSenal( contenedorRegistrosActivado, G_CALLBACK( vistaRegistro ), (void *)(&empresas) );
-	interfaz.conectarSenal( botonRegistroNuevo, G_CALLBACK( irHacia ), (void *)"NuevoRegistro" );
-	interfaz.conectarSenal( botonRegistroEditar, G_CALLBACK( vistaRegistroEditar ), (void *)(&empresas) );
-    interfaz.conectarSenal( botonRegistroGuardarEdicion, G_CALLBACK( actualizarRegistro ), (void *)(&empresas) );
+	// Vistas
+	interfaz.conectarSenal( botonRegistroVistaConsultar, G_CALLBACK( vistaRegistro ), (void *)(&empresas) );
+	interfaz.conectarSenal( botonRegistroVistaNuevo, G_CALLBACK( irHacia ), (void *)"NuevoRegistro" );
+	interfaz.conectarSenal( botonRegistroVistaEditar, G_CALLBACK( vistaRegistroEditar ), (void *)(&empresas) );
+	interfaz.conectarSenal( botonRegistroVistaEliminar, G_CALLBACK( vistaRegistroEliminar ), nullptr );
 
-    interfaz.conectarSenal( botonRegistroGuardarNuevo, G_CALLBACK( crearRegistro ), (void *)(&empresas) );
-    interfaz.conectarSenal( botonRegistroCancelarNuevo, G_CALLBACK( regresarVista ), nullptr );
-    interfaz.conectarSenal( botonSi, G_CALLBACK( eliminarEmpresa ), nullptr );
+	// Acciones
+	interfaz.conectarSenal( botonRegistroGuardarNuevo, G_CALLBACK( crearRegistro ), (void *)(&empresas) );
+    interfaz.conectarSenal( botonRegistroGuardarEdicion, G_CALLBACK( actualizarRegistro ), (void *)(&empresas) );
+    interfaz.conectarSenal( botonSi, G_CALLBACK( eliminarRegistro ), (void *)(&empresas) );
 }
 
 void vistaRegistrosProductos( GtkWidget *widget, gpointer ptr )
@@ -69,11 +71,14 @@ void vistaRegistrosProductos( GtkWidget *widget, gpointer ptr )
 	productos.actualizarListaRegistros();
 	
 	// Conecta las señales de la vista
-	interfaz.conectarSenal( contenedorRegistrosActivado, G_CALLBACK( vistaRegistro ), (void *)(&productos) );
-	interfaz.conectarSenal( botonRegistroNuevo, G_CALLBACK( irHacia ), (void *)"NuevoRegistro" ); 
+	interfaz.conectarSenal( botonRegistroVistaConsultar, G_CALLBACK( vistaRegistro ), (void *)(&productos) );
+	interfaz.conectarSenal( botonRegistroVistaNuevo, G_CALLBACK( irHacia ), (void *)"NuevoRegistro" );
+	interfaz.conectarSenal( botonRegistroVistaEditar, G_CALLBACK( vistaRegistroEditar ), (void *)(&productos) );
+	interfaz.conectarSenal( botonRegistroVistaEliminar, G_CALLBACK( vistaRegistroEliminar ), nullptr );
+
+	interfaz.conectarSenal( botonRegistroGuardarNuevo, G_CALLBACK( crearRegistro ), (void *)(&productos) );
     interfaz.conectarSenal( botonRegistroGuardarEdicion, G_CALLBACK( actualizarRegistro ), (void *)(&productos) );
-    interfaz.conectarSenal( botonRegistroGuardarNuevo, G_CALLBACK( crearRegistro ), (void *)(&productos) );
-	interfaz.conectarSenal( botonRegistroCancelarNuevo, G_CALLBACK( regresarVista ), nullptr );
+	interfaz.conectarSenal( botonSi, G_CALLBACK( eliminarRegistro ), (void *)(&productos) );
 }
 
 void vistaRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data )
@@ -87,7 +92,7 @@ void vistaRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data )
 		mostrarMensaje( "Registro no encontrado." );
 		return;
 	}
-	
+
 	// Establece la clave del registro
 	stringstream clave;
 	clave << setfill( '0' ) << setw( 7 ) << ( registro -> obtenerClave() );
@@ -126,11 +131,34 @@ void vistaRegistroEditar( GtkWidget *widget, gpointer data )
 	}
 }
 
+void vistaRegistroEliminar( GtkWidget *widget, gpointer ptr )
+{
+	interfaz.establecerTextoEtiqueta( "MensajeAlerta", "ALERTA: Si el existen registros de pesaje que hagan\nreferencia a este registro, también serán eliminados.\n¿Estás seguro que deseas hacerlo?" );
+	interfaz.mostrarElemento( "VentanaSiNo" );
+}
+
+void vistaBasculaEliminar()
+{
+	interfaz.establecerTextoEtiqueta( "MensajeAlerta", "¿Quieres eliminar la báscula seleccionada?" );
+	interfaz.mostrarElemento( "VentanaSiNo" );
+}
+
+void vistaBasculaEdicion()
+{
+	basculaLimpiarFormulario();
+
+	irA( "OpcionesBascula", false );
+}
+
+
 void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
 {
 	// Numero copias
 	interfaz.establecerTextoEntrada( "OpcionesImpresionFormatos", to_string( numeroFormatos ) );
 	interfaz.establecerTextoEntrada( "OpcionesImpresionCopias", to_string( numeroCopias ) );
+
+	// Establece la señal de eliminar bascula
+	interfaz.conectarSenal( botonSi, G_CALLBACK( basculaEliminar ), nullptr );
 
 	// Se dirige a la vista
 	irA( "Configuracion", false );
@@ -199,10 +227,9 @@ void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
 	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", "No establecido" );
 	
 	// Establece el completador de producto
-	interfaz.establecerCompletadorEntrada( "EntradaConsultarNombre", NULL );
 	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoInterno", NULL );
 	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoPublico", productos.obtenerCompletador() ); 
-	cout << "Llego aqui" << endl;
+	
 	// Establece la vista de nuevo ticket
 	irA( "NuevoTicketPublico", false );
 }
@@ -292,17 +319,12 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	interfaz.establecerActivoBotonToggle( "RegistraEntrada" );
 	
 	// Establece el completador de empresa
-	interfaz.establecerCompletadorEntrada( "EntradaConsultarNombre", NULL );
 	interfaz.establecerCompletadorEntrada( "EntradaNombreEmpresaInterno", empresas.obtenerCompletador() );
 	
 	// Establece el completador de producto
-	interfaz.establecerCompletadorEntrada( "EntradaConsultarNombre", NULL );
 	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoPublico", NULL );
 	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoInterno", productos.obtenerCompletador() );
 	
-	// Es un ticket pendiente hasta que no se demuestre lo contrario
-	// internoPendiente = true;
-
 	// Establece la vista de nuevo ticket 
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
 }
@@ -382,27 +404,26 @@ void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 
 void vistaLeerPesoBruto()
 {
-	lectorBascula.abrir( interfaz );
-	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( internoRegistrarPesoBruto ), nullptr ) );
+	basculaAbrirLector();
+	interfaz.conectarSenal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoBruto ), nullptr );
 }
 
 void vistaLeerPesoTara()
 {
-	lectorBascula.abrir( interfaz );
-	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( internoRegistrarPesoTara ), nullptr ) );
+	basculaAbrirLector();
+	interfaz.conectarSenal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoTara ), nullptr );
 }
 
 void vistaLeerPesoBrutoPublico()
 {
-	lectorBascula.abrir( interfaz );
-	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( publicoRegistrarPesoBruto ), nullptr ) );
+	basculaAbrirLector();
+	interfaz.conectarSenal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoBruto ), nullptr );
 }
 
 void vistaLeerPesoTaraPublico()
 {
-	string pesoBruto = interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoPublico" );
-	lectorBascula.abrir( interfaz );
-	lectorBascula.establecerIdSenal( interfaz.conectarSenal( "BotonRegistrarPeso", "clicked", G_CALLBACK( publicoRegistrarPesoTara ), nullptr ) );
+	basculaAbrirLector();
+	interfaz.conectarSenal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoTara ), nullptr );
 }
 
 void vistaConsultarPesajesInternos()
@@ -503,7 +524,7 @@ void vistaInternoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointe
 	interfaz.conectarSenal( botonSi, G_CALLBACK( internoEliminarSeleccionado ), nullptr );
 
 	// Señal boton de eliminar registro interno seleccionado
-	interfaz.conectarSenal( eliminarRegistro, G_CALLBACK( internoAlertaEliminar ), nullptr );
+	interfaz.conectarSenal( eliminarRegistroInterno, G_CALLBACK( internoAlertaEliminar ), nullptr );
 
 	// Redirige a la vista
 	irA( "PesajeInterno", false );
@@ -531,7 +552,7 @@ void vistaPublicoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointe
 	interfaz.establecerTextoEtiqueta( "PesoNetoPublico", to_string( registroPublico -> obtenerPesoNeto() ) );// Peso neto
 
 	// Señal boton de eliminar registro interno seleccionado
-	interfaz.conectarSenal( eliminarRegistro, G_CALLBACK( internoAlertaEliminar ), nullptr );
+	interfaz.conectarSenal( eliminarRegistroInterno, G_CALLBACK( internoAlertaEliminar ), nullptr );
 
 	// Señal de boton si
 	interfaz.conectarSenal( botonSi, G_CALLBACK( publicoEliminarSeleccionado ), nullptr );
@@ -618,4 +639,24 @@ void internoLimpiarFormulario()
 	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );		// Peso tara
 	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );		// Peso neto
 	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", "" );				// Observaciones
+}
+
+void vistaBascula( GtkListBox *box, GtkListBoxRow *row, gpointer data )
+{
+	// Obtiene la bascula seleccionada
+	Bascula *bascula = basculaBuscarPorCodigo( obtenerFolioSelector( row ) );
+	if( bascula == nullptr ){
+		throw runtime_error( "Ocurrió un error al intentar recuperar la bascula seleccionada." );
+	}
+
+	// Establece las opciones que indica la bascula
+	interfaz.establecerTextoEtiqueta( "OpcionesBasculaCodigo", to_string( obtenerFolioSelector( row ) ) );
+	interfaz.establecerTextoEntrada( "OpcionesBasculaNombre", bascula -> obtenerNombre() );
+	interfaz.establecerActivoComboBoxText( "OpcionesBasculaPuerto", bascula -> obtenerPuerto() );
+	interfaz.establecerTextoEntrada( "OpcionesBasculaBitsDatos", to_string( bascula -> obtenerByteSize() ) );
+	interfaz.establecerTextoEntrada( "OpcionesBasculaBitsStop", to_string( bascula -> obtenerStopBits() ) );
+	interfaz.establecerTextoEntrada( "OpcionesBasculaBytesIgnorados", to_string( bascula -> obtenerBytesIgnorados() ) );
+
+	// Redirige hacia la vista
+	irA( "OpcionesBascula", false );
 }

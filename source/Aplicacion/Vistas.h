@@ -8,6 +8,7 @@
 void vistaCuenta( GtkWidget *widget, gpointer ptr );
 void vistaRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data );
 void vistaRegistroEditar( GtkWidget *widget, gpointer data );
+void vistaRegistroEliminar( GtkWidget *widget, gpointer data );
 void vistaRegistrosEmpresas( GtkWidget *widget, gpointer ptr );
 void vistaRegistrosProductos( GtkWidget *widget, gpointer ptr );
 void vistaConfiguracion( GtkWidget *widget, gpointer ptr );
@@ -30,9 +31,15 @@ void vistaPublicoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointe
 void vistaConsultarUsuarios();
 void vistaConsultarUsuario();
 
+void vistaBasculaEliminar();
+
+void vistaBasculaEdicion();
+
 void internoLimpiarFormulario();
 
 void regresarInicio();
 void regresarUsuarios();
+
+void vistaBascula( GtkListBox *box, GtkListBoxRow *row, gpointer data );
 
 #endif

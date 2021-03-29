@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3` -mwindows
 LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
-OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o LectorBascula.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o Senales.o aplicacion.res
+OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Registro.o Database.o ContenedorRegistros.o Vistas.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o Senales.o Bascula.o GestorBasculas.o aplicacion.res
 
 ../../build/aplicacion:  main.cpp $(OBJS)
 	$(CC) main.cpp $(CFLAGS) -o ../../build/aplicacion $(OBJS) $(LIBS)
@@ -36,9 +36,6 @@ ContenedorRegistros.o: ContenedorRegistros.h ContenedorRegistros.cpp
 Vistas.o: Vistas.h Vistas.cpp
 	$(CC) $(CFLAGS) -c Vistas.h Vistas.cpp $(LIBS)
 	
-LectorBascula.o: LectorBascula.h LectorBascula.cpp
-	$(CC) $(CFLAGS) -c LectorBascula.h LectorBascula.cpp $(LIBS)
-	
 Sesion.o: Sesion.h Sesion.cpp
 	$(CC) $(CFLAGS) -c Sesion.h Sesion.cpp $(LIBS)
 	
@@ -57,5 +54,12 @@ TicketPublico.o: TicketPublico.h TicketPublico.cpp
 Senales.o: Senales.h Senales.cpp
 	$(CC) $(CFLAGS) -c Senales.h Senales.cpp $(LIBS)
 
+GestorBasculas.o: GestorBasculas.h GestorBasculas.cpp
+	$(CC) $(CFLAGS) -c GestorBasculas.h GestorBasculas.cpp $(LIBS)
+
+Bascula.o: Bascula.h Bascula.cpp
+	$(CC) $(CFLAGS) -c Bascula.h Bascula.cpp $(LIBS)
+
 aplicacion.res: aplicacion.rc
 	windres aplicacion.rc -O coff -o aplicacion.res
+

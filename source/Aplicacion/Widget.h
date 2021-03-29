@@ -1,7 +1,7 @@
 #ifndef WIDGET_H
 #define WIDGET_H
 #include <string>
-#include <gtk/gtk.h>
+#include <gtk/gtk.h> 
 
 struct Signal
 {
@@ -55,6 +55,9 @@ class Widget
         // Inserta un widget a una lista de cajas
         void insertarElementoListBox( const Widget *elemento, std::string idFuente, std::string idDestino, gint position );
         
+        // Obtiene el nombre del Widget seleccionado en un ListBox
+        std::string obtenerWidgetSeleccionadoListBox( std::string idListBox );
+
         // Elimina el Widget dado
         void eliminarElemento( const Widget *elemento, std::string idElemento, std::string idContenedor );
         
@@ -106,6 +109,9 @@ class Widget
         // Obtiene la opcion seleccionada
         const char *obtenerOpcionComboBoxText( std::string idComboBox );
         
+        // Establece un opcion activa en el comboBox
+        void establecerOpcionComboBox( std::string idComboBox, unsigned int indice );
+
         // Limpia el combobox text indicado removiendo todas las opciones
         void limpiarComboBoxText( std::string idComboBox );
 

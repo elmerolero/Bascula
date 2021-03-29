@@ -166,11 +166,16 @@ void Widget::insertarElementoListBox( const Widget *elemento, string idFuente, s
 // Obtiene el nombre del Widget seleccionado de un ListBox
 std::string Widget::obtenerWidgetSeleccionadoListBox( std::string idListBox )
 {
+    // Obtiene el contenedor
     GObject *listBox = obtenerObjeto( idListBox );
+
+    // Busca el renglón seleccionado y si no se ha seleccionado ninguno, lanza un excepción
     GtkListBoxRow *row = gtk_list_box_get_selected_row( GTK_LIST_BOX( listBox ) );
     if( row == NULL ){
         throw invalid_argument( "No se ha seleccionado ninguna opción." );
     }
+
+    // Retorna el nombre del widget seleccionado
     GtkWidget *item = gtk_bin_get_child( GTK_BIN( row ) );
 	return gtk_widget_get_name( item );
 }
@@ -322,6 +327,12 @@ void Widget::agregarOpcionComboBoxText( std::string idComboBox, std::string opci
     GObject *objeto = obtenerObjeto( idComboBox.c_str() );
     
     gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( objeto ), idOpcion, opcion.c_str() );
+}
+
+void Widget::establecerOpcionComboBox( std::string idComboBox, unsigned int indice )
+{
+    GObject *objeto = obtenerObjeto( idComboBox.c_str() );
+    gtk_combo_box_set_active( GTK_COMBO_BOX( objeto ), indice );
 }
 
 // Establece la opcion con el id indicado como el objeto activo

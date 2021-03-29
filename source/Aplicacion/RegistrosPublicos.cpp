@@ -1,6 +1,6 @@
 #include "RegistrosPublicos.h"
 #include "Aplicacion.h"
-#include "LectorBascula.h"
+#include "GestorBasculas.h"
 #include "Funciones.h"
 #include "Vistas.h"
 #include <iostream>
@@ -40,7 +40,7 @@ void publicoRegistrarPendiente()
 		registroPublico -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
 		registroPublico -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorPublico" ) );
 		registroPublico -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasPublico" ) );
-		registroPublico -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
+		registroPublico -> establecerEntradaManual( 0 );// lectorBascula.lecturaManualActivada() );
 		registroPublico -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
 		registroPublico -> establecerPendiente( true );
 
@@ -149,7 +149,7 @@ void publicoFinalizarPendiente()
 		registroPublico -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
 		registroPublico -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorPublico" ) );
 		registroPublico -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasPublico" ) );
-		registroPublico -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
+		registroPublico -> establecerEntradaManual( 0 );//lectorBascula.lecturaManualActivada() );
 		registroPublico -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
 
 		// Registra el tipo de registro
@@ -214,20 +214,9 @@ void publicoFinalizarPendiente()
 // Registra el peso bruto
 void publicoRegistrarPesoBruto()
 {
-    // Cierra la báscula
-   	lectorBascula.cerrar();
-		
-	// Indica en la interfaz los datos registrados
-	try{
-		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", lectorBascula.leer() );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", obtenerHora() );
-    }
-    catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
-		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", "No establecido" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", "No establecida" );
-    }
-    
+	// Registra el peso bruto
+	basculaRegistrarPeso( "EntradaPesoBrutoPublico", "EntradaHoraEntradaPublico" );
+	
     // Intenta calcular el peso neto
     publicoActualizarPesoNeto();
 }
@@ -235,25 +224,8 @@ void publicoRegistrarPesoBruto()
 // Registra el peso tara
 void publicoRegistrarPesoTara()
 {
-	// Cierra el lector de la báscula
-    lectorBascula.cerrar();
-    
-    try{
-		// Establece el peso leído de la etiqueta
-		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", lectorBascula.leer() );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", obtenerHora() );
-		
-		// Habilita la opción de poder finalizar ticket
-		interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Finalizar" );
-    }
-    catch( invalid_argument &ia ){
-    	// Muestra el error sucedido
-		mostrarMensajeError( ia.what() );
-		
-		// Reestablece el campo de la hora y el peso de entrada
-		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", "No establecido" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", "No establecida" );
-    }
+	// Registra el peso tara
+	basculaRegistrarPeso( "EntradaPesoTaraPublico", "EntradaHoraSalidaPublico" );
     
     // Calcula el peso neto
     publicoActualizarPesoNeto();

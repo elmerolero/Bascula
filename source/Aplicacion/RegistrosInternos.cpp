@@ -1,6 +1,7 @@
 #include "RegistrosInternos.h"
 #include "GestorRegistros.h"
 #include "LectorBascula.h"
+#include "GestorBasculas.h"
 #include "Aplicacion.h"
 #include "Funciones.h"
 #include "Vistas.h"
@@ -314,19 +315,8 @@ void internoFinalizarPendiente()
 // Registra el peso bruto
 void internoRegistrarPesoBruto()
 {
-	// Cierra el lector de la báscula
-	lectorBascula.cerrar();
-
-	// Establece la hora y el peso bruto en el ticket
-	try{
-		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", lectorBascula.leer() );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", obtenerHora() );
-	}
-	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
-		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", "No establecido" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", "No establecida" );
-	}
+	// Registra el peso bruto
+	basculaRegistrarPeso( "EntradaPesoBrutoInterno", "EntradaHoraEntradaInterno" );
 
 	// Intenta calcula el peso neto
 	internoActualizarPesoNeto();
@@ -335,20 +325,10 @@ void internoRegistrarPesoBruto()
 // Registra el peso tara
 void internoRegistrarPesoTara()
 {
-	// Cierra el lector de la báscula
-	lectorBascula.cerrar();
-		
-	// Establece el peso leído en la etiqueta
-	try{
-		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", lectorBascula.leer() );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", obtenerHora() );
-	}
-	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
-		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );
-		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", "No establecida" );
-	}
+	// Registra el peso tara
+	basculaRegistrarPeso( "EntradaPesoTaraInterno", "EntradaHoraSalidaInterno" );
 
+	// Intenta calcular el peso neto
 	internoActualizarPesoNeto();
 }
 

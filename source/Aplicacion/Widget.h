@@ -124,6 +124,12 @@ class Widget
         // Permite cargar una imagen desde archivo para un GtkImage
         void establecerImagen( std::string idImagen, std::string archivo );
         
+        // Obtiene el ancho de un Widget
+        unsigned int obtenerAnchoWidget( std::string idWidget );
+
+        //  Obtiene el alto de un Widget
+        unsigned int obtenerAltoWidget( std::string idWidget );
+
         // Permite obtener el builder de un Widget
         const GtkBuilder *obtenerBuilder() const;
         

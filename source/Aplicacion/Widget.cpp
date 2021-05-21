@@ -387,6 +387,22 @@ void Widget::establecerImagen( string idImagen, string archivo )
     gtk_image_set_from_file( GTK_IMAGE( objeto ), archivo.c_str() );
 }
 
+// Obtiene el ancho de un Widget
+unsigned int Widget::obtenerAnchoWidget( string idWidget )
+{
+    GObject *objeto = obtenerObjeto( idWidget );
+
+    return gtk_widget_get_allocated_width( GTK_WIDGET( objeto ) );
+}
+
+//  Obtiene el alto de un Widget
+unsigned int Widget::obtenerAltoWidget( string idWidget )
+{
+    GObject *objeto = obtenerObjeto( idWidget );
+
+    return gtk_widget_get_allocated_height( GTK_WIDGET( objeto ) );
+}
+
 void Widget::removerElementosHijos( std::string idContenedor )
 {
     // Necesarios

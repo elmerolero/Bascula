@@ -1,6 +1,5 @@
 #include "GestorRegistros.h"
 #include "Aplicacion.h"
-#include "LectorBascula.h"
 #include "Sesion.h"
 #include "Vistas.h"
 #include "sha256.h"
@@ -579,7 +578,6 @@ void guardarConfiguracion()
 {
     try{
         actualizarOpcionesImpresion();
-        lectorBasculaActualizarOpciones();
     }
     catch( exception &ia ){
         mostrarMensajeError( ia.what() );

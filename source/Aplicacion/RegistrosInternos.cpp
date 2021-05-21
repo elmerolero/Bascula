@@ -1,6 +1,5 @@
 #include "RegistrosInternos.h"
 #include "GestorRegistros.h"
-#include "LectorBascula.h"
 #include "GestorBasculas.h"
 #include "Aplicacion.h"
 #include "Funciones.h"
@@ -45,7 +44,6 @@ void internoRegistrarPendiente()
 		ticket -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorInterno" ) );
 		ticket -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasInterno" ) );
 		ticket -> establecerObservaciones( interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" ) );
-		ticket -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
 		ticket -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
 		ticket -> establecerPendiente( true );
 
@@ -197,7 +195,6 @@ void internoFinalizarPendiente()
 		ticket -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorInterno" ) );
 		ticket -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasInterno" ) );
 		ticket -> establecerObservaciones( interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" ) );
-		ticket -> establecerEntradaManual( lectorBascula.lecturaManualActivada() );
 		ticket -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
 
 		// Establece el tipo de registro

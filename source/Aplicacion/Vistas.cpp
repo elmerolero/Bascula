@@ -7,7 +7,6 @@
 #include <list>
 #include "Funciones.h"
 #include "Sesion.h"
-#include "LectorBascula.h"
 #include "GestorBasculas.h"
 #include "GestorRegistros.h"
 #include "RegistrosInternos.h"

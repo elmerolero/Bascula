@@ -2,7 +2,6 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
-#include "LectorBascula.h"
 using namespace std;
 
 void actualizarTiempo( GtkWidget *widget, gpointer ptr );

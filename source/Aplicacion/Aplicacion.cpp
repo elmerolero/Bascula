@@ -1,4 +1,3 @@
-#include "Aplicacion.h"
 #include <stdexcept>
 #include <iostream>
 #include <string>
@@ -27,13 +26,49 @@ bool aplicacionActiva;
 // Pila de vistas
 vector< string > pilaVistas;
 
+Signal senalDibujo{ "AreaImpresion", "draw", 0 };
+
+gboolean
+draw_callback (GtkWidget *widget, cairo_t *cr, gpointer data)
+{
+  guint width, height;
+  GdkRGBA color;
+  GtkStyleContext *context;
+
+  context = gtk_widget_get_style_context (widget);
+
+  width = gtk_widget_get_allocated_width (widget);
+  height = gtk_widget_get_allocated_height (widget);
+
+  gtk_render_background (context, cr, 0, 0, width, height);
+
+  //cairo_arc (cr,
+    //         width / 2.0, height / 2.0,
+      //       MIN (width, height) / 2.0,
+        //     0, 2 * G_PI);
+
+  cairo_move_to( cr, width / 2.0, height /  2.0 );
+  cairo_line_to( cr, 50, 50 );
+  cairo_text_path( cr, "Hola" );
+
+  gtk_style_context_get_color (context,
+                               gtk_style_context_get_state (context),
+                               &color);
+  gdk_cairo_set_source_rgba (cr, &color);
+
+  cairo_fill (cr);
+
+ return FALSE;
+}
+
+
 void iniciar( GtkApplication *aplicacion, gpointer informacion )
 {
     // Carga la ventana principal y conecta la función para cerrar la ventana y finalizar el programa
     interfaz.cargarWidget( "../resources/interfaces/Principal.glade" );
     gtk_application_add_window( aplicacion, GTK_WINDOW( interfaz.obtenerObjeto( "VentanaPrincipal" ) ) );
     interfaz.mostrarElemento( "VentanaPrincipal" );
-    interfaz.conectarSenal( "VentanaPrincipal", "destroy", G_CALLBACK( gtk_widget_destroy ), nullptr );
+    interfaz.conectarSenal( ventanaPrincipal, G_CALLBACK( gtk_widget_destroy ), nullptr );
 
     // Establece la hora
     actualizarTiempo( nullptr, nullptr );
@@ -93,6 +128,7 @@ void mostrarMensajeError( string mensajeError )
 // Son necesarias para que funcione el inicio de sesión
 void conectarSenalesBase()
 {
+    interfaz.conectarSenal( senalDibujo, G_CALLBACK( draw_callback ), nullptr );
     // Enlace regresar
     interfaz.conectarSenal( enlaceRegresar, G_CALLBACK( regresarVista ), nullptr );
 
@@ -118,6 +154,8 @@ void conectarSenalesBase()
 // Conecta las señales de cada una de las vistas
 void conectarSenales()
 {
+    interfaz.conectarSenal( senalDibujo, G_CALLBACK( draw_callback ), nullptr );
+
     // Vista Inicio
     interfaz.conectarSenal( botonBascula, G_CALLBACK( irHacia ), (void *)"Bascula" );
     interfaz.conectarSenal( enlaceCreditos, G_CALLBACK( irHacia ), (void *)"Creditos" );
@@ -176,28 +214,28 @@ void conectarSenalesAdministrador()
 	interfaz.mostrarElemento( "BotonUsuarios" );
 
     // Vista de registro de empresa (primer inicio)
-    interfaz.conectarSenal( "BotonRegistrarEmpresaPropia", "clicked", G_CALLBACK( registrarEmpresa ), nullptr );
+    interfaz.conectarSenal( botonRegistrarEmpresaPropia, G_CALLBACK( registrarEmpresa ), nullptr );
 
     // Vista de registros
-    interfaz.conectarSenal( "BotonRegistros", "clicked", G_CALLBACK( irHacia ), (void *)"Registros" );
-    interfaz.conectarSenal( "BotonUsuarios", "clicked", G_CALLBACK( vistaConsultarUsuarios ), nullptr );
+    interfaz.conectarSenal( botonRegistros, G_CALLBACK( irHacia ), (void *)"Registros" );
+    interfaz.conectarSenal( botonUsuarios, G_CALLBACK( vistaConsultarUsuarios ), nullptr );
 
     // Vista Registros
-    interfaz.conectarSenal( "BotonRegistrosEmpresas", "clicked", G_CALLBACK( vistaRegistrosEmpresas ), nullptr );
-    interfaz.conectarSenal( "BotonRegistrosProductos", "clicked", G_CALLBACK( vistaRegistrosProductos ), nullptr );
-    interfaz.conectarSenal( "BotonRegistrosPesajesInternos", "clicked", G_CALLBACK( vistaConsultarPesajesInternos ), nullptr );
-    interfaz.conectarSenal( "BotonRegistrosBasculaPublica", "clicked", G_CALLBACK( vistaConsultarPesajesPublicos ), nullptr );
+    interfaz.conectarSenal( botonRegistrosEmpresas, G_CALLBACK( vistaRegistrosEmpresas ), nullptr );
+    interfaz.conectarSenal( botonRegistrosProductos, G_CALLBACK( vistaRegistrosProductos), nullptr );
+    interfaz.conectarSenal( botonRegistrosPesajesInternos, G_CALLBACK( vistaConsultarPesajesInternos ), nullptr );
+    interfaz.conectarSenal( botonRegistrosBasculaPublica, G_CALLBACK( vistaConsultarPesajesPublicos ), nullptr );
 
     // Vista de listado de registros
     interfaz.conectarSenal( botonRegistroCancelarEdicion, G_CALLBACK( regresarVista ), nullptr );
     interfaz.conectarSenal( botonRegistroCancelarNuevo, G_CALLBACK( regresarVista ), nullptr );
-    interfaz.conectarSenal( "BotonNo", "clicked", G_CALLBACK( cancelarAccion ), nullptr );
+    interfaz.conectarSenal( botonNo, G_CALLBACK( cancelarAccion ), nullptr );
 
     // Vista de ticket interno
-    interfaz.conectarSenal( "EliminarRegistroInterno", "clicked", G_CALLBACK( internoAlertaEliminar ), nullptr );
+    interfaz.conectarSenal( eliminarRegistroInterno, G_CALLBACK( internoAlertaEliminar ), nullptr );
 
     // Vista de ticket interno
-    interfaz.conectarSenal( "EliminarRegistroPublico", "clicked", G_CALLBACK( internoAlertaEliminar ), nullptr );
+    interfaz.conectarSenal( eliminarRegistroPublico, G_CALLBACK( internoAlertaEliminar ), nullptr );
 
     // Vista de administración de usuarios
 	interfaz.conectarSenal( entradaConsultarUsuario, G_CALLBACK( vistaConsultarUsuario ), nullptr );

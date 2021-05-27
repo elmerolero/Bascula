@@ -1,6 +1,17 @@
 #include "Senales.h"
 #include "Widget.h"
 
+Signal ventanaPrincipal{ "VentanaPrincipal", "destroy", 0 };
+Signal botonRegistrarEmpresaPropia{ "BotonRegistrarEmpresaPropia", "clicked", 0 };
+
+Signal botonRegistros{ "BotonRegistros", "clicked", 0 };
+Signal botonUsuarios{ "BotonUsuarios", "clicked", 0 };
+
+Signal botonRegistrosEmpresas{ "BotonRegistrosEmpresas", "clicked", 0 };
+Signal botonRegistrosProductos{ "BotonRegistrosProductos", "clicked", 0 };
+Signal botonRegistrosPesajesInternos{ "BotonRegistrosPesajesInternos", "clicked", 0 };
+Signal botonRegistrosBasculaPublica{ "BotonRegistrosBasculaPublica", "clicked", 0 };
+
 /* SEÑALES BASE (son necesarias para iniciar en el programa */
 Signal enlaceRegresar{ "EnlaceRegresar", "activate-link", 0 };
 
@@ -94,9 +105,11 @@ Signal botonRegistroCancelarEdicion{ "BotonRegistroCancelarEdicion", "clicked", 
 // Noc
 Signal imprimirRegistroPublico{ "ImprimirRegistroPublico", "clicked", 0 };
 Signal eliminarRegistroInterno{ "EliminarRegistroInterno", "clicked", 0 };
+Signal eliminarRegistroPublico{ "EliminarRegistroPublico", "clicked", 0 };
 Signal botonRegistroGuardarNuevo{ "BotonRegistroGuardarNuevo", "clicked", 0 };
 Signal botonRegistroCancelarNuevo{ "BotonRegistroCancelarNuevo", "clicked", 0 };
 Signal botonSi{ "BotonSi", "clicked", 0 };
+Signal botonNo{ "BotonNo", "clicked", 0 };
 
 Signal botonRegistrosPesajeSeleccionarDia{ "BotonRegistrosPesajeSeleccionarDia", "clicked", 0 };
 Signal botonRegistrosPesajeObtenerInforme{ "BotonRegistrosPesajeObtenerInforme", "clicked", 0 };

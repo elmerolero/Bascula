@@ -3,7 +3,19 @@
 
 #include "Widget.h"
 
+extern Signal ventanaPrincipal;
+
 extern Signal enlaceRegresar;
+
+// 
+extern Signal botonRegistrarEmpresaPropia;
+extern Signal botonRegistros;
+extern Signal botonUsuarios;
+
+extern Signal botonRegistrosEmpresas;
+extern Signal botonRegistrosProductos;
+extern Signal botonRegistrosPesajesInternos;
+extern Signal botonRegistrosBasculaPublica;
 
 // Señales base
 extern Signal enlaceRegistrarNuevoUsuario;
@@ -98,10 +110,12 @@ extern Signal botonRegistroCancelarEdicion;
 // Noc
 extern Signal imprimirRegistroPublico;
 extern Signal eliminarRegistroInterno;
+extern Signal eliminarRegistroPublico;
 
 extern Signal botonRegistroGuardarNuevo;
 extern Signal botonRegistroCancelarNuevo;
 extern Signal botonSi;
+extern Signal botonNo;
 
 extern Signal enlaceRegistrosPesajeRegresar;
 extern Signal botonRegistrosPesajeSeleccionarDia;

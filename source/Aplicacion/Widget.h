@@ -35,13 +35,7 @@ class Widget
         std::string obtenerNombreWidget( std::string idWidget );
 
         // Conecta un evento al elemento e indica una función que ejecutará
-        guint conectarSenal( std::string id, std::string tipoSenal, GCallback funcion, gpointer data );
-
-        // Conecta un evento al elemento e indica una función que ejecutará
         void conectarSenal( Signal &senal, GCallback funcion, gpointer data );
-
-        // Desconecta la señal del elemento indicado
-        void desconectarSenal( std::string idElemento, guint &idSenal );
 
         // Desconecta la señal del elemento indicado
         void desconectarSenal( Signal &senal );

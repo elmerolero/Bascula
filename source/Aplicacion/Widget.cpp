@@ -69,16 +69,6 @@ GObject *Widget::obtenerObjeto( string id ) const
 }
 
 // Conecta la señal a una función
-guint Widget::conectarSenal( string id, string tipoSenal, GCallback funcion, gpointer data )
-{
-    // Obtiene el objeto indicado por el ID
-    GObject *object = obtenerObjeto( id );
-
-    // Conecta la señal dada y la función dada con ese objeto
-    return g_signal_connect( object, tipoSenal.c_str(), funcion, data);
-}
-
-// Conecta la señal a una función
 void Widget::conectarSenal( Signal &senal, GCallback funcion, gpointer data )
 {
     // Si hay una señal asociada al mismo, la desconecta
@@ -91,21 +81,6 @@ void Widget::conectarSenal( Signal &senal, GCallback funcion, gpointer data )
 
     // Conecta la señal dada y la función dada con ese objeto
     senal.id = g_signal_connect( object, senal.type.c_str(), funcion, data );
-}
-
-// Desconecta la señal dado el id correspondiente
-void Widget::desconectarSenal( string idElemento, guint &idSenal )
-{
-    // Obtiene el objeto indicado por la señal
-    GObject *object = obtenerObjeto( idElemento );
-
-    if( idSenal > 0 ){
-        // Desconecta la señal
-        g_signal_handler_disconnect( object, idSenal );
-    }
-    
-    // Establece el identificador en cero
-    idSenal = 0;
 }
 
 // Desconecta la señal dado el id correspondiente

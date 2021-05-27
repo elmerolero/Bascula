@@ -6240,6 +6240,8 @@ y condiciones indicados en la página web mencionada a continuación.
                           <object class="GtkDrawingArea" id="AreaImpresion">
                             <property name="visible">True</property>
                             <property name="can_focus">False</property>
+                            <property name="hexpand">True</property>
+                            <property name="vexpand">True</property>
                           </object>
                           <packing>
                             <property name="expand">False</property>

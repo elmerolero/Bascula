@@ -38,7 +38,7 @@ TicketPublico::TicketPublico( std::unordered_map< std::string, std::string > *re
     establecerHoraSalida( (*renglon)[ "hora_salida" ] );
     establecerPesoBruto( (*renglon)[ "peso_bruto" ] );
     establecerPesoTara( (*renglon)[ "peso_tara" ] );
-    establecerPesoNeto( (*renglon)[ "peso_neto" ] ) );
+    establecerPesoNeto( (*renglon)[ "peso_neto" ] );
     establecerPesoBrutoEstablecido( stoi( (*renglon)[ "bruto_establecido" ] ) );
     establecerPesoTaraEstablecido( stoi( (*renglon)[ "tara_establecido" ] ) );
     establecerPesoNetoEstablecido( stoi( (*renglon)[ "neto_establecido" ] ) );

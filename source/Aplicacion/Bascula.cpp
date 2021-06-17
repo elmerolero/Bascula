@@ -8,6 +8,13 @@ using namespace std;
 
 HANDLE dispositivo;
 
+Bascula::Bascula():
+	codigo( 0 ), nombre( "Bascula" ), puerto( "" ), baudRate( CBR_9600 ), parity( NOPARITY ), 
+	stopBits( 0 ), ignoredBytes( 0 ), activo( false ), peso( 0.f )
+{
+	
+}
+
 Bascula::Bascula( unordered_map< string, string > *renglon )
 {
 	// Se asegura que no se esté intentando establecer un renglón nulo

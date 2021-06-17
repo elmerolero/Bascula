@@ -8,6 +8,7 @@
 class Bascula
 {
     public:
+        Bascula();
         Bascula( std::unordered_map< std::string, std::string > *renglon );
 
         void conectar();

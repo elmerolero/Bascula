@@ -425,7 +425,7 @@ void internoObtenerPorFecha( list< Ticket * > &registros, std::string fecha )
 	limpiarRegistrosInternos( registrosInternosConsultados );
 	
 	// Conecta con la base de datos
-	database.open( nombreArchivo );
+	database.open( databaseFile );
 
 	// Genera el comando de consulta para obtener los tickets
 	string consulta = "select * from registros_internos where pendiente = 0 and fecha = '" + fecha + "'";
@@ -434,15 +434,15 @@ void internoObtenerPorFecha( list< Ticket * > &registros, std::string fecha )
 	database.query( consulta );
 
 	// ¿Hay resultados?
-	if( rows.size() > 0 ){
-		for( size_t i = 0; i < rows.size(); i++ ){
-			Row *row = rows[ i ];
-			// Crea el nuevo ticket
-			Ticket *ticket = new Ticket();
-
+	if( results.size() > 0 ){
+		for( auto renglon : results ){
 			try{
-    		    // Establece los datos del registro
-    		    establecerRegistroInternoDesdeRenglon( ticket, row );
+				//
+				Registro *producto = productos.buscarRegistroPorClave( stoi( (* renglon)[ "clave_producto" ] ) );
+				Registro *empresa = empresas.buscarRegistroPorClave( stoi( (* renglon)[ "clave_empresa" ] ) );
+
+				// Crea el nuevo ticket
+				Ticket *ticket = new Ticket( renglon, producto, empresa );
     				
     		    // Lo agrega al campo de registros internos pendientes
     		    registros.push_back( ticket );
@@ -495,7 +495,7 @@ void internoAlertaEliminar()
 void internoEliminarSeleccionado()
 {
 	// Elimina el registro de la base de datos
-	database.open( nombreArchivo );
+	database.open( databaseFile );
 
 	// Comando de consulta
 	string consulta = "delete from registros_internos where folio = " + to_string( ticket -> obtenerFolio() );
@@ -562,42 +562,15 @@ void internoObtenerRegistrosRango()
 	interfaz.obtenerFechaCalendario( "FechaInformeInicio", &diaInicio, &mesInicio, &anioInicio );
 	interfaz.obtenerFechaCalendario( "FechaInformeFin", &diaFin, &mesFin, &anioFin );
 
-	// Archivo con el informe
-    ofstream archivo;
-
-	// Se abre el archivo
-    archivo.open( "../resources/data/Registros.csv", ios_base::out );
-    if( !archivo ){
-        mostrarMensaje( "No se pudo abrir el archivo.\n"
-        				"Asegúrate de que ningún programa esté haciendo uso de el archivo,\n"
-        				"de tener espacio en el disco duro e inténtalo de nuevo." );
-        return;
-    }
-
-	// Agrega el caracter BOM para archivos UTF-8
-	const char *bom = "\xef\xbb\xbf";
-    archivo << bom;
-
 	// Consulta de la base de datos
     string consulta = "select folio, fecha, tipo_registro, nombre_empresa, nombre_producto, numero_placas, nombre_conductor, hora_entrada, "
     				  "hora_salida, peso_bruto, peso_tara, descuento, peso_neto, manual_activado, observaciones, nombre_basculista "
     				  "from registros_internos join productos on registros_internos.clave_producto = productos.clave_producto "
     				  "join empresas on registros_internos.clave_empresa = empresas.clave_empresa where pendiente = 0 and fecha between '" + 
     				  obtenerFecha( diaInicio, mesInicio + 1, anioInicio ) + "' and '" + obtenerFecha( diaFin, mesFin + 1, anioFin ) + "'";
-    database.open( nombreArchivo );
-    database.query( consulta );
-    if( rows.size() > 0 ){
-    	archivo << "Folio, Fecha, Registra, Empresa, Producto, No. Placas, Conductor, Hora entrada, Hora salida, Peso bruto, Peso tara, Descuento, Peso neto, Manual, Observaciones, Basculista" << endl;
-    	for( Row *row : rows ){
-			archivo << row -> columns.at( 0 ) << ", " << row -> columns.at( 1 ) << ", " << ( stoi( row -> columns.at( 2 ) ) == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" ) 
-					<< ", " << row -> columns.at( 3 ) << ", " << row -> columns.at( 4 ) << ", " << row -> columns.at( 5 ) << ", " 
-					<< row -> columns.at( 6 ) << ", " << row -> columns.at( 7 ) << ", " << row -> columns.at( 8 ) << ", " << row -> columns.at( 9 ) 
-					<< ", " << row -> columns.at( 10 ) << ", " << row -> columns.at( 11 ) << ", " << row -> columns.at( 12 ) << ", " 
-					<< row -> columns.at( 13 ) << ", " << row -> columns.at( 14 ) << ", " << row -> columns.at( 15 ) << endl;
-    	}
-    }
+    database.open( databaseFile );
+    database.query( consulta, "../resources/data/Registros.csv" );
     database.close();
-    archivo.close();
 
     ShellExecute(NULL, "open", "..\\resources\\data\\Registros.csv", NULL, NULL, SW_HIDE );
 	irHacia( nullptr, (void *)"Pesajes" );
@@ -606,6 +579,7 @@ void internoObtenerRegistrosRango()
 // Genera un informe
 void internoGenerarInforme()
 {
+/*
 	// Muestra un mensaje que indica que se está generando el informe
 	mostrarMensaje( "Generando informe.\nPor favor espere.");
 
@@ -631,7 +605,7 @@ void internoGenerarInforme()
     		<< "Fecha:, " << obtenerFecha() << endl;
 
     // Consulta a la base de datos
-    string consulta = "select registros_internos.clave_empresa, nombre_empresa, productos.clave_producto, nombre_producto, sum( peso_bruto ), " 
+    string consulta = "select registros_internos.clave_empresa as clave_empresa, nombre_empresa, productos.clave_producto, nombre_producto, sum( peso_bruto ), " 
     				  "sum( peso_tara ), sum( peso_neto ) from registros_internos "
 					  "join empresas on registros_internos.clave_empresa = empresas.clave_empresa "
 					  "join productos on registros_internos.clave_producto = productos.clave_producto "
@@ -639,30 +613,30 @@ void internoGenerarInforme()
 					  "registros_internos.clave_producto order by nombre_empresa;";
 
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     database.query( consulta );
-    if( rows.size() > 0 ){
+    if( results.size() > 0 ){
 		// Obtiene la clave de la primera empresa
-    	unsigned int claveEmpresa = stoi( rows.at( 0 ) -> columns.at( 0 ) );
+    	unsigned int claveEmpresa = stoi( (* results.at( 0 ))[ "clave_empresa" ] );
 
     	// Primer elemento
     	archivo << "Entradas" << endl
-    			<< "Proveedor:," << rows.at(0) -> columns.at( 1 ) << endl
+    			<< "Proveedor:, " << (* results.at( 0 ))[ "nombre_empresa" ] << endl
     			<< "Codigo, Producto, Total peso bruto, Total peso tara, Peso neto" << endl;
 
-    	for( Row *row : rows ){
+    	for( auto *row : results ){
     		// ¿La clave empresa es diferente de la clave original?
-    		if( claveEmpresa != stoi( row -> columns.at( 0 ) ) ){
+    		if( claveEmpresa != stoi( (* row )[ "clave_empresa" ] ) ){
     			// Establece la nueva clave de la empresa
-    			claveEmpresa = stoi(  row -> columns.at( 0 ) );
+    			claveEmpresa = stoi(  (* row )[ "clave_empresa" ] );
     			archivo << endl
-    				    << "Proveedor:," << row -> columns.at( 1 ) << endl
+    				    << "Proveedor:," << (* row )[ "nombre_empresa" ] << endl
     					<< "Codigo, Producto, Total peso bruto, Total peso tara, Peso neto" << endl;
     		}
 
     		// Muestra los registros
-    		archivo << row -> columns.at( 2 ) << ", " << row -> columns.at( 3 ) << ", " << row -> columns.at( 4 ) << ", " << row -> columns.at( 5 )
-    				<< ", " << row -> columns.at( 6 ) << endl;
+    		archivo << row -> at( 2 ) << ", " << row -> at( 3 ) << ", " << row -> at( 4 ) << ", " << row -> at( 5 )
+    				<< ", " << row -> at( 6 ) << endl;
     	}
     }
 
@@ -676,26 +650,26 @@ void internoGenerarInforme()
 	database.query( consulta );
 	if( rows.size() > 0 ){
 		// Obtiene la clave de la primera empresa
-    	unsigned int claveEmpresa = stoi( rows.at( 0 ) -> columns.at( 0 ) );
+    	unsigned int claveEmpresa = stoi( rows.at( 0 ) -> at( 0 ) );
 
     	// Primer elemento
     	archivo << "\nSalidas" << endl
-    			<< "Proveedor:," << rows.at(0) -> columns.at( 1 ) << endl
+    			<< "Proveedor:," << rows.at(0) -> at( 1 ) << endl
     			<< "Codigo, Producto, Total peso bruto, Total peso tara, Peso neto" << endl;
 
     	for( Row *row : rows ){
     		// ¿La clave empresa es diferente de la clave original?
-    		if( claveEmpresa != stoi( row -> columns.at( 0 ) ) ){
+    		if( claveEmpresa != stoi( row -> at( 0 ) ) ){
     			// Establece la nueva clave de la empresa
-    			claveEmpresa = stoi(  row -> columns.at( 0 ) );
+    			claveEmpresa = stoi(  row -> at( 0 ) );
     			archivo << endl
-    				    << "Proveedor:," << row -> columns.at( 1 ) << endl
+    				    << "Proveedor:," << row -> at( 1 ) << endl
     					<< "Codigo, Producto, Total peso bruto, Total peso tara, Peso neto" << endl;
     		}
 
     		// Muestra los registros
-    		archivo << row -> columns.at( 2 ) << ", " << row -> columns.at( 3 ) << ", " << row -> columns.at( 4 ) << ", " << row -> columns.at( 5 )
-    				<< ", " << row -> columns.at( 6 ) << endl;
+    		archivo << row -> at( 2 ) << ", " << row -> at( 3 ) << ", " << row -> at( 4 ) << ", " << row -> at( 5 )
+    				<< ", " << row -> at( 6 ) << endl;
     	}
     }
 
@@ -707,7 +681,7 @@ void internoGenerarInforme()
     database.query( consulta );
 	if( rows.size() > 0 ){
 		// Obtiene la clave de la primera empresa
-    	unsigned int claveEmpresa = stoi( rows.at( 0 ) -> columns.at( 0 ) );
+    	unsigned int claveEmpresa = stoi( rows.at( 0 ) -> at( 0 ) );
 
     	// Primer elemento
     	archivo << "\nTotales," << endl
@@ -715,14 +689,14 @@ void internoGenerarInforme()
 
     	for( Row *row : rows ){
     		// Muestra los registros
-    		archivo << row -> columns.at( 0 ) << ", " << row -> columns.at( 1 ) << ", " << row -> columns.at( 2 ) << ", " << row -> columns.at( 3 )
-    				<< ", " << row -> columns.at( 4 ) << endl;
+    		archivo << row -> at( 0 ) << ", " << row -> at( 1 ) << ", " << row -> at( 2 ) << ", " << row -> at( 3 )
+    				<< ", " << row -> at( 4 ) << endl;
     	}
     }
 
     database.close();
     archivo.close();
-
+*/
     ShellExecute(NULL, "open", "..\\resources\\data\\Informe.csv", NULL, NULL, SW_HIDE );
 
 	irHacia( nullptr, (void *)"Pesajes" );

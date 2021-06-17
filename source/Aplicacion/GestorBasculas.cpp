@@ -4,6 +4,7 @@
 #include <iomanip>
 #include <sstream>
 #include <iostream>
+#include <unordered_map>
 #include <thread>
 using namespace std;
 
@@ -82,7 +83,7 @@ void basculaObtenerRegistros()
 {
     // Obtiene las básculas registradas en la base de datos
     string consulta = "select * from basculas";
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     database.query( consulta );
     database.close();
     if( results.size() > 0 ){
@@ -97,12 +98,12 @@ void basculaObtenerRegistros()
 
     // Obtiene el codigo máximo registrado
     consulta = "select max( clave ) from basculas";
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     database.query( consulta );
     database.close();
-    if( rows.size() > 0 ){
+    if( results.size() > 0 ){
         try{
-            codigoBasculaActual = stoi( rows.at( 0 ) -> columns.at( 0 ) );
+            codigoBasculaActual = stoi( results.at( 0 ) -> at( 0 ) );
         }
         catch( invalid_argument &ia ){
             codigoBasculaActual = 0;
@@ -208,7 +209,7 @@ void basculaNuevo( Bascula *bascula )
                  << (int)bascula -> obtenerStopBits() << ", "
                  << bascula -> obtenerBytesIgnorados() << ", 0 )"; 
 
-        database.open( nombreArchivo );
+        database.open( databaseFile );
         database.query( consulta.str() );
         database.close();
 
@@ -234,7 +235,7 @@ void basculaEditar( Bascula *bascula )
                  << "stopbits = " << (int)bascula -> obtenerStopBits() << ", "
                  << "ignoredbyte = " << bascula -> obtenerBytesIgnorados() << ", 0 )"; 
 
-        database.open( nombreArchivo );
+        database.open( databaseFile );
         database.query( consulta.str() );
         database.close();
     }
@@ -256,7 +257,7 @@ void basculaEliminar()
         stringstream consulta;
         consulta << "delete from basculas where clave = " << bascula -> obtenerCodigo() ; 
 
-        database.open( nombreArchivo );
+        database.open( databaseFile );
         database.query( consulta.str() );
         database.close();
 

@@ -65,7 +65,7 @@ void actualizarElementosLista( GtkListStore **listaNombresRegistro, GtkEntryComp
     }
 
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
 
     // Limpia la lista
     gtk_list_store_clear( *listaNombresRegistro );
@@ -75,7 +75,7 @@ void actualizarElementosLista( GtkListStore **listaNombresRegistro, GtkEntryComp
     database.query( consulta );
     if( results.size() > 0 ){
         for( auto *renglon : results ){
-            string nombreRegistro = renglon -> columns.at( 0 );
+            string nombreRegistro = renglon -> at( 0 );
             agregarElementoLista( listaNombresRegistro, nombreRegistro );
         }
     }
@@ -101,14 +101,14 @@ void agregarElementoLista( GtkListStore **listaNombresRegistros, std::string nom
 void obtenerFolioActualInterno()
 {
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     
     // Obtiene la clave actual de productos registrados
     string consulta = "select max( folio ) from registros_internos;";
     database.query( consulta );
     if( results.size() > 0 ){
         // Obtiene el valor máximo en formato string
-        string maxStr = results.at( 0 ) -> columns.at( 0 );
+        string maxStr = results.at( 0 ) -> at( 0 );
         
         // Lo traduce a entero si el string no contiene la cadena "NULL"
         folioActual = ( maxStr.compare( "NULL" ) != 0 ? stoi( maxStr ) : 0 );
@@ -124,14 +124,14 @@ void obtenerFolioActualInterno()
 void obtenerFolioActualPublico()
 {
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     
     // Obtiene la clave actual de productos registrados
     string consulta = "select max( folio ) from registros_publicos;";
     database.query( consulta );
     if( results.size() > 0 ){
         // Obtiene el valor máximo en formato string
-        string maxStr = results.at( 0 ) -> columns.at( 0 );
+        string maxStr = results.at( 0 ) -> at( 0 );
         
         // Lo traduce a entero si el string no contiene la cadena "NULL"
         folioActualPublico = ( maxStr.compare( "NULL" ) != 0 ? stoi( maxStr ) : 0 );
@@ -147,7 +147,7 @@ void obtenerFolioActualPublico()
 void obtenerRegistrosPublicosPendientes()
 {
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     
     // Obtiene los tickets del día
     string consulta = "select * from registros_publicos where pendiente = 1";
@@ -156,7 +156,7 @@ void obtenerRegistrosPublicosPendientes()
         for( auto renglon : results ){
     	    try{
                 //Crea el nuevo registro
-                TicketPublico *registroPublico = new TicketPublico( renglon, productos.buscarRegistroPorClave( ( *renglon )[ "clave_producto" ] ) );
+                TicketPublico *registroPublico = new TicketPublico( renglon, productos.buscarRegistroPorClave( stoi( ( *renglon )[ "clave_producto" ] ) ) );
     				
     		    // Lo agrega al campo de registros internos pendientes
     		    registrosPublicosPendientes.push_back( registroPublico );
@@ -175,7 +175,7 @@ void obtenerRegistrosPublicosPendientes()
 void obtenerRegistrosInternosPendientes()
 {
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     
     // Obtiene los tickets del día
     string consulta = "select * from registros_internos where pendiente = 1";
@@ -184,8 +184,8 @@ void obtenerRegistrosInternosPendientes()
         for( auto *renglon : results ){
     	    try{
                 // Busca el producto y la empresa correspondiente
-                Registro *producto = productos.buscarRegistroPorClave( (* renglon)[ "clave_producto" ] );
-                Registro *empresa = empresas.buscarRegistroPorClave( (* renglon)[ "clave_empresa" ] );
+                Registro *producto = productos.buscarRegistroPorClave( stoi( (* renglon)[ "clave_producto" ] ) );
+                Registro *empresa = empresas.buscarRegistroPorClave( stoi( (* renglon)[ "clave_empresa" ] ) );
 
     			//Crea el nuevo registro
                 Ticket *ticket = new Ticket( renglon, producto, empresa );	
@@ -207,7 +207,7 @@ void obtenerRegistrosInternosPendientes()
 void obtenerUsuariosRegistrados()
 {
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     
     // Obtiene los tickets del día
     string consulta = "select * from usuarios";
@@ -235,7 +235,7 @@ void obtenerUsuariosRegistrados()
 void crearRegistroPendiente( Ticket *ticket )
 {
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     
     // Consulta para el registro en la base de datos
     stringstream consulta;
@@ -271,7 +271,7 @@ void crearRegistroPendiente( Ticket *ticket )
 void actualizarRegistroPendiente( Ticket *ticket )
 {
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     
     // Consulta para el registro en la base de datos
     stringstream consulta;
@@ -311,7 +311,7 @@ void finalizarRegistro( Ticket *ticket, bool esNuevo )
     }
 
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     
     // Consulta para el registro en la base de datos
     stringstream consulta;
@@ -371,7 +371,7 @@ void crearRegistroPublicoPendiente( TicketPublico *registroPublico )
              << registroPublico -> estaPendiente() << ", " << registroPublico -> esEntradaManual() << ")";
     
     // Realiza la consulta definida anteriormente en la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     database.query( consulta.str() );
     database.close();
 
@@ -402,7 +402,7 @@ void actualizarRegistroPublicoPendiente( TicketPublico *registroPublico )
              << "where folio = " << registroPublico -> obtenerFolio();
     
     // Realiza la consulta definida anteriormente en la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     database.query( consulta.str() );
     database.close();
 }
@@ -436,7 +436,7 @@ void finalizarRegistroPublico( TicketPublico *registroPublico, bool esNuevo )
              << "where folio = " << registroPublico -> obtenerFolio();
     
     // Realiza la consulta definida anteriormente en la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     database.query( consulta.str() );
     database.close();
     
@@ -470,7 +470,7 @@ void registrarNombreEmpresa( std::string nombre )
 
     try{
         // Abre la base de datos
-        database.open( nombreArchivo );
+        database.open( databaseFile );
 
         // Realiza la consulta
         database.query( "insert into empresa values ( '" + nombre + "' )" );
@@ -489,13 +489,13 @@ void cargarNombreEmpresa()
 {
     try{
         // Abre la base de datos
-        database.open( nombreArchivo );
+        database.open( databaseFile );
 
         // Realiza la consulta
         database.query( "select * from empresa" );
         if( results.size() > 0 ){
             // Establece el nombre de la empresa
-            nombreEmpresa = results.at( 0 ) -> columns.at( 0 );
+            nombreEmpresa = results.at( 0 ) -> at( 0 );
 
             // Actualiza el nombre de la empresa
             interfaz.establecerTextoEtiqueta( "NombreEmpresa", nombreEmpresa );
@@ -686,7 +686,7 @@ Usuario *buscarUsuarioPorNombreUsuario( std::string nombreUsuario, std::list< Us
 void actualizarEstadoAdministrador()
 {
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
 
     unsigned int opcion = 0;
     if( interfaz.obtenerEstadoBotonToggle( "UsuarioAdministrador" ) == TRUE ){
@@ -714,14 +714,14 @@ void actualizarEstadoAdministrador()
 // Elimina el usuario
 void eliminarUsuario()
 {
-    database.open( nombreArchivo );
+    database.open( databaseFile );
 
     string consulta = "select count( administrador ) from usuarios where administrador = 1;";
     database.query( consulta );
     if( results.size() > 0 ){
         // Obtiene la cantidad de usuarios que son administrador
         try{
-            unsigned int numeroAdministradores = stoi( rows.at( 0 ) -> columns.at( 0 ) );
+            unsigned int numeroAdministradores = stoi( results.at( 0 ) -> at( 0 ) );
 
             // Si solo hay un administrador o menos
             if( numeroAdministradores <= 1 ){
@@ -806,7 +806,7 @@ void generarCodigoRecuperacion()
     string inputHash = hashTool( codigo.str() );
 
     // Registra el código en la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     database.query( "delete from codigos_recuperacion where nombre_usuario = '" + usuario + "'" );
     database.query( "insert into codigos_recuperacion values( '" + inputHash + "', '" + usuario + "')" );
 
@@ -822,12 +822,12 @@ void validarCodigoRecuperacion()
         string codigoSeguridad = interfaz.obtenerTextoEntrada( "EntradaRecuperacionCodigoSeguridad" );
 
         // Obtiene el código en base el nombre de usuario
-        database.open( nombreArchivo );
+        database.open( databaseFile );
         database.query( "select codigo from codigos_recuperacion where nombre_usuario = '" + entradaUsuario + "';" );
         database.close();
         if( results.size() > 0 ){
             // Obtiene el código dado
-            string codigo = results.at( 0 ) -> columns.at( 0 );
+            string codigo = results.at( 0 ) -> at( 0 );
 
             // Crea el hash para el código de recuperación introducido y lo compara
             SHA256 hashTool;

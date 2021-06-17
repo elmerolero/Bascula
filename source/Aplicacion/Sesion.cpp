@@ -36,7 +36,7 @@ void registrarUsuario()
 		string administrador = existenUsuariosRegistrados() ? "0" : "1";
 
 		// Registra al usuario en la base de datos
-		database.open( nombreArchivo );
+		database.open( databaseFile );
 		database.query( "insert into usuarios values( '" + nombreUsuario + "', '" +  contrasenaFinal + "', '" + sal + "', '" + nombre + "', '" + apellidos + "', " + administrador + " )" );
 		database.close();
 		
@@ -88,7 +88,7 @@ void actualizarDatosUsuario()
 		usuario.establecerNombreUsuario( nombreUsuario );
 
 		// Actualiza la información en la base de datos
-		database.open( nombreArchivo );
+		database.open( databaseFile );
 		database.query( "update usuarios set nombre = '" + usuario.obtenerNombre() + "', apellidos = '" + usuario.obtenerApellidos() + "', nombre_usuario = '" + usuario.obtenerNombreUsuario() + "' where nombre_usuario = '" + usuario.obtenerNombreUsuario() + "'" );
 		database.close();
 		
@@ -107,7 +107,7 @@ void actualizarDatosUsuario()
 void iniciarSesion()
 {
 	// Conecta con la base de datos
-	database.open( nombreArchivo );
+	database.open( databaseFile );
 		
 	try{
 		// Establece el nombre de usuario
@@ -119,13 +119,13 @@ void iniciarSesion()
 		database.query( consulta );
 		
 		// Si hay resultados (usuario encontrado)
-		if( rows.size() > 0 ){
+		if( results.size() > 0 ){
 			// Obtiene la contraseña y la sal
-			string hash = rows.at( 0 ) -> columns.at( 1 );
-			string sal = rows.at( 0 ) -> columns.at( 2 );
-			string nombre = rows.at( 0 ) -> columns.at( 3 );
-			string apellidos = rows.at( 0 ) -> columns.at( 4 );
-			bool administrador = stoi( rows.at( 0 ) -> columns.at( 5 ) );
+			string hash = (* results.at( 0 ))[ "constrasena" ];
+			string sal = (* results.at( 0 ))[ "sal" ];
+			string nombre = (* results.at( 0 ))[ "nombre" ];
+			string apellidos = (* results.at( 0 ))[ "apellidos" ];
+			bool administrador = stoi( (* results.at( 0 ))[ "administrador" ] );
 			
 			// Verifica la autenticidad de la contrasena
 			verificarContrasena( contrasena, sal, hash );
@@ -176,11 +176,11 @@ void mostrarUsuario()
 void nombreUsuarioOcupado( std::string nombreUsuario )
 {
 	// Abre la base de datos
-	database.open( nombreArchivo );
+	database.open( databaseFile );
 	
 	string consulta = "select * from usuarios where nombre_usuario = '" + nombreUsuario + "'";
 	database.query( consulta );
-	if( rows.size() > 0 ){
+	if( results.size() > 0 ){
 		throw invalid_argument( "El nombre de usuario que deseas registrar ya está en uso." );
 	}	
 	
@@ -233,7 +233,7 @@ void cambiarContrasena( string usuario, string contrasena, string confirmacion )
 		string contrasenaFinal = crearHash( contrasena + sal );
 
 		// Actualiza los datos de sal, de la nueva contraseña y elimina el código de recuperación
-		database.open( nombreArchivo );
+		database.open( databaseFile );
 		database.query( "update usuarios set contrasena = '" + contrasenaFinal + "', sal = '" + sal + "' where nombre_usuario = '" + usuario + "';"  );
 		database.close();
 	}
@@ -259,7 +259,7 @@ void cambiarContrasenaUsuario()
 		cambiarContrasena( usuario, contrasena, confirmacion );
 
 		// Elimina el código de seguridad
-		database.open( nombreArchivo );
+		database.open( databaseFile );
 		database.query( "delete from codigos_recuperacion where codigo = '" + codigoRecuperacion + "';" );
 		database.close();
 
@@ -282,12 +282,12 @@ void cambiarContrasenaUsuario()
 bool existenUsuariosRegistrados()
 {
 	// Consulta los usuarios registrados cuyo nombre de usuario no sea 'admin'
-	database.open( nombreArchivo );
+	database.open( databaseFile );
 	database.query( "select * from usuarios where nombre_usuario != 'admin'" );
 	database.close();
 
 	// Retorna si hubo resultados
-	return rows.size() > 0;
+	return results.size() > 0;
 }
 
 string crearHash( std::string contrasena )

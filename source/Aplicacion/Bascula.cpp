@@ -8,6 +8,24 @@ using namespace std;
 
 HANDLE dispositivo;
 
+Bascula::Bascula( unordered_map< string, string > *renglon )
+{
+	// Se asegura que no se esté intentando establecer un renglón nulo
+    if( renglon == nullptr ){
+	    throw invalid_argument( "El renglón que se desea asignar está vacío." );
+    }
+
+	// Establece los datos solicitados
+	establecerCodigo( (* renglon)[ "clave" ] );
+    establecerNombre( (* renglon)[ "nombre" ] );
+    establecerPuerto( (* renglon)[ "puerto" ] );
+    establecerBaudRate( (* renglon)[ "baudrate" ] );
+    establecerByteSize( (* renglon)[ "bytesize" ] );
+    establecerParity( stoi( (* renglon)[ "parity" ] ) );
+    establecerStopBits( (* renglon)[ "stopbits" ] );
+    establecerBytesIgnorados( (* renglon)[ "ignoredbytes" ] );
+}
+
 void Bascula::conectar()
 {
     dispositivo = CreateFile( obtenerPuerto().c_str(), GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL );

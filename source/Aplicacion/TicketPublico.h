@@ -2,6 +2,7 @@
 #define TICKET_PUBLICO_H
 
 #include <string>
+#include <unordered_map>
 #include "Registro.h"
 
 const int VIAJE_LOCAL = 0;
@@ -12,6 +13,9 @@ class TicketPublico
 	public:
 		// Constructor
 		TicketPublico();
+
+		// Constructor con Row
+		TicketPublico( std::unordered_map< std::string, std::string > *renglon, Registro *producto );
 		
 		// Folio
 		void establecerFolio( unsigned int folio );

@@ -1,5 +1,6 @@
 #ifndef TICKET_H
 #define TICKET_H
+#include <unordered_map>
 #include <string>
 #include "Registro.h"
 
@@ -11,6 +12,9 @@ class Ticket
 	public:
 		// Constructor
 		Ticket();
+
+		// Constructor a partir de renglón
+		Ticket( std::unordered_map< std::string, std::string > *renglon, Registro *producto, Registro *empresa );
 		
 		// Folio
 		void establecerFolio( unsigned int folio );

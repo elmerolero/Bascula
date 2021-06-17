@@ -120,7 +120,7 @@ void validarCodigoRecuperacion();
 void eliminarUsuario();
 
 // Dado un renglón de la consulta de la base de datos, establece los datos del ticket
-void establecerRegistroInternoDesdeRenglon( Ticket *ticket, Row *row );
-void establecerRegistroPublicoDesdeRenglon( TicketPublico *ticket, Row *row );
+/*void establecerRegistroInternoDesdeRenglon( Ticket *ticket, Row *row );
+void establecerRegistroPublicoDesdeRenglon( TicketPublico *ticket, Row *row );*/
 
 #endif

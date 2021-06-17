@@ -11,6 +11,19 @@ Registro::Registro():
 
 }
 
+// Constructor a partir de un resulado de la base de datos
+Registro::Registro( unordered_map< string, string > *renglon, string tipo )
+{
+	// Verifica que el renglón que se desea asignar no sea un renglón vacío
+	if( renglon == nullptr ){
+		throw invalid_argument( "Intento de asignación de un renglón vacío." );
+	}
+
+	// Establece los campos necesarios
+	establecerClave( stoi( (* renglon)[ "clave_" + tipo ] ) );
+	establecerNombre( (* renglon)[ "nombre_" + tipo ] );
+}
+
 // Destructor
 Registro::~Registro()
 {

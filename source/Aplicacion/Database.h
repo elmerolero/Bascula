@@ -2,13 +2,12 @@
 #define DATABASE_H
 
 #include <sqlite3.h>
+#include <unordered_map>
 #include <vector>
 #include <string>
 
-struct Row
-{
-	std::vector< std::string > columns;
-};
+extern std::string databaseFile;
+extern std::vector< std::unordered_map< std::string, std::string > * >results;
 
 class Database
 {
@@ -24,6 +23,7 @@ class Database
 		
 		// Queries the database
 		void query( std::string query );
+		void query( std::string query, std::string fileName );
 		
 		// Gets the error found in the data base
 		std::string error() const;
@@ -36,10 +36,6 @@ class Database
 		sqlite3 *ptrDatabase;
 		char *errorMessage;
 };
-
-extern std::string nombreArchivo;
-extern std::vector< std::string > nameColumns;
-extern std::vector< Row * >rows;
 
 // Called when a query is made
 int buildResults( void * notUsed, int numberColums, char **columns, char **columnNames );

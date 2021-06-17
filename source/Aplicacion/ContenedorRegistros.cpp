@@ -36,17 +36,17 @@ void ContenedorRegistros::obtenerRegistros()
     };
 	
     // Conecta con la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
 	
 	// Obtiene la clave actual de productos registrados
     string consulta = "select max( clave_" + obtenerNombreSingular() + " ) from " + obtenerNombrePlural();
     database.query( consulta );
-    if( rows.size() > 0 ){
-        if( rows.at( 0 ) -> columns.at( 0 ).empty() || rows.at( 0 ) -> columns.at( 0 ).compare( "NULL" ) == 0 ){
+    if( results.size() > 0 ){
+        if( results.at( 0 ) -> at( 0 ).empty() || results.at( 0 ) -> at( 0 ).compare( "NULL" ) == 0 ){
             claveActual = 0;
         }
         else{
-            claveActual = stoi( rows.at( 0 ) -> columns.at( 0 ) ); 
+            claveActual = stoi( results.at( 0 ) -> at( 0 ) ); 
         }
     }
     else{
@@ -58,21 +58,17 @@ void ContenedorRegistros::obtenerRegistros()
     database.query( consulta );
 	
     //  ¿Hay resultados?
-    if( rows.size() > 0 ){
+    if( results.size() > 0 ){
 	// Crea la lista de autocompletado
 	listaNombresRegistros = gtk_list_store_new( 1, G_TYPE_STRING );
 		
 	// Para cada uno de los renglones
-	for( Row *row : rows ){
+	for( auto *renglon : results ){
 			// Crea un nuevo registro
-            Registro *registro = new Registro();
+            Registro *registro = new Registro( renglon, obtenerNombreSingular() );
             
             // Iterador
             GtkTreeIter iterador;
-            
-            // Establece sus datos
-            registro -> establecerClave( stoi( row -> columns.at( 0 ) ) );
-            registro -> establecerNombre( row -> columns.at( 1 ) );
             
             // Lo agrega a la lista de registros
             registros.push_back( registro );
@@ -113,7 +109,7 @@ Registro *ContenedorRegistros::agregarNuevoRegistro( string nombre )
 	   gtk_list_store_set( listaNombresRegistros, &iterador, 0, registro -> obtenerNombre().c_str(), -1 );
 	
 	   // Se agrega a la base de datos
-	   database.open( nombreArchivo );
+	   database.open( databaseFile );
 	   stringstream consulta;
 	   consulta << "insert into " << obtenerNombrePlural() << " values( " << registro -> obtenerClave() << ", '" << registro -> obtenerNombre() << "' )";
 	   database.query( consulta.str() );
@@ -139,7 +135,7 @@ void ContenedorRegistros::actualizarRegistro( Registro * registro )
     }
             
     // Conecta a la base de datos
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     stringstream consulta;
     consulta << "update " << obtenerNombrePlural() << " set nombre_" << obtenerNombreSingular() << " = '" << registro -> obtenerNombre() << "' where clave_" << obtenerNombreSingular() << " = " << registro -> obtenerClave() << ";";
     database.query( consulta.str() );
@@ -154,7 +150,7 @@ void ContenedorRegistros::eliminarRegistro( Registro *registro )
 	    throw invalid_argument( "Error, intento de establecer un registro nulo." );
     }
     
-    database.open( nombreArchivo );
+    database.open( databaseFile );
     
     // Elimina las referencias en los registros internos
     stringstream consulta;

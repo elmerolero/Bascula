@@ -3,12 +3,17 @@
 
 #include <string>
 #include <regex>
+#include <unordered_map>
 #include <stdexcept>
 
 class Usuario
 {
     public:
+        // Constructor
         Usuario();
+
+        // Constructor con unordered_map como renglon de una base de datos
+        Usuario( std::unordered_map< std::string, std::string > *renglon );
 
         /* Modificadores de acceso */
         // Nombre de usuario

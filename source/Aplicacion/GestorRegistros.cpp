@@ -73,9 +73,9 @@ void actualizarElementosLista( GtkListStore **listaNombresRegistro, GtkEntryComp
     // Obtiene la clave actual de productos registrados
     string consulta = "select distinct( " + registro + " ) from registros_internos where " + registro + " != '';";
     database.query( consulta );
-    if( rows.size() > 0 ){
-        for( Row *row : rows ){
-            string nombreRegistro = row -> columns.at( 0 );
+    if( results.size() > 0 ){
+        for( auto *renglon : results ){
+            string nombreRegistro = renglon -> columns.at( 0 );
             agregarElementoLista( listaNombresRegistro, nombreRegistro );
         }
     }
@@ -106,9 +106,9 @@ void obtenerFolioActualInterno()
     // Obtiene la clave actual de productos registrados
     string consulta = "select max( folio ) from registros_internos;";
     database.query( consulta );
-    if( rows.size() > 0 ){
+    if( results.size() > 0 ){
         // Obtiene el valor máximo en formato string
-        string maxStr = rows.at( 0 ) -> columns.at( 0 );
+        string maxStr = results.at( 0 ) -> columns.at( 0 );
         
         // Lo traduce a entero si el string no contiene la cadena "NULL"
         folioActual = ( maxStr.compare( "NULL" ) != 0 ? stoi( maxStr ) : 0 );
@@ -129,9 +129,9 @@ void obtenerFolioActualPublico()
     // Obtiene la clave actual de productos registrados
     string consulta = "select max( folio ) from registros_publicos;";
     database.query( consulta );
-    if( rows.size() > 0 ){
+    if( results.size() > 0 ){
         // Obtiene el valor máximo en formato string
-        string maxStr = rows.at( 0 ) -> columns.at( 0 );
+        string maxStr = results.at( 0 ) -> columns.at( 0 );
         
         // Lo traduce a entero si el string no contiene la cadena "NULL"
         folioActualPublico = ( maxStr.compare( "NULL" ) != 0 ? stoi( maxStr ) : 0 );
@@ -152,17 +152,14 @@ void obtenerRegistrosPublicosPendientes()
     // Obtiene los tickets del día
     string consulta = "select * from registros_publicos where pendiente = 1";
     database.query( consulta );
-    if( rows.size() > 0 ){
-        for( Row *row : rows ){
-    	    //Crea el nuevo registro
-            TicketPublico *registroPublico = new TicketPublico();
-    		
+    if( results.size() > 0 ){
+        for( auto renglon : results ){
     	    try{
-    		  // Establece los datos del registro
-    		  establecerRegistroPublicoDesdeRenglon( registroPublico, row );
+                //Crea el nuevo registro
+                TicketPublico *registroPublico = new TicketPublico( renglon, productos.buscarRegistroPorClave( ( *renglon )[ "clave_producto" ] ) );
     				
-    		  // Lo agrega al campo de registros internos pendientes
-    		  registrosPublicosPendientes.push_back( registroPublico );
+    		    // Lo agrega al campo de registros internos pendientes
+    		    registrosPublicosPendientes.push_back( registroPublico );
     	    }
     	    catch( invalid_argument &ia ){
     		  cerr << ia.what() << endl;
@@ -183,15 +180,16 @@ void obtenerRegistrosInternosPendientes()
     // Obtiene los tickets del día
     string consulta = "select * from registros_internos where pendiente = 1";
     database.query( consulta );
-    if( rows.size() > 0 ){
-        for( Row *row : rows ){
-    	    //Crea el nuevo registro
-            Ticket *ticket = new Ticket();
-    		
+    if( results.size() > 0 ){
+        for( auto *renglon : results ){
     	    try{
-    		    // Establece los datos del registro
-    		    establecerRegistroInternoDesdeRenglon( ticket, row );
-    				
+                // Busca el producto y la empresa correspondiente
+                Registro *producto = productos.buscarRegistroPorClave( (* renglon)[ "clave_producto" ] );
+                Registro *empresa = empresas.buscarRegistroPorClave( (* renglon)[ "clave_empresa" ] );
+
+    			//Crea el nuevo registro
+                Ticket *ticket = new Ticket( renglon, producto, empresa );	
+                
     		    // Lo agrega al campo de registros internos pendientes
     		    registrosInternosPendientes.push_back( ticket );
     	    }
@@ -214,19 +212,11 @@ void obtenerUsuariosRegistrados()
     // Obtiene los tickets del día
     string consulta = "select * from usuarios";
     database.query( consulta );
-    if( rows.size() > 0 ){
-        for( Row *row : rows ){
-            //Crea el nuevo registro
-            Usuario *usuario = new Usuario();
-            
+    if( results.size() > 0 ){
+        for( auto *renglon : results ){            
             try{
-                // Establece los datos del registro
-                usuario -> establecerNombreUsuario( row -> columns.at( 0 ) );
-                usuario -> establecerHash( row -> columns.at( 1 ) );
-                usuario -> establecerSal( row -> columns.at( 2 ) );
-                usuario -> establecerNombre( row -> columns.at( 3 ) );
-                usuario -> establecerApellidos( row -> columns.at( 4 ) );
-                usuario -> establecerAdministrador( stoi( row -> columns.at( 5 ) ) );
+                //Crea el nuevo registro
+                Usuario *usuario = new Usuario( renglon );
                     
                 // Lo agrega al campo de registros internos pendientes
                 registrosUsuarios.push_back( usuario );
@@ -503,9 +493,9 @@ void cargarNombreEmpresa()
 
         // Realiza la consulta
         database.query( "select * from empresa" );
-        if( rows.size() > 0 ){
+        if( results.size() > 0 ){
             // Establece el nombre de la empresa
-            nombreEmpresa = rows.at( 0 ) -> columns.at( 0 );
+            nombreEmpresa = results.at( 0 ) -> columns.at( 0 );
 
             // Actualiza el nombre de la empresa
             interfaz.establecerTextoEtiqueta( "NombreEmpresa", nombreEmpresa );
@@ -728,7 +718,7 @@ void eliminarUsuario()
 
     string consulta = "select count( administrador ) from usuarios where administrador = 1;";
     database.query( consulta );
-    if( rows.size() > 0 ){
+    if( results.size() > 0 ){
         // Obtiene la cantidad de usuarios que son administrador
         try{
             unsigned int numeroAdministradores = stoi( rows.at( 0 ) -> columns.at( 0 ) );
@@ -835,9 +825,9 @@ void validarCodigoRecuperacion()
         database.open( nombreArchivo );
         database.query( "select codigo from codigos_recuperacion where nombre_usuario = '" + entradaUsuario + "';" );
         database.close();
-        if( rows.size() > 0 ){
+        if( results.size() > 0 ){
             // Obtiene el código dado
-            string codigo = rows.at( 0 ) -> columns.at( 0 );
+            string codigo = results.at( 0 ) -> columns.at( 0 );
 
             // Crea el hash para el código de recuperación introducido y lo compara
             SHA256 hashTool;
@@ -863,65 +853,4 @@ void validarCodigoRecuperacion()
     catch( invalid_argument &ia ){
         mostrarMensajeError( ia.what() );
     }
-}
-
-// Establece un registro interno desde un renglón dado
-void establecerRegistroInternoDesdeRenglon( Ticket *registroInterno, Row *row )
-{
-    // Se asegura que no se esté intento de establecer un registro nulo
-    if( registroInterno == nullptr ){
-	    throw invalid_argument( "Intento de asignación de información a un registro nulo." );
-    }
-
-    // Se establece los datos del registro interno
-    registroInterno -> establecerFolio( static_cast< unsigned int >( stoi( row -> columns.at( 0 ) ) ) );
-    registroInterno -> establecerFecha( row -> columns.at( 1 ) );
-    registroInterno -> establecerTipoRegistro( stoi( row -> columns.at( 2 ) ) );
-    registroInterno -> establecerEmpresa( empresas.buscarRegistroPorClave( stoi( row -> columns.at( 3 ) ) ) );
-    registroInterno -> establecerProducto( productos.buscarRegistroPorClave( stoi( row -> columns.at( 4 ) ) ) );
-    registroInterno -> establecerNumeroPlacas( row -> columns.at( 5 ) );
-    registroInterno -> establecerNombreConductor( row -> columns.at( 6 ) );
-    registroInterno -> establecerHoraEntrada( row -> columns.at( 7 ) );
-    registroInterno -> establecerHoraSalida( row -> columns.at( 8 ) );
-    registroInterno -> establecerPesoBruto( row -> columns.at( 9 ) );
-    registroInterno -> establecerPesoBrutoEstablecido( stoi( row -> columns.at( 10 ) ) );
-    registroInterno -> establecerPesoTara( row -> columns.at( 11 ) );
-    registroInterno -> establecerPesoTaraEstablecido( stoi( row -> columns.at( 12 ) ) );
-    registroInterno -> permitirDescuento( stoi( row -> columns.at( 15 ) ) );
-    registroInterno -> establecerDescuento( row -> columns.at( 13 ) );
-    registroInterno -> establecerDescuentoEstablecido( stoi( row -> columns.at( 14 ) ) );
-    registroInterno -> establecerPesoNeto( row -> columns.at( 16 ) );
-    registroInterno -> establecerPesoNetoEstablecido( stoi( row -> columns.at( 17 ) ) );
-    registroInterno -> establecerObservaciones( row -> columns.at( 18 ) );
-    registroInterno -> establecerEntradaManual( stoi( row -> columns.at( 19 ) ) );
-    registroInterno -> establecerPendiente( stoi( row -> columns.at( 20 ) ) );
-    registroInterno -> establecerNombreBasculista( row -> columns.at( 21 ) );
-}
-
-// Establece un registro publico desde un renglón dado
-void establecerRegistroPublicoDesdeRenglon( TicketPublico *registroPublico, Row *row )
-{
-    // Se asegura que no se esté intento de establecer un registro nulo
-    if( registroPublico == nullptr ){
-	    throw invalid_argument( "Intento de asignación de información a un registro nulo." );
-    }
-    
-    // Se establece los datos del registro interno
-    registroPublico -> establecerFolio( static_cast< unsigned int >( stoi( row -> columns.at( 0 ) ) ) );
-    registroPublico -> establecerFecha( row -> columns.at( 1 ) );
-    registroPublico -> establecerTipoViaje( stoi( row -> columns.at( 2 ) ) );
-    registroPublico -> establecerProducto( productos.buscarRegistroPorClave( stoi( row -> columns.at( 3 ) ) ) );
-    registroPublico -> establecerNumeroPlacas( row -> columns.at( 4 ) );
-    registroPublico -> establecerNombreConductor( row -> columns.at( 5 ) );
-    registroPublico -> establecerHoraEntrada( row -> columns.at( 6 ) );
-    registroPublico -> establecerHoraSalida( row -> columns.at( 7 ) );
-    registroPublico -> establecerPesoBruto( row -> columns.at( 8 ) );
-    registroPublico -> establecerPesoTara( row -> columns.at( 9 ) );
-    registroPublico -> establecerPesoNeto( stod( row -> columns.at( 10 ) ) );
-    registroPublico -> establecerPesoBrutoEstablecido( stoi( row -> columns.at( 11 ) ) );
-    registroPublico -> establecerPesoTaraEstablecido( stoi( row -> columns.at( 12 ) ) );
-    registroPublico -> establecerPesoNetoEstablecido( stoi( row -> columns.at( 13 ) ) );
-    registroPublico -> establecerNombreBasculista( row -> columns.at( 14 ) );
-    registroPublico -> establecerPendiente( stoi( row -> columns.at( 15 ) ) );
-    registroPublico -> establecerEntradaManual( stoi( row -> columns.at( 16 ) ) );
 }

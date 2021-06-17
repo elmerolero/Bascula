@@ -1,11 +1,13 @@
 #ifndef REGISTRO_H
 #define REGISTRO_H
+#include <unordered_map>
 #include <string>
 
 class Registro
 {
 	public:
 		Registro();
+		Registro( std::unordered_map< std::string, std::string > *renglon, std::string tipo );
 		~Registro();
 	
 		// Clave

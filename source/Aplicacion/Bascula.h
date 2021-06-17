@@ -2,11 +2,14 @@
 #define BASCULA_H
 
 #include <Windows.h>
+#include <unordered_map>
 #include <string>
 
 class Bascula
 {
     public:
+        Bascula( std::unordered_map< std::string, std::string > *renglon );
+
         void conectar();
         void desconectar();
 

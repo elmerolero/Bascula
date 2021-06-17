@@ -16,6 +16,49 @@ Ticket::Ticket():
 	// Nada que hacer aquí
 }
 
+//
+Ticket::Ticket( unordered_map< string, string > *renglon, Registro *producto, Registro *empresa )
+{
+	// Se asegura que no se esté intento de establecer un registro nulo
+    if( renglon == nullptr ){
+	    throw invalid_argument( "Intento de asignación de un renglón vacío." );
+    }
+
+	// Se asegura que no esté intentando establecer un producto vacío (nulo)
+	if( producto == nullptr ){
+		throw invalid_argument( "Intento de asignación de un producto vacío." );
+	}
+
+	// Se asegura que no esté intentando establecer una empresa vacío (nulo)
+	if( empresa == nullptr ){
+		throw invalid_argument( "Intento de asignación de una empresa vacía." );
+	}
+
+    // Se establece los datos del registro interno
+    establecerFolio( stoi( (* renglon )[ "folio" ] ) );
+    establecerFecha( (* renglon )[ "fecha" ] );
+    establecerTipoRegistro( stoi( (* renglon )[ "tipo_registro" ] ) );
+    establecerEmpresa( empresa );
+    establecerProducto( producto );
+    establecerNumeroPlacas( (* renglon )[ "numero_placas" ] );
+    establecerNombreConductor( (* renglon )[ "nombre_conductor" ] );
+    establecerHoraEntrada( (* renglon )[ "hora_entrada" ] );
+    establecerHoraSalida( (* renglon )[ "hora_salida" ] );
+    establecerPesoBruto( (* renglon )[ "peso_bruto" ] );
+    establecerPesoBrutoEstablecido( stoi( (* renglon )[ "bruto_establecido" ] ) );
+    establecerPesoTara( (* renglon )[ "peso_tara" ] );
+	establecerPesoTaraEstablecido( stoi( (* renglon )[ "tara_establecido" ] ) );
+    permitirDescuento( stoi( (* renglon )[ "descuento_permitido" ] ) );
+	establecerDescuento( (* renglon )[ "descuento" ] );
+	establecerDescuentoEstablecido( stoi( (* renglon )[ "descuento_establecido" ] ) );
+	establecerPesoNeto( (* renglon )[ "peso_neto" ] );
+	establecerPesoNetoEstablecido( stoi( (* renglon )[ "neto_establecido" ] ) );
+	establecerObservaciones( (* renglon )[ "observaciones" ] );
+	establecerEntradaManual( stoi( (* renglon )[ "manual_activado" ] ) );
+	establecerPendiente( stoi( (* renglon )[ "pendiente" ] ) );
+	establecerNombreBasculista( (* renglon )[ "nombre_basculista" ] );
+}
+
 // Establece el folio del ticket
 void Ticket::establecerFolio( unsigned int folio )
 {

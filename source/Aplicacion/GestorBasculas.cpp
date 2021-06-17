@@ -85,13 +85,10 @@ void basculaObtenerRegistros()
     database.open( nombreArchivo );
     database.query( consulta );
     database.close();
-    if( rows.size() > 0 ){
-        for( Row *row : rows ){
+    if( results.size() > 0 ){
+        for( auto *renglon : results ){
             // Crea el objeto para ese registro
-            Bascula *bascula = new Bascula();
-
-            // Establece sus datos de la consulta
-            basculaEstablecerRenglon( bascula, row );
+            Bascula *bascula = new Bascula( renglon );
 
             // Lo añade al grupo de básculas
             basculasRegistradas.push_back( bascula );
@@ -370,16 +367,4 @@ Bascula *basculaBuscarPorCodigo( unsigned int codigo )
     }
     
     return nullptr;
-}
-
-void basculaEstablecerRenglon( Bascula *bascula, Row *row )
-{
-    bascula -> establecerCodigo( row -> columns.at( 0 ) );
-    bascula -> establecerNombre( row -> columns.at( 1 ) );
-    bascula -> establecerPuerto( row -> columns.at( 2 ) );
-    bascula -> establecerBaudRate( row -> columns.at( 3 ) );
-    bascula -> establecerByteSize( row -> columns.at( 4 ) );
-    bascula -> establecerParity( stoi( row -> columns.at( 5 ) ) );
-    bascula -> establecerStopBits( row -> columns.at( 6 ) );
-    bascula -> establecerBytesIgnorados( row -> columns.at( 7 ) );
 }

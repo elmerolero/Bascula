@@ -29,6 +29,5 @@ void basculaActualizarRegistros();
 void basculaLimpiarFormulario( void );
 void basculaRegistrarPeso( std::string etiquetaPeso, std::string etiquetaHora );
 Bascula *basculaBuscarPorCodigo( unsigned int codigo );
-void basculaEstablecerRenglon( Bascula *bascula, Row *row );
 
 #endif

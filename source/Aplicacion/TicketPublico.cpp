@@ -14,6 +14,39 @@ TicketPublico::TicketPublico():
 	 // Vacío
 }
 
+// Constructor con unordered map
+TicketPublico::TicketPublico( std::unordered_map< std::string, std::string > *renglon, Registro *producto )
+{
+	// Se asegura que no se esté intentando establecer un renglón nulo
+    if( renglon == nullptr ){
+	    throw invalid_argument( "El renglón que se desea asignar está vacío." );
+    }
+
+	// Se asegura que no se esté intentando establecer un producto nulo
+    if( producto == nullptr ){
+	    throw invalid_argument( "El registro que se desea asignar no es válido." );
+    }
+    
+    // Se establece los datos del registro interno
+    establecerFolio( stoi( (*renglon)[ "folio" ] ) );
+    establecerFecha( (*renglon)[ "fecha" ] );
+    establecerTipoViaje( stoi( (*renglon)[ "tipo_viaje" ] ) );
+    establecerProducto( producto );
+    establecerNumeroPlacas( (*renglon)[ "numero_placas" ] );
+    establecerNombreConductor( (*renglon)[ "nombre_conductor" ] );
+    establecerHoraEntrada( (*renglon)[ "hora_entrada" ] );
+    establecerHoraSalida( (*renglon)[ "hora_salida" ] );
+    establecerPesoBruto( (*renglon)[ "peso_bruto" ] );
+    establecerPesoTara( (*renglon)[ "peso_tara" ] );
+    establecerPesoNeto( (*renglon)[ "peso_neto" ] ) );
+    establecerPesoBrutoEstablecido( stoi( (*renglon)[ "bruto_establecido" ] ) );
+    establecerPesoTaraEstablecido( stoi( (*renglon)[ "tara_establecido" ] ) );
+    establecerPesoNetoEstablecido( stoi( (*renglon)[ "neto_establecido" ] ) );
+    establecerNombreBasculista( (*renglon)[ "nombre_basculista" ] );
+    establecerPendiente( stoi( (*renglon)[ "pendiente" ] ) );
+    establecerEntradaManual( stoi( (*renglon)[ "entrada_manual" ] ) );
+}
+
 // Folio
 void TicketPublico::establecerFolio( unsigned int folio )
 {

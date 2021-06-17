@@ -11,6 +11,23 @@ Usuario::Usuario():
     // Nada que hacer
 }
 
+Usuario::Usuario( unordered_map< string, string > *renglon ):
+    administrador( false )
+{
+    // Se asegura que no se esté intentando establecer un renglón nulo
+    if( renglon == nullptr ){
+	    throw invalid_argument( "El renglón que se desea asignar está vacío." );
+    }
+
+    // Establece los datos del registro
+    establecerNombreUsuario( (* renglon)[ "nombre_usuario" ] );
+    establecerHash( (* renglon)[ "contrasena" ] );
+    establecerSal( (* renglon)[ "sal" ] );
+    establecerNombre( (* renglon)[ "nombre" ] );
+    establecerApellidos( (* renglon)[ "apellidos" ] );
+    establecerAdministrador( stoi( (* renglon)[ "administrador" ] ) );
+}
+
 // Establece el nombre del usuario
 void Usuario::establecerNombreUsuario( string nombreUsuario )
 {

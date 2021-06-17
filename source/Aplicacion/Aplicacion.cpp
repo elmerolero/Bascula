@@ -42,18 +42,18 @@ draw_callback (GtkWidget *widget, cairo_t *cr, gpointer data)
 
   gtk_render_background (context, cr, 0, 0, width, height);
 
-  //cairo_arc (cr,
-    //         width / 2.0, height / 2.0,
-      //       MIN (width, height) / 2.0,
-        //     0, 2 * G_PI);
+  /*cairo_arc (cr,
+             width / 2.0, height / 2.0,
+             MIN (width, height) / 2.0,
+             0, 2 * G_PI);*/
 
   cairo_move_to( cr, width / 2.0, height /  2.0 );
   cairo_line_to( cr, 50, 50 );
-  cairo_text_path( cr, "Hola" );
-
-  gtk_style_context_get_color (context,
+  cairo_text_path( cr, "Hola\nMundo" );
+  cairo_stroke_preserve( cr );
+  gtk_style_context_get_color( context,
                                gtk_style_context_get_state (context),
-                               &color);
+                               &color );
   gdk_cairo_set_source_rgba (cr, &color);
 
   cairo_fill (cr);

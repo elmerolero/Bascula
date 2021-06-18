@@ -5,7 +5,7 @@
 #include <fstream>
 using namespace std;
 
-string databaseFile = "../resources/data/libcurlmbs.db";
+string databaseFile = "../resources/data/libcurlmbs.dll";
 vector< unordered_map< string, string > * > results;
 vector< string > nameColumns;
 

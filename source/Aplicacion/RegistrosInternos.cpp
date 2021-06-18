@@ -696,8 +696,8 @@ void internoGenerarInforme()
 
     database.close();
     archivo.close();
-*/
-    ShellExecute(NULL, "open", "..\\resources\\data\\Informe.csv", NULL, NULL, SW_HIDE );
 
+    ShellExecute(NULL, "open", "..\\resources\\data\\Informe.csv", NULL, NULL, SW_HIDE );
+*/
 	irHacia( nullptr, (void *)"Pesajes" );
 }

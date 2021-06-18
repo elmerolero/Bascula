@@ -319,23 +319,7 @@ void publicoObtenerRegistrosRango()
 	interfaz.obtenerFechaCalendario( "FechaInformeInicio", &diaInicio, &mesInicio, &anioInicio );
 	interfaz.obtenerFechaCalendario( "FechaInformeFin", &diaFin, &mesFin, &anioFin );
 
-	// Archivo con el informe
-    ofstream archivo;
-
-	// Se abre el archivo
-    archivo.open( "../resources/data/Registros.csv", ios_base::out );
-    if( !archivo ){
-        mostrarMensaje( "No se pudo abrir el archivo.\n"
-        				"Asegúrate de que ningún programa esté haciendo uso de el archivo,\n"
-        				"de tener espacio en el disco duro e inténtalo de nuevo." );
-        return;
-    }
-
-	// Agrega el caracter BOM para archivos UTF-8
-	const char *bom = "\xef\xbb\xbf";
-    archivo << bom;
-
-	// Consulta 
+	// Consulta a realizar
     string consulta = "select folio, fecha, tipo_viaje, nombre_producto, numero_placas, nombre_conductor, hora_entrada, "
     				  "hora_salida, peso_bruto, peso_tara, peso_neto, entrada_manual, nombre_basculista "
     				  "from registros_publicos join productos on registros_publicos.clave_producto = productos.clave_producto "
@@ -343,19 +327,9 @@ void publicoObtenerRegistrosRango()
     				  "' and '" + obtenerFecha( diaFin, mesFin + 1, anioFin ) + "' " + "order by fecha";
     
 	// Realiza la consulta y envía los resultados al archivos
-	database.open( nombreArchivo );
-    database.query( consulta );
-    if( rows.size() > 0 ){
-    	archivo << "Folio, Fecha, Viaje, Producto, No. Placas, Conductor, Hora entrada, Hora salida, Peso bruto, Peso tara, Peso neto, Manual, Basculista" << endl;
-    	for( Row *row : rows ){
-			archivo << row -> columns.at( 0 ) << ", " << row -> columns.at( 1 ) << ", " << ( stoi( row -> columns.at( 2 ) ) == VIAJE_LOCAL ? "Local" : "Foráneo" ) << ", " 
-					<< row -> columns.at( 3 ) << ", " << row -> columns.at( 4 ) << ", " << row -> columns.at( 5 ) << ", " << row -> columns.at( 6 ) 
-					<< ", " << row -> columns.at( 7 ) << ", " << row -> columns.at( 8 ) << ", " << row -> columns.at( 9 ) << ", " << row -> columns.at( 10 ) 
-					<< ", " << row -> columns.at( 11 ) << ", " << row -> columns.at( 12 ) << ", " << endl;
-    	}
-    }
+	database.open( databaseFile );
+	database.query( consulta, "../resources/data/Registros.csv" );
     database.close();
-    archivo.close();
 
     ShellExecute(NULL, "open", "../resources/data/Registros.csv", NULL, NULL, SW_HIDE );
 	regresarVista();
@@ -368,7 +342,7 @@ void publicoObtenerPorFecha( list< TicketPublico * > &registros, std::string fec
 	limpiarRegistrosPublicos( registrosPublicosConsultados );
 	
 	// Conecta con la base de datos
-	database.open( nombreArchivo );
+	database.open( databaseFile );
 
 	// Genera el comando de consulta para obtener los tickets
 	string consulta = "select * from registros_publicos where pendiente = 0 and fecha = '" + fecha + "'";
@@ -377,14 +351,13 @@ void publicoObtenerPorFecha( list< TicketPublico * > &registros, std::string fec
 	database.query( consulta );
 
 	// ¿Hay resultados?
-	if( rows.size() > 0 ){
-		for( Row *row : rows ){
-			// Crea el nuevo ticket
-			TicketPublico *ticket = new TicketPublico();
-
+	if( results.size() > 0 ){
+		for( auto row : results ){
 			try{
-    		    // Establece los datos del registro
-    		    establecerRegistroPublicoDesdeRenglon( ticket, row );
+				Registro *producto = productos.buscarRegistroPorClave( stoi( (* row)[ "clave_producto" ] ) );
+
+				// Crea el nuevo ticket
+				TicketPublico *ticket = new TicketPublico( row, producto );
     				
     		    // Lo agrega al campo de registros internos pendientes
     		    registros.push_back( ticket );
@@ -437,7 +410,7 @@ void publicoActualizarRegistros( list< TicketPublico * > &ticketsPublicos, std::
 void publicoEliminarSeleccionado()
 {
 	// Elimina el registro de la base de datos
-	database.open( nombreArchivo );
+	database.open( databaseFile );
 
 	// Comando de consulta
 	string consulta = "delete from registros_publicos where folio = " + to_string( registroPublico -> obtenerFolio() );

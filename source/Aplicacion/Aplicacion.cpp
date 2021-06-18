@@ -96,7 +96,7 @@ void cargarInformacion()
     productos.establecerNombrePlural( "productos" );
     productos.establecerNombreSingular( "producto" );
     productos.obtenerRegistros();
-    
+    cout << "llego aqui" << endl;
     empresas.establecerNombrePlural( "empresas" );
     empresas.establecerNombreSingular( "empresa" );
     empresas.obtenerRegistros();

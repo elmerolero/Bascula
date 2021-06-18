@@ -39,10 +39,10 @@ void ContenedorRegistros::obtenerRegistros()
     database.open( databaseFile );
 	
 	// Obtiene la clave actual de productos registrados
-    string consulta = "select max( clave_" + obtenerNombreSingular() + " ) from " + obtenerNombrePlural();
+    string consulta = "select max( clave_" + obtenerNombreSingular() + " ) as clave from " + obtenerNombrePlural();
     database.query( consulta );
     if( results.size() > 0 ){
-        if( results.at( 0 ) -> at( 0 ).empty() || results.at( 0 ) -> at( 0 ).compare( "NULL" ) == 0 ){
+        if( (* results.at( 0 ))[ "clave" ].empty() || (* results.at( 0 ))[ "clave" ].compare( "NULL" ) == 0 ){
             claveActual = 0;
         }
         else{

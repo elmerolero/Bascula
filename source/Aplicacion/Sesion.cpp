@@ -121,7 +121,7 @@ void iniciarSesion()
 		// Si hay resultados (usuario encontrado)
 		if( results.size() > 0 ){
 			// Obtiene la contraseña y la sal
-			string hash = (* results.at( 0 ))[ "constrasena" ];
+			string hash = (* results.at( 0 ))[ "contrasena" ];
 			string sal = (* results.at( 0 ))[ "sal" ];
 			string nombre = (* results.at( 0 ))[ "nombre" ];
 			string apellidos = (* results.at( 0 ))[ "apellidos" ];

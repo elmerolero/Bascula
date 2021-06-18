@@ -18,9 +18,9 @@ Registro::Registro( unordered_map< string, string > *renglon, string tipo )
 	if( renglon == nullptr ){
 		throw invalid_argument( "Intento de asignación de un renglón vacío." );
 	}
-
+	
 	// Establece los campos necesarios
-	establecerClave( stoi( (* renglon)[ "clave_" + tipo ] ) );
+	establecerClave( stoi( (* renglon)[ ("clave_" + tipo) ] ) );
 	establecerNombre( (* renglon)[ "nombre_" + tipo ] );
 }
 

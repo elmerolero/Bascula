@@ -46,7 +46,7 @@ void ContenedorRegistros::obtenerRegistros()
             claveActual = 0;
         }
         else{
-            claveActual = stoi( results.at( 0 ) -> at( 0 ) ); 
+            claveActual = stoi( (* results.at( 0 ) )[ "clave" ] ); 
         }
     }
     else{

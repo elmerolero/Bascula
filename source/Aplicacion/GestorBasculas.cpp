@@ -97,13 +97,13 @@ void basculaObtenerRegistros()
     }
 
     // Obtiene el codigo máximo registrado
-    consulta = "select max( clave ) from basculas";
+    consulta = "select max( clave ) as clave from basculas";
     database.open( databaseFile );
     database.query( consulta );
     database.close();
     if( results.size() > 0 ){
         try{
-            codigoBasculaActual = stoi( results.at( 0 ) -> at( 0 ) );
+            codigoBasculaActual = stoi( (* results.at( 0 ))[ "clave" ] );
         }
         catch( invalid_argument &ia ){
             codigoBasculaActual = 0;

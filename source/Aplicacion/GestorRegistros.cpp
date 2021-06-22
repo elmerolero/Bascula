@@ -71,11 +71,11 @@ void actualizarElementosLista( GtkListStore **listaNombresRegistro, GtkEntryComp
     gtk_list_store_clear( *listaNombresRegistro );
 
     // Obtiene la clave actual de productos registrados
-    string consulta = "select distinct( " + registro + " ) from registros_internos where " + registro + " != '';";
+    string consulta = "select distinct( " + registro + " ) as registro from registros_internos where " + registro + " != '';";
     database.query( consulta );
     if( results.size() > 0 ){
         for( auto *renglon : results ){
-            string nombreRegistro = renglon -> at( 0 );
+            string nombreRegistro = (* renglon)[ "registro" ];
             agregarElementoLista( listaNombresRegistro, nombreRegistro );
         }
     }
@@ -104,11 +104,11 @@ void obtenerFolioActualInterno()
     database.open( databaseFile );
     
     // Obtiene la clave actual de productos registrados
-    string consulta = "select max( folio ) from registros_internos;";
+    string consulta = "select max( folio ) as folio from registros_internos;";
     database.query( consulta );
     if( results.size() > 0 ){
         // Obtiene el valor máximo en formato string
-        string maxStr = results.at( 0 ) -> at( 0 );
+        string maxStr = (* results.at( 0 ))[ "folio" ];
         
         // Lo traduce a entero si el string no contiene la cadena "NULL"
         folioActual = ( maxStr.compare( "NULL" ) != 0 ? stoi( maxStr ) : 0 );
@@ -127,11 +127,11 @@ void obtenerFolioActualPublico()
     database.open( databaseFile );
     
     // Obtiene la clave actual de productos registrados
-    string consulta = "select max( folio ) from registros_publicos;";
+    string consulta = "select max( folio ) as folio from registros_publicos;";
     database.query( consulta );
     if( results.size() > 0 ){
         // Obtiene el valor máximo en formato string
-        string maxStr = results.at( 0 ) -> at( 0 );
+        string maxStr = (* results.at( 0 ))[ "folio" ];
         
         // Lo traduce a entero si el string no contiene la cadena "NULL"
         folioActualPublico = ( maxStr.compare( "NULL" ) != 0 ? stoi( maxStr ) : 0 );
@@ -495,7 +495,7 @@ void cargarNombreEmpresa()
         database.query( "select * from empresa" );
         if( results.size() > 0 ){
             // Establece el nombre de la empresa
-            nombreEmpresa = results.at( 0 ) -> at( 0 );
+            nombreEmpresa = (* results.at( 0 ))[ "nombre" ];
 
             // Actualiza el nombre de la empresa
             interfaz.establecerTextoEtiqueta( "NombreEmpresa", nombreEmpresa );

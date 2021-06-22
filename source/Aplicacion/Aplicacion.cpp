@@ -96,17 +96,17 @@ void cargarInformacion()
     productos.establecerNombrePlural( "productos" );
     productos.establecerNombreSingular( "producto" );
     productos.obtenerRegistros();
-    cout << "llego aqui" << endl;
+
     empresas.establecerNombrePlural( "empresas" );
     empresas.establecerNombreSingular( "empresa" );
     empresas.obtenerRegistros();
-    
+
     // Obtiene los tickets registrados y pendientes
     obtenerFolioActualInterno();
     obtenerFolioActualPublico();
     obtenerRegistrosInternosPendientes();
     obtenerRegistrosPublicosPendientes();
-
+    
     // Obtine los registros de completado de conductor y numero de placas
     actualizarElementosLista( &listaNombresConductor, &completadorNombresConductor, "nombre_conductor" );
     actualizarElementosLista( &listaNumerosPlaca, &completadorNumerosPlaca, "numero_placas" ); 
@@ -117,6 +117,7 @@ void cargarInformacion()
     cargarOpcionesImpresion();
     basculaObtenerPuertosDisponibles();
     basculaObtenerRegistros();
+    cout << "Llego aquí" << endl;
 }
 
 void mostrarMensajeError( string mensajeError )

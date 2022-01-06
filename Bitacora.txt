@@ -1,0 +1,1 @@
+Gestionar los Pixbuf creados para los registros a consultar.

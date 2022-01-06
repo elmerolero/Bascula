@@ -36,6 +36,10 @@ extern ContenedorRegistros empresas;
 // Registros de usuarios
 extern std::list< Usuario * > registrosUsuarios;
 
+extern std::string empresa_razon_social;
+extern std::string empresa_rfc;
+extern std::string empresa_imagen;
+
 // Completador para el nombre del conductor
 extern GtkListStore *listaNombresConductor;
 extern GtkEntryCompletion *completadorNombresConductor;

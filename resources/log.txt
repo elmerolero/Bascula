@@ -1,0 +1,5 @@
+[Fecha: 2021-12-13 Hora: 12:54:19]: basic_string::_M_construct null not valid
+[Fecha: 2021-12-13 Hora: 12:54:34]: basic_string::_M_construct null not valid
+[Fecha: 2021-12-13 Hora: 12:57:46]: basic_string::_M_construct null not valid
+[Fecha: 2021-12-13 Hora: 12:58:32]: basic_string::_M_construct null not valid
+[Fecha: 2021-12-13 Hora: 13:05:38]: basic_string::_M_construct null not valid

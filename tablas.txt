@@ -1,0 +1,26 @@
+-- Información usuarios
+create table Usuario( id_usuario integer not null primary key autoincrement, pseudonimo text( 20 ) not null, contrasena text( 64 ) not null, nombre text( 35 ) not null, apellidos text( 35 ), RFC text( 13 ), correo text( 320 ), fecha_nacimiento text( 10 ), fecha_registro text( 10 ), imagen text( 68 ), administrador integer not null );
+create table domicilio_usuario( id_domicilio integer not null primary key autoincrement, id_usuario integer not null, calle text( 100 ), numero text( 10 ), numero_interior text( 10 ), colonia text( 100 ), codigo_postal integer, municipio text( 100 ), estado text( 100 ), pais text( 100 ), descripcion text( 300 ) );
+create index domicilios_usuarios on domicilio_usuario( id_usuario );
+create table telefono_usuario( id_telefono integer not null primary key autoincrement, id_usuario integer not null, id_domicilio integer, codigo_pais text( 4 ), codigo_area text( 12 ), telefono text( 10 ), extension text( 5 ) );
+create index telefonos_usuarios on telefono_usuario( id_usuario );
+
+-- Información empresas propias
+create table EmpresaPropia( id_empresa integer not null primary key autoincrement, razon_social text( 100 ) not null, RFC text( 13 ), imagen text( 68 ) );
+create table DomicilioEmpresaPropia( id_domicilio integer not null primary key autoincrement, id_empresa integer not null, calle text( 100 ), numero text( 10 ), numero_interior text( 10 ), colonia text( 100 ), codigo_postal integer, municipio text( 100 ), estado text( 100 ), pais text( 100 ), descripcion text( 300 ) );
+create index domicilios_empresas_propias on DomicilioEmpresaPropia( id_empresa );
+create table TelefonoEmpresaPropia( id_telefono integer not null primary key autoincrement, id_empresa integer not null, id_domicilio integer, codigo_pais text( 4 ), codigo_area text( 12 ), telefono text( 10 ), extension text( 5 ) );
+create index telefonos_empresas_propias on TelefonoEmpresaPropia( id_empresa );
+
+-- Información empresas
+create table Empresa( id_empresa integer not null primary key autoincrement, razon_social text( 100 ) not null, RFC text( 13 ), imagen text( 68 ) );
+create table DomicilioEmpresa( id_domicilio integer not null primary key autoincrement, id_empresa integer not null, calle text( 100 ), numero text( 10 ), numero_interior text( 10 ), colonia text( 100 ), codigo_postal integer, municipio text( 100 ), estado text( 100 ), pais text( 100 ), descripcion text( 300 ) );
+create index domicilios_empresas on domicilio_empresa( id_empresa );
+create table telefono_empresa( id_telefono integer not null primary key autoincrement, id_empresa integer not null, id_domicilio integer, codigo_pais text( 4 ), codigo_area text( 12 ), telefono text( 10 ), extension text( 5 ) );
+create index telefonos_empresas on telefono_empresa( id_empresa );
+
+-- Codigos de recuperacion
+CREATE TABLE codigos_recuperacion( codigo text( 64 ) not null, id_usuario integer not null );
+
+-- Productos
+CREATE TABLE Producto( id_producto integer not null primary key autoincrement, nombre text( 35 ) not null, descripcion text( 200 ), imagen text( 68 ) );

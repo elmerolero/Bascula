@@ -98,11 +98,11 @@ void publicoRegistrarPendiente()
 		// Crea o registra el registro según corresponda
 		if( esRegistroNuevo ){
 			crearRegistroPublicoPendiente( registroPublico );
-			mostrarMensajeError( "Registro creado correctamente." );
+			app_mostrar_error( "Registro creado correctamente." );
 		}
 		else{
 			actualizarRegistroPublicoPendiente( registroPublico );
-			mostrarMensajeError( "Registro actualizado correctamente." );
+			app_mostrar_error( "Registro actualizado correctamente." );
 		}
 
 		// Obtiene los tickets pendientes
@@ -113,7 +113,7 @@ void publicoRegistrarPendiente()
 	}
 	catch( invalid_argument &ia ){
 		folioActualPublico--;
-		mostrarMensajeError( ia.what() );
+		app_mostrar_error( ia.what() );
 		if( esRegistroNuevo ){
 			delete registroPublico;
 			registroPublico = nullptr;
@@ -177,7 +177,7 @@ void publicoFinalizarPendiente()
 			registroPublico -> establecerPesoNetoEstablecido( true );
 		}
 		else{
-			mostrarMensajeError( "No se han establecido todos los campos necesarios para\nregistrar el peso neto." );
+			app_mostrar_error( "No se han establecido todos los campos necesarios para\nregistrar el peso neto." );
 			if( esRegistroNuevo ){
 				delete registroPublico;
 				registroPublico = nullptr;
@@ -196,13 +196,13 @@ void publicoFinalizarPendiente()
 		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
 		
 		// Indica que se creo correctamente el registro
-		mostrarMensajeError( "Registro finalizado. Se creará formato de impresión si se encuentra habilitado." );
+		app_mostrar_error( "Registro finalizado. Se creará formato de impresión si se encuentra habilitado." );
 
 		// Establece las vistas
 		regresarVista();
 	}
 	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
+		app_mostrar_error( ia.what() );
 		if( esRegistroNuevo ){
 			delete registroPublico;
 			registroPublico = nullptr;
@@ -291,10 +291,10 @@ void publicoSeleccionarDia()
 	interfaz.obtenerFechaCalendario( "EntradaDiaConsultar", &dia, &mes, &anio );
 
 	// Obtiene los tickets de la fecha seleccionada
-	publicoObtenerPorFecha( registrosPublicosConsultados, obtenerFecha( dia, mes + 1, anio ) );
+	publicoObtenerPorFecha( registrosPublicosConsultados, tiempo_construir_fecha( dia, mes + 1, anio ) );
 
 	// Establece la fecha del ticket que se está consultando
-	interfaz.establecerTextoEtiqueta( "TicketsRegistrados", "Registros del día " + obtenerFecha( dia, mes, anio ) + ":"  );
+	interfaz.establecerTextoEtiqueta( "TicketsRegistrados", "Registros del día " + tiempo_construir_fecha( dia, mes, anio ) + ":"  );
 
 	// Establece el número de tickets
 	interfaz.establecerTextoEtiqueta( "TicketsContados", to_string( registrosPublicosConsultados.size() ) + " registros"  );
@@ -309,7 +309,7 @@ void publicoSeleccionarDia()
 void publicoObtenerRegistrosRango()
 {
 	// Muestra un mensaje que indica que se está generando el informe
-	mostrarMensaje( "Obteniendo registros.\nPor favor espere.");
+	app_mostrar_mensaje( "Obteniendo registros.\nPor favor espere.");
 
 	// Variables para el rango de seleccion de fechas
 	unsigned int diaInicio, mesInicio, anioInicio;
@@ -323,8 +323,8 @@ void publicoObtenerRegistrosRango()
     string consulta = "select folio, fecha, tipo_viaje, nombre_producto, numero_placas, nombre_conductor, hora_entrada, "
     				  "hora_salida, peso_bruto, peso_tara, peso_neto, entrada_manual, nombre_basculista "
     				  "from registros_publicos join productos on registros_publicos.clave_producto = productos.clave_producto "
-    				  "where pendiente = 0 and fecha between '" + obtenerFecha( diaInicio, mesInicio + 1, anioInicio ) + 
-    				  "' and '" + obtenerFecha( diaFin, mesFin + 1, anioFin ) + "' " + "order by fecha";
+    				  "where pendiente = 0 and fecha between '" + tiempo_construir_fecha( diaInicio, mesInicio + 1, anioInicio ) + 
+    				  "' and '" + tiempo_construir_fecha( diaFin, mesFin + 1, anioFin ) + "' " + "order by fecha";
     
 	// Realiza la consulta y envía los resultados al archivos
 	database.open( databaseFile );
@@ -368,7 +368,7 @@ void publicoObtenerPorFecha( list< TicketPublico * > &registros, std::string fec
 		}
 	}
 	else{
-		mostrarMensaje( "No se encontraron registros del día seleccionado." );
+		app_mostrar_mensaje( "No se encontraron registros del día seleccionado." );
 	}
 
 	// Cierra la base de datos
@@ -390,7 +390,7 @@ void publicoActualizarRegistros( list< TicketPublico * > &ticketsPublicos, std::
 		clave << setfill( '0' ) << setw( 7 ) << (*ticket) -> obtenerFolio();
 
 		try{
-		    elemento -> cargarWidget( "../resources/interfaces/ElementoTicketPublico.glade" );
+		    elemento -> cargarWidget( "../recursos/interfaces/ElementoTicketPublico.glade" );
 			elemento -> establecerNombreWidget( "Ticket", to_string( (*ticket) -> obtenerFolio() ) );
 		    elemento -> establecerTextoEtiqueta( "ItemEntradaFolioInterno", clave.str() );
 		    elemento -> establecerTextoEtiqueta( "ItemEntradaFechaInterno", (*ticket) -> obtenerFecha() );
@@ -429,7 +429,7 @@ void publicoEliminarSeleccionado()
 	}
 
 	// Muestra un mensaje que indica que el registro fue eliminado correctamente
-	mostrarMensaje( "Registro eliminado" );
+	app_mostrar_mensaje( "Registro eliminado" );
 
 	// Cierra la ventana
 	interfaz.ocultarElemento( "VentanaSiNo" );
@@ -445,13 +445,13 @@ void publicoImprimirSeleccionado()
 	// Busca el ticket publico y lo imprime
 	TicketPublico *registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "FolioPublico" ) ), registrosPublicosConsultados );
 	if( registroPublico != nullptr ){
-		registroPublico -> imprimir( nombreEmpresa );
+		registroPublico -> imprimir( empresa_razon_social );
 
-		mostrarMensaje( "Formato de impresión creado." );
+		app_mostrar_mensaje( "Formato de impresión creado." );
 	}
 }
 
 void publicoGenerarInforme()
 {
-	mostrarMensaje( "Los informes para registros públicos\nno están disponibles." );
+	app_mostrar_mensaje( "Los informes para registros públicos\nno están disponibles." );
 }

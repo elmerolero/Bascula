@@ -39,7 +39,9 @@ ContenedorRegistros productos;
 ContenedorRegistros empresas;
 
 // Nombre de la empresa
-string nombreEmpresa;
+string empresa_razon_social;
+string empresa_rfc;
+string empresa_imagen;
 
 // Numero de copias a imprimir en el ticket
 unsigned int numeroFormatos = 0;
@@ -336,7 +338,7 @@ void finalizarRegistro( Ticket *ticket, bool esNuevo )
         database.query( consulta.str() );
         
         // Imprime el ticket
-        ticket -> imprimir( nombreEmpresa, numeroFormatos, numeroCopias );
+        ticket -> imprimir( empresa_razon_social, numeroFormatos, numeroCopias );
         
         // Remueve el ticket de los registros pendientes
         registrosInternosPendientes.remove( ticket );
@@ -441,7 +443,7 @@ void finalizarRegistroPublico( TicketPublico *registroPublico, bool esNuevo )
     database.close();
     
     // Imprime el ticket
-    registroPublico -> imprimir( nombreEmpresa );
+    registroPublico -> imprimir( empresa_razon_social );
     
     // Remueve el ticket de los registros pendientes
     registrosPublicosPendientes.remove( registroPublico );
@@ -449,68 +451,6 @@ void finalizarRegistroPublico( TicketPublico *registroPublico, bool esNuevo )
     // Elimina el ticket
     delete registroPublico;
     registroPublico = nullptr;
-}
-
-void registrarNombreEmpresa( std::string nombre )
-{
-    // Formato para validar la información
-    regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ.\\s]*" );
-
-    if( nombre.empty() ){
-        throw invalid_argument( "Es necesario registrar un nombre para su negocio." );
-    }
-
-    if( nombre.size() > 50 ){
-        throw invalid_argument( "El nombre excede la cantidad de caracteres permitidos." );
-    }
-
-    if( !regex_match( nombre, formato ) ){
-        throw invalid_argument( "El nombre introducido no es válido." );
-    }
-
-    try{
-        // Abre la base de datos
-        database.open( databaseFile );
-
-        // Realiza la consulta
-        database.query( "insert into empresa values ( '" + nombre + "' )" );
-
-        // Cierra la conexión
-        database.close();
-    }
-    catch( runtime_error &re ){
-        cerr << re.what();
-    }
-
-    cargarNombreEmpresa();
-}
-
-void cargarNombreEmpresa()
-{
-    try{
-        // Abre la base de datos
-        database.open( databaseFile );
-
-        // Realiza la consulta
-        database.query( "select * from empresa" );
-        if( results.size() > 0 ){
-            // Establece el nombre de la empresa
-            nombreEmpresa = (* results.at( 0 ))[ "nombre" ];
-
-            // Actualiza el nombre de la empresa
-            interfaz.establecerTextoEtiqueta( "NombreEmpresa", nombreEmpresa );
-            interfaz.mostrarElemento( "NombreEmpresa" );
-        }
-        else{
-            irHacia( nullptr, (void *)"RegistrarEmpresa" );
-        }
-
-        // Cierra la conexión
-        database.close();
-    }
-    catch( exception &e ){
-        cerr << e.what() << endl;
-    }
 }
 
 void cargarOpcionesImpresion()
@@ -570,10 +510,10 @@ void guardarConfiguracion()
         actualizarOpcionesImpresion();
     }
     catch( exception &ia ){
-        mostrarMensajeError( ia.what() );
+        app_mostrar_error( ia.what() );
     }
 
-    mostrarMensaje( "Configuración actualizada." );
+    app_mostrar_mensaje( "Configuración actualizada." );
     irHacia( nullptr, (void *)"Inicio" );
 }
 
@@ -704,10 +644,10 @@ void actualizarEstadoAdministrador()
 
     // Muestra mensaje
     if( opcion ){
-        mostrarMensaje( "Es administrador." );
+        app_mostrar_mensaje( "Es administrador." );
     }
     else{
-        mostrarMensaje( "No es administrador." );
+        app_mostrar_mensaje( "No es administrador." );
     }
 }
 
@@ -725,7 +665,7 @@ void eliminarUsuario()
 
             // Si solo hay un administrador o menos
             if( numeroAdministradores <= 1 ){
-                mostrarMensaje( "Es necesario que al menos exista un administrador.");
+                app_mostrar_mensaje( "Es necesario que al menos exista un administrador.");
                 return;
             }
             
@@ -737,13 +677,13 @@ void eliminarUsuario()
 
             // ¿El usuario que se eliminó es el usuario actual?
             if( usuarioConsultado -> obtenerNombreUsuario().compare( usuario.obtenerNombreUsuario() ) == 0 ){
-                mostrarMensaje( "Su usuario ha sido eliminado. Una vez abandonado el programa o\n"
+                app_mostrar_mensaje( "Su usuario ha sido eliminado. Una vez abandonado el programa o\n"
                                 "cerrado sesión, no será capaz de acceder al programa.\n"
                                 "En caso de volver a registrarse, no contará con permisos de\n"
                                 "administrador. ¡Hasta pronto!" );
             }
             else{
-                mostrarMensaje( "Usuario eliminado correctamente." ); 
+                app_mostrar_mensaje( "Usuario eliminado correctamente." ); 
             }
             
             registrosUsuarios.remove( usuarioConsultado );
@@ -752,7 +692,7 @@ void eliminarUsuario()
             irHacia( nullptr, (void *)"ConsultarUsuarios" );
         }
         catch( invalid_argument &ia ){
-            mostrarMensaje( "Ha ocurrido un error al intentar\neliminar el usuario." );
+            app_mostrar_mensaje( "Ha ocurrido un error al intentar\neliminar el usuario." );
         }
     }
 }
@@ -770,7 +710,7 @@ void actualizarRegistrosUsuarios( list< Usuario * > &usuarios, std::string idCon
         Widget *elemento = new Widget();
 
         try{
-            elemento -> cargarWidget( "../resources/interfaces/ElementoUsuario.glade" );
+            elemento -> cargarWidget( "../recursos/interfaces/ElementoUsuario.glade" );
             elemento -> establecerTextoEtiqueta( "ItemEntradaNombre", (*usuario) -> obtenerNombre() + " " + (*usuario) -> obtenerApellidos() );
             elemento -> establecerTextoEtiqueta( "ItemEntradaUsuario", (*usuario) -> obtenerNombreUsuario() );
             interfaz.insertarElementoAGrid( elemento, "ItemUsuario", idContenedor, 0, contador, 1, 1 );
@@ -799,7 +739,7 @@ void generarCodigoRecuperacion()
     }
 
     // Muestra el código generado
-    mostrarMensaje( "El código de recuperación es: " + codigo.str() );
+    app_mostrar_mensaje( "El código de recuperación es: " + codigo.str() );
 
     // Crea el hash para el código de recuperación
     SHA256 hashTool;
@@ -807,7 +747,7 @@ void generarCodigoRecuperacion()
 
     // Registra el código en la base de datos
     database.open( databaseFile );
-    database.query( "delete from codigos_recuperacion where nombre_usuario = '" + usuario + "'" );
+    database.query( "delete from codigos_recuperacion where id_usuario = '" + usuario + "'" );
     database.query( "insert into codigos_recuperacion values( '" + inputHash + "', '" + usuario + "')" );
 
     // Cierra la base de datos
@@ -835,7 +775,7 @@ void validarCodigoRecuperacion()
             
             // Compara el hash del código introducido con el hash de la base de datos
             if( codigoSeguridad.compare( codigo ) != 0 ){
-                mostrarMensajeError( "El código introducido no coincide con ningún código de\nrecuperación asignado al usuario indicado." );
+                app_mostrar_error( "El código introducido no coincide con ningún código de\nrecuperación asignado al usuario indicado." );
                 return;
             }
 
@@ -847,10 +787,10 @@ void validarCodigoRecuperacion()
             irA( "ReemplazarContrasena", false );
         }
         else{
-            mostrarMensajeError( "No se encontró un código de recuperación." );
+            app_mostrar_error( "No se encontró un código de recuperación." );
         }
     }
     catch( invalid_argument &ia ){
-        mostrarMensajeError( ia.what() );
+        app_mostrar_error( ia.what() );
     }
 }

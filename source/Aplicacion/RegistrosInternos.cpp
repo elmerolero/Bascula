@@ -142,11 +142,11 @@ void internoRegistrarPendiente()
 		// Crea o actualiza el ticket pendiente
 		if( esRegistroNuevo ){
 			crearRegistroPendiente( ticket );
-			mostrarMensajeError( "Registro creado correctamente." );
+			app_mostrar_error( "Registro creado correctamente." );
 		}
 		else{
 			actualizarRegistroPendiente( ticket );
-			mostrarMensajeError( "Registro actualizado correctamente." );
+			app_mostrar_error( "Registro actualizado correctamente." );
 		}
 
 		// Actualiza la lista de registros
@@ -157,7 +157,7 @@ void internoRegistrarPendiente()
 		folioActual--;
 	
 		// Muestra un mensaje de error al usuario
-		mostrarMensajeError( ia.what() );
+		app_mostrar_error( ia.what() );
 
 		// Si se estaba creando un ticket erróneo se elimina
 		if( esRegistroNuevo && ticket != nullptr ){
@@ -221,7 +221,7 @@ void internoFinalizarPendiente()
 			string descuento = interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" );
 			if( descuento.empty() ){
 				// Indica un error
-				mostrarMensajeError( "Es necesario establecer un descuento." );
+				app_mostrar_error( "Es necesario establecer un descuento." );
 
 				// Establece los parámetros para descuento
 				ticket -> establecerDescuento( 0.f );
@@ -269,7 +269,7 @@ void internoFinalizarPendiente()
 		}
 		else{
 			// No registra un peso neto
-			mostrarMensajeError( "Es necesario que el peso bruto y el peso tara se encuentren establecidos." );
+			app_mostrar_error( "Es necesario que el peso bruto y el peso tara se encuentren establecidos." );
 
 			// Si es registro nuevo elimina el ticket
 			if( esRegistroNuevo ){
@@ -294,11 +294,11 @@ void internoFinalizarPendiente()
 		regresarVista();
 
 		// Muestra un mensaje que indica que finalizó adecuadamente
-		mostrarMensajeError( "Registro finalizado. Se creará formato de impresión si la opción se encuentra habilitada." );
+		app_mostrar_error( "Registro finalizado. Se creará formato de impresión si la opción se encuentra habilitada." );
 	}
 	catch( invalid_argument &ia ){
 		/// Muestra un mensaje de error
-		mostrarMensajeError( ia.what() );
+		app_mostrar_error( ia.what() );
 
 		// Si es registro nuevo elimina el ticket
 		if( esRegistroNuevo ){
@@ -400,7 +400,7 @@ void internoActualizarRegistros( list< Ticket * > &tickets, std::string idConten
         clave << setfill( '0' ) << setw( 7 ) << (*ticket) -> obtenerFolio();
         
         try{
-			elemento -> cargarWidget( "../resources/interfaces/ElementoTicket.glade" );
+			elemento -> cargarWidget( "../recursos/interfaces/ElementoTicket.glade" );
 			elemento -> establecerNombreWidget( "Ticket", to_string( (* ticket) -> obtenerFolio() ).c_str() );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaFolioInterno", clave.str() );
 			elemento -> establecerTextoEtiqueta( "ItemEntradaFechaInterno", (*ticket) -> obtenerFecha() );
@@ -453,7 +453,7 @@ void internoObtenerPorFecha( list< Ticket * > &registros, std::string fecha )
 		}
 	}
 	else{
-		mostrarMensaje( "No se encontraron registros del día seleccionado." );
+		app_mostrar_mensaje( "No se encontraron registros del día seleccionado." );
 	}
 
 	// Cierra la base de datos
@@ -477,9 +477,9 @@ void internoImprimirSeleccionado()
 	Ticket *ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "FolioInterno" ) ), registrosInternosConsultados );
 
 	if( ticket != nullptr ){
-		ticket -> imprimir( nombreEmpresa, numeroFormatos, numeroCopias );
+		ticket -> imprimir( empresa_razon_social, numeroFormatos, numeroCopias );
 
-		mostrarMensaje( "Formato de impresión creado." );
+		app_mostrar_mensaje( "Formato de impresión creado." );
 	}
 }
 
@@ -514,7 +514,7 @@ void internoEliminarSeleccionado()
 	}
 
 	// Muestra un mensaje que indica que el registro fue eliminado correctamente
-	mostrarMensaje( "Registro eliminado" );
+	app_mostrar_mensaje( "Registro eliminado" );
 
 	// Cierra la ventana
 	interfaz.ocultarElemento( "VentanaSiNo" );
@@ -534,10 +534,10 @@ void internoSeleccionarDia()
 	interfaz.obtenerFechaCalendario( "EntradaDiaConsultar", &dia, &mes, &anio );
 
 	// Obtiene los tickets de la fecha seleccionada
-	internoObtenerPorFecha( registrosInternosConsultados, obtenerFecha( dia, mes + 1, anio ) );
+	internoObtenerPorFecha( registrosInternosConsultados, tiempo_construir_fecha( dia, mes + 1, anio ) );
 
 	// Establece la fecha del ticket que se está consultando
-	interfaz.establecerTextoEtiqueta( "TicketsRegistrados", "Registros del día " + obtenerFecha( dia, mes, anio ) + ":"  );
+	interfaz.establecerTextoEtiqueta( "TicketsRegistrados", "Registros del día " + tiempo_construir_fecha( dia, mes, anio ) + ":"  );
 
 	// Establece el número de tickets
 	interfaz.establecerTextoEtiqueta( "TicketsContados", to_string( registrosInternosConsultados.size() ) + " registros"  );
@@ -552,7 +552,7 @@ void internoSeleccionarDia()
 void internoObtenerRegistrosRango()
 {
 	// Muestra un mensaje que indica que se está generando el informe
-	mostrarMensaje( "Obteniendo registros.\nPor favor espere.");
+	app_mostrar_mensaje( "Obteniendo registros.\nPor favor espere.");
 
 	// Variables para el rango de seleccion de fechas
 	unsigned int diaInicio, mesInicio, anioInicio;
@@ -567,7 +567,7 @@ void internoObtenerRegistrosRango()
     				  "hora_salida, peso_bruto, peso_tara, descuento, peso_neto, manual_activado, observaciones, nombre_basculista "
     				  "from registros_internos join productos on registros_internos.clave_producto = productos.clave_producto "
     				  "join empresas on registros_internos.clave_empresa = empresas.clave_empresa where pendiente = 0 and fecha between '" + 
-    				  obtenerFecha( diaInicio, mesInicio + 1, anioInicio ) + "' and '" + obtenerFecha( diaFin, mesFin + 1, anioFin ) + "'";
+    				  tiempo_construir_fecha( diaInicio, mesInicio + 1, anioInicio ) + "' and '" + tiempo_construir_fecha( diaFin, mesFin + 1, anioFin ) + "'";
     database.open( databaseFile );
     database.query( consulta, "../resources/data/Registros.csv" );
     database.close();
@@ -581,7 +581,7 @@ void internoGenerarInforme()
 {
 /*
 	// Muestra un mensaje que indica que se está generando el informe
-	mostrarMensaje( "Generando informe.\nPor favor espere.");
+	app_mostrar_mensaje( "Generando informe.\nPor favor espere.");
 
 	// Archivo con el informe
     ofstream archivo;
@@ -589,7 +589,7 @@ void internoGenerarInforme()
 	// Se abre el archivo
     archivo.open( "../resources/data/Informe.csv", ios_base::out );
     if( !archivo ){
-        mostrarMensaje( "No se pudo abrir el archivo.\n"
+        app_mostrar_mensaje( "No se pudo abrir el archivo.\n"
         				"Asegúrate de que ningún programa esté haciendo uso de el archivo,\n"
         				"de tener espacio en el disco duro e inténtalo de nuevo." );
         return;
@@ -602,7 +602,7 @@ void internoGenerarInforme()
     // Establece el nombre de la empresa
     archivo << nombreEmpresa << endl
     		<< "Reportes de pesajes" << endl
-    		<< "Fecha:, " << obtenerFecha() << endl;
+    		<< "Fecha:, " << tiempo_obtener_fecha_corta() << endl;
 
     // Consulta a la base de datos
     string consulta = "select registros_internos.clave_empresa as clave_empresa, nombre_empresa, productos.clave_producto, nombre_producto, sum( peso_bruto ), " 

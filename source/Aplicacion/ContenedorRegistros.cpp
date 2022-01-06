@@ -5,6 +5,8 @@
 #include <stdexcept>
 #include <iomanip>
 #include "Aplicacion.h"
+#include "Senales.h"
+#include "Imagen.h"
 #include "GestorRegistros.h"
 using namespace std;
 
@@ -39,14 +41,14 @@ void ContenedorRegistros::obtenerRegistros()
     database.open( databaseFile );
 	
 	// Obtiene la clave actual de productos registrados
-    string consulta = "select max( clave_" + obtenerNombreSingular() + " ) as clave from " + obtenerNombrePlural();
+    string consulta = "select max( id_" + obtenerNombreSingular() + " ) as id from " + obtenerNombreSingular();
     database.query( consulta );
     if( results.size() > 0 ){
-        if( (* results.at( 0 ))[ "clave" ].empty() || (* results.at( 0 ))[ "clave" ].compare( "NULL" ) == 0 ){
-            claveActual = 0;
+        try{
+            claveActual = stoi( (* results.at( 0 ) )[ "id" ] );
         }
-        else{
-            claveActual = stoi( (* results.at( 0 ) )[ "clave" ] ); 
+        catch( invalid_argument &ia ){
+            claveActual = 0;
         }
     }
     else{
@@ -54,8 +56,9 @@ void ContenedorRegistros::obtenerRegistros()
     }
 	
     // Comando para la base de datos
-    consulta = "select * from " + obtenerNombrePlural();
+    consulta = "select * from " + obtenerNombreSingular();
     database.query( consulta );
+    database.close();
 	
     //  ¿Hay resultados?
     if( results.size() > 0 ){
@@ -83,10 +86,8 @@ void ContenedorRegistros::obtenerRegistros()
     completador = gtk_entry_completion_new();
     gtk_entry_completion_set_text_column( completador, 0);
     gtk_entry_completion_set_model( completador, GTK_TREE_MODEL( listaNombresRegistros ) );
-	
-    // Cierra la conexión con la base de datos
-    database.close();
 }
+
 
 Registro *ContenedorRegistros::agregarNuevoRegistro( string nombre )
 {
@@ -191,33 +192,33 @@ Registro *ContenedorRegistros::buscarRegistroPorNombre( string nombre )
 }
 
 // Actualiza la lista de registros en la interfaz de usuario
-void ContenedorRegistros::actualizarListaRegistros()
-{
+void ContenedorRegistros::actualizarListaRegistros(){
     // Limpia el contenedor
-    interfaz.removerElementosHijos( "ContenedorRegistros" );
+    limpiar_contenedor( "ContenedorRegistros" );
     
     // Itera a través de la lista de registros y los añade a la interfaz
     for( list< Registro * >::iterator registro = registros.begin(); registro != registros.end(); registro++ ){
-        // Crea un elemento que será añadido a la interfaz
-        Widget *elemento = new Widget();
+        GError *error = nullptr;
+        GtkBuilder *builder = gtk_builder_new();
         
+        // Clave del registro
         stringstream clave;
         clave << setfill( '0' ) << setw( 7 ) << (*registro) -> obtenerClave();
         
         try{
-	        elemento -> cargarWidget( "../resources/interfaces/ItemRegistro.glade" );
-            elemento -> establecerNombreWidget( "ItemRegistro", to_string( (*registro) -> obtenerClave() ) );
-	        elemento -> establecerTextoEtiqueta( "ItemEntradaClave", clave.str() );
-	        elemento -> establecerTextoEtiqueta( "ItemEntradaNombre", (*registro) -> obtenerNombre() );
-	        elemento -> establecerImagen( "ImagenRegistro", "../resources/images/icons/" + obtenerNombreSingular() + "64.png" );
+            gtk_builder_add_from_file( builder, "../recursos/interfaces/ItemRegistro.glade", &error );
+            gtk_widget_set_name( GTK_WIDGET( buscar_objeto( "ItemRegistro" ) ), to_string( (*registro) -> obtenerClave() ).c_str() );
+            gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemEntradaClave" ) ), clave.str().c_str() );
+            gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemEntradaNombre" ) ), (*registro) -> obtenerNombre().c_str() );
+            gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenRegistro" ) ), ("../resources/images/icons/" + obtenerNombreSingular() + "64.png").c_str() );
 	    
-	        interfaz.insertarElementoListBox( elemento, "ItemRegistro", "ContenedorRegistros", (*registro) -> obtenerClave());
+            gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( "ContenedorRegistros" ) ), GTK_WIDGET( buscar_objeto( "ItemRegistro" ) ), (*registro) -> obtenerClave() );
 	    }
 	    catch( runtime_error &re ){
 		    cerr << re.what() << endl;
 	    }
 	
-	    delete elemento;
+	    gtk_widget_destroy( GTK_WIDGET( builder ) );
     }
 	
 }

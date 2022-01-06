@@ -4,11 +4,136 @@
 #include <stdexcept>
 using namespace std;
 
+GtkBuilder *builder = nullptr;
+std::vector< GdkPixbuf * > imagenesRegistros;
+
 // Constructor sin argumentos
 Widget::Widget():
     builder( nullptr )
 {
     // Nada por hacer
+}
+
+/*void leer_widget_seleccionado_listbox( string id ){
+    // Busca el renglón seleccionado y si no se ha seleccionado ninguno, lanza un excepción
+    GtkListBoxRow *row = 
+
+    // Retorna el nombre del widget seleccionado
+	return gtk_bin_get_child( GTK_BIN( row ) );
+}*/
+
+void Widget::establecerBuildable( GtkBuilder *buildable ){
+    this -> builder = buildable;
+}
+
+GObject *buscar_objeto( string id ){
+    return gtk_builder_get_object( builder, id.c_str() );
+}
+
+void conectar_senal( Signal &senal, gpointer data ){
+    cout << "conectar_senal" << endl;
+    // Si hay una señal asociada al mismo, la desconecta
+    if( senal.id > 0 ){
+        desconectar_senal( senal );
+    }
+
+    // Obtiene el objeto indicado por el ID
+    GObject *objeto = gtk_builder_get_object( builder, senal.object.c_str() );
+
+    // Conecta la señal dada y la función dada con ese objeto
+    senal.id = g_signal_connect( objeto, senal.type.c_str(), senal.callback, data );
+}
+
+void desconectar_senal( Signal &senal ){
+    cout << "desconectar_senal" << endl;
+    // Obtiene el objeto indicado por la señal
+    GObject *objeto = gtk_builder_get_object( builder, senal.object.c_str() );
+
+    if( senal.id > 0 ){
+        // Desconecta la señal
+        g_signal_handler_disconnect( objeto, senal.id );
+    }
+    
+    // Establece el identificador en cero
+    senal.id = 0;
+}
+
+string obtener_nombre_elemento( string id ){
+    GObject *objeto = gtk_builder_get_object( builder, id.c_str() );
+
+    return gtk_widget_get_name( GTK_WIDGET( objeto ) );
+}
+
+void limpiar_contenedor( string idContenedor ){
+    // Necesarios
+    GList *hijos, *iterador;
+   
+    // Libera las imágenes de los registros contenedores
+    for( GdkPixbuf *imagenRegistro : imagenesRegistros ){
+        g_object_unref( imagenRegistro );
+    }
+
+    imagenesRegistros.clear();
+
+    // Obtiene ol contenedor con el id indicado
+    GObject *contenedor = buscar_objeto( idContenedor );
+    hijos = gtk_container_get_children( GTK_CONTAINER( contenedor ) );
+    for( iterador = hijos; iterador != NULL; iterador = g_list_next( iterador ) ){
+        gtk_widget_destroy( GTK_WIDGET( iterador -> data ) );
+    }
+    
+    // Libera las listas
+    g_list_free( hijos );
+}
+
+const char *obtener_texto_entrada( string id ){
+    // Obtiene el objeto que necesita
+    GObject *objeto =  gtk_builder_get_object( builder, id.c_str() );
+    
+    // Retorna el objeto
+    return gtk_entry_get_text( GTK_ENTRY( objeto ) );
+}
+
+void establecer_texto_entrada( string id, string texto ){
+    // Obtiene la entrada con el id indicado
+    GObject *objeto = gtk_builder_get_object( builder, id.c_str() );
+    
+    // Establece el texto en la entrada
+    gtk_entry_set_text( GTK_ENTRY( objeto ), texto.c_str() );
+}
+
+void establecer_texto_etiqueta( string id, string texto ){
+    // Obtiene el item solicitado
+    GObject *item = gtk_builder_get_object( builder, id.c_str() );
+
+    // Establece la etiqueta adecuada
+    if( item == NULL ){
+        throw runtime_error( "El objeto con el ID " + id + " no se encuentra." );
+    }
+
+    // Muestra el elemento
+    gtk_label_set_text( GTK_LABEL( item ), texto.c_str() );
+}
+
+void mostrar_elemento( string id ){
+    // Obtiene el elemento que se desea mostrar
+    GObject const *objeto = gtk_builder_get_object( builder, id.c_str() );
+
+    // ¿El objeto solicitado no se encuentra?
+    if( objeto == NULL ){
+        throw runtime_error( "El objeto con el ID " + id + " no se encuentra." );
+    }
+    
+    // Se muestra el objeto
+    gtk_widget_show( GTK_WIDGET( objeto ) );
+}
+    
+void ocultar_elemento( string id ){
+    // Obtiene el objeto indicado por la señal
+    GObject *objeto = gtk_builder_get_object( builder, id.c_str() );
+
+    // Se oculta el objeto
+    gtk_widget_hide( GTK_WIDGET( objeto ) );
 }
 
 // Destructor
@@ -29,14 +154,12 @@ void Widget::cargarWidget( string archivo )
 {
     // Elemento para obtener los errores que ocurran al cargar el widget
     GError *error = nullptr;
-
-    // Crea el builder
     builder = gtk_builder_new();
 
     // ¿Ocurre algún error al cargar el archivo?
     if( gtk_builder_add_from_file( builder, archivo.c_str(), &error ) == 0 ){
         // Lanza una excepcion
-        throw runtime_error( "Error al cargar el archivo " + archivo + "." );
+        throw runtime_error( "<- Widget::cargarWidget() Error al cargar el archivo " + archivo + "." ); 
     }
 }
 
@@ -214,7 +337,7 @@ void Widget::ocultarElemento( string id ) const
         throw runtime_error( "El objeto con el ID " + id + "no se encuentra." );
     }
     
-    // Se muestra el objeto
+    // Se oculta el objeto
     gtk_widget_hide( GTK_WIDGET( objeto ) );
 }
 
@@ -319,24 +442,21 @@ void Widget::establecerActivoComboBoxText( std::string idComboBox, std::string i
 }
 
 // Obtiene la opcion seleccionada
-const char *Widget::obtenerOpcionComboBoxText( std::string idComboBox )
-{
+const char *Widget::obtenerOpcionComboBoxText( std::string idComboBox ){
     GObject *objeto = obtenerObjeto( idComboBox.c_str() );
     
     return gtk_combo_box_text_get_active_text( GTK_COMBO_BOX_TEXT( objeto ) );
 }
 
 // Limpia el combobox text indicado removiendo todas las opciones
-void Widget::limpiarComboBoxText( std::string idComboBox )
-{
+void Widget::limpiarComboBoxText( std::string idComboBox ){
     GObject *objeto = obtenerObjeto( idComboBox.c_str() );
     
     gtk_combo_box_text_remove_all( GTK_COMBO_BOX_TEXT( objeto ) );
 }
 
 // Establece la fecha en el calendario
-void Widget::establecerFechaCalendario( std::string idCalendario, unsigned int dia, unsigned int mes, unsigned int anio )
-{
+void Widget::establecerFechaCalendario( std::string idCalendario, unsigned int dia, unsigned int mes, unsigned int anio ){
     GObject *objeto = obtenerObjeto( idCalendario );
 
     // Establece el día y el mes
@@ -345,8 +465,7 @@ void Widget::establecerFechaCalendario( std::string idCalendario, unsigned int d
 }
 
 // Obtiene la fecha de la entrada de calendario dada
-void Widget::obtenerFechaCalendario( std::string idCalendario, unsigned int *dia, unsigned int *mes, unsigned int *anio )
-{
+void Widget::obtenerFechaCalendario( std::string idCalendario, unsigned int *dia, unsigned int *mes, unsigned int *anio ){
     // Obtiene el calendario
     GObject *objeto = obtenerObjeto( idCalendario );
 
@@ -355,16 +474,14 @@ void Widget::obtenerFechaCalendario( std::string idCalendario, unsigned int *dia
 }
 
 // Permite cargar una imagen desde archivo para un GtkImage
-void Widget::establecerImagen( string idImagen, string archivo )
-{
+void Widget::establecerImagen( string idImagen, string archivo ){
     GObject *objeto = obtenerObjeto( idImagen.c_str() );
     
     gtk_image_set_from_file( GTK_IMAGE( objeto ), archivo.c_str() );
 }
 
 // Obtiene el ancho de un Widget
-unsigned int Widget::obtenerAnchoWidget( string idWidget )
-{
+unsigned int Widget::obtenerAnchoWidget( string idWidget ){
     GObject *objeto = obtenerObjeto( idWidget );
 
     return gtk_widget_get_allocated_width( GTK_WIDGET( objeto ) );
@@ -378,8 +495,7 @@ unsigned int Widget::obtenerAltoWidget( string idWidget )
     return gtk_widget_get_allocated_height( GTK_WIDGET( objeto ) );
 }
 
-void Widget::removerElementosHijos( std::string idContenedor )
-{
+void Widget::removerElementosHijos( std::string idContenedor ){
     // Necesarios
     GList *hijos, *iterador;
    

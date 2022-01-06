@@ -3,9 +3,10 @@
 #include <vector>
 #include <unordered_map>
 #include <fstream>
+#include <iostream>
 using namespace std;
 
-string databaseFile = "../resources/data/libcurlmbs.dll";
+string databaseFile = "../recursos/datos/database.dat";
 vector< unordered_map< string, string > * > results;
 vector< string > nameColumns;
 
@@ -25,6 +26,7 @@ Database::~Database()
 // Connects with the database
 void Database::open( string file )
 {
+	cout << "database_open" << endl;
 	int status = sqlite3_open( file.c_str(), &ptrDatabase );
 	if( status ){
 		throw runtime_error( "Error trying to open database \'" + file + "\'."  );
@@ -34,7 +36,8 @@ void Database::open( string file )
 // Queries the database
 void Database::query( string query )
 {
-	// Deletes the last results
+	cout << "database_query" << endl;
+	// Deletes the last results 
 	clear();
 
     // Makes the query
@@ -43,10 +46,11 @@ void Database::query( string query )
 		throw runtime_error( "Error querying. Error: " + error() );
 	}
 }
-
+ 
 // Queries the database and saves the results into a CSV file
 void Database::query( string query, string fileName )
 {
+	cout << "database_query" << endl;
 	// File where file will be saved
 	ofstream outputFile;
 
@@ -85,9 +89,10 @@ void Database::query( string query, string fileName )
 }
 
 // Gets the error
-string Database::error() const
-{
+string Database::error() const{
+	cout << "database_error" << endl;
 	string error = ( errorMessage != nullptr ? errorMessage : "Unknown error" );
+	cout << error << endl;
 	
 	return error;
 }
@@ -95,6 +100,7 @@ string Database::error() const
 // Closes the database
 void Database::close()
 {
+	cout << "database_close" << endl;
 	// If is really open a database
 	if( ptrDatabase != nullptr ){
 		sqlite3_close( ptrDatabase );
@@ -122,23 +128,31 @@ void Database::clear()
 // Called when a query is made
 int buildResults( void * notUsed, int numberColumns, char **columns, char **columnNames )
 {
-	// Creates a new Row
-	unordered_map< string, string > *result = new unordered_map< string, string >();
-	
-	// Adds the columns names if (first time)
-	if( results.empty() ){
-		for( int count = 0; count < numberColumns; ++count ){
-			nameColumns.push_back( columnNames[ count ] );
+	// Valida que ambos valores se encuentren en resultados
+	if( columns[ 0 ] != nullptr && columnNames[ 0 ] != nullptr ){
+		// Creates a new Row
+		unordered_map< string, string > *result = new unordered_map< string, string >();
+		
+		// Adds the columns names if (first time)
+		if( results.empty() ){
+			for( int count = 0; count < numberColumns; ++count ){
+				nameColumns.push_back( columnNames[ count ] );
+			}
 		}
-	}
 
-	// Adds the columns found
-	for( int count = 0; count < numberColumns; ++count ){
-		result -> insert( make_pair( columnNames[ count ], columns[ count ] ) );
-	}
+		// Adds the columns found
+		for( int count = 0; count < numberColumns; ++count ){
+			if( columns[ count ] != NULL ){
+				result -> insert( make_pair( columnNames[ count ], columns[ count ] ) );
+			}
+			else{
+				result -> insert( make_pair( columnNames[ count ], "null" ) );
+			}
+		}
 
-	// Adds he row to vector of rows
-	results.push_back( result );
+		// Adds he row to vector of rows
+		results.push_back( result );
+	}
 	
 	return 0;
 }

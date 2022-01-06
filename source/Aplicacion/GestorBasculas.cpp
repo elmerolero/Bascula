@@ -6,6 +6,7 @@
 #include <iostream>
 #include <unordered_map>
 #include <thread>
+#include "Database.h"
 using namespace std;
 
 // Lista de las básculas creadas
@@ -79,42 +80,40 @@ void basculaLecturaActualizar()
 }
 
 // Obtiene las básculas registradas en la base de datos
-void basculaObtenerRegistros()
-{
-    // Obtiene las básculas registradas en la base de datos
-    string consulta = "select * from basculas";
-    database.open( databaseFile );
-    database.query( consulta );
-    database.close();
-    if( results.size() > 0 ){
-        for( auto *renglon : results ){
-            // Crea el objeto para ese registro
-            Bascula *bascula = new Bascula( renglon );
+void basculaObtenerRegistros(){
+    cout << "bascula_obtener_registros" << endl;
 
-            // Lo añade al grupo de básculas
-            basculasRegistradas.push_back( bascula );
-        }
-    }
+    try{
+        // Obtiene las básculas registradas en la base de datos
+        string consulta = "select * from basculas";
+        database.open( databaseFile );
+        database.query( consulta );
+        database.close();
+        
+        if( results.size() > 0 ){ 
+            for( auto *renglon : results ){
+                // Crea el objeto para ese registro
+                Bascula *bascula = new Bascula( renglon );
 
-    // Obtiene el codigo máximo registrado
-    consulta = "select max( clave ) as clave from basculas";
-    database.open( databaseFile );
-    database.query( consulta );
-    database.close();
-    if( results.size() > 0 ){
-        try{
-            codigoBasculaActual = stoi( (* results.at( 0 ))[ "clave" ] );
+                // Lo añade al grupo de básculas
+                basculasRegistradas.push_back( bascula );
+            }
         }
-        catch( invalid_argument &ia ){
-            codigoBasculaActual = 0;
-        }
-    }
-    else{
-        codigoBasculaActual = 0;
-    }
+        
+        // Obtiene el codigo máximo registrado
+        consulta = "select max( clave ) as clave from basculas";
+        database.open( databaseFile );
+        database.query( consulta );
+        database.close();
 
-    // Actualiza la vista de básculas registradas
-    basculaActualizarRegistros();
+        codigoBasculaActual = ( results.size() > 0 ? stoi( (* results.at( 0 ))[ "clave" ] ) : 0 );
+
+        // Actualiza la vista de básculas registradas
+        basculaActualizarRegistros();
+    }
+    catch( runtime_error re ){
+        throw re;
+    }
 }
 
 // Obtiene todos los puertos disponibles
@@ -142,7 +141,7 @@ void basculaObtenerPuertosDisponibles()
 	}
 
 	if( contadorDispositivos < 1 ){
-        mostrarMensaje( "No se detectaron básculas." );
+        app_mostrar_mensaje( "No se detectaron básculas." );
 	}
 }
 
@@ -185,13 +184,13 @@ void basculaGuardar()
         regresarVista();
 
         // Indica que se añadió la báscula correctamente
-        mostrarMensajeError( "Báscula agregada correctamente." );
+        app_mostrar_error( "Bascula agregada correctamente." );
     }
     catch( invalid_argument &ia ){
         --codigoBasculaActual;
-        mostrarMensajeError( ia.what() );
+        app_mostrar_error( ia.what() );
     }
-
+ 
 }
 
 void basculaNuevo( Bascula *bascula )
@@ -217,7 +216,7 @@ void basculaNuevo( Bascula *bascula )
         basculasRegistradas.push_back( bascula );
     }
     catch( invalid_argument &ia ){
-        mostrarMensajeError( ia.what() );
+        app_mostrar_error( ia.what() );
     }
 }
 
@@ -240,7 +239,7 @@ void basculaEditar( Bascula *bascula )
         database.close();
     }
     catch( invalid_argument &ia ){
-        mostrarMensajeError( ia.what() );
+        app_mostrar_error( ia.what() );
     }
 }
 
@@ -270,49 +269,54 @@ void basculaEliminar()
         basculaActualizarRegistros();
 
         // Indica que se añadió la báscula correctamente
-        mostrarMensajeError( "Báscula eliminada correctamente." );
+        app_mostrar_error( "Báscula eliminada correctamente." );
     }
     catch( invalid_argument &ia ){
-        mostrarMensajeError( ia.what() );
+        app_mostrar_error( ia.what() );
     }
 }
 
 void basculaActualizarRegistros()
 {
-    // Limpia los contenedores
-    interfaz.removerElementosHijos( "ContenedorBasculas" );
-    interfaz.limpiarComboBoxText( "BasculasRegistradas" );
-    interfaz.agregarOpcionComboBoxText( "BasculasRegistradas", "Seleccionar", NULL );
-	interfaz.establecerOpcionComboBox( "BasculasRegistradas", 0 );
+    try{
+        // Limpia los contenedores
+        interfaz.removerElementosHijos( "ContenedorBasculas" );
+        interfaz.limpiarComboBoxText( "BasculasRegistradas" );
+        interfaz.agregarOpcionComboBoxText( "BasculasRegistradas", "Seleccionar", NULL );
+        interfaz.establecerOpcionComboBox( "BasculasRegistradas", 0 );
 
-    // Para cada una de las básculas registradas
-    for( Bascula *bascula : basculasRegistradas ){
-        // Crea un elemento que será añadido a la interfaz
-        Widget *elemento = new Widget();
+        // Para cada una de las básculas registradas
+        for( Bascula *bascula : basculasRegistradas ){
+            // Crea un elemento que será añadido a la interfaz
+            Widget *elemento = new Widget();
 
-        // Carga el elemento y lo ancla hacia las opciones
-        elemento -> cargarWidget( "../resources/interfaces/ElementoBascula.glade" );
-        elemento -> establecerNombreWidget( "ItemBascula", to_string( bascula -> obtenerCodigo() ) );
-        elemento -> establecerTextoEtiqueta( "ItemBasculaNombre", bascula -> obtenerNombre() );
-        elemento -> establecerTextoEtiqueta( "ItemBasculaPuerto", bascula-> obtenerPuerto() );
-        elemento -> establecerTextoEtiqueta( "ItemBasculaVelocidad", to_string( bascula -> obtenerBaudRate() ) + " bps"  );
+            // Carga el elemento y lo ancla hacia las opciones
+            elemento -> cargarWidget( "../recursos/interfaces/ElementoBascula.glade" );
+            elemento -> establecerNombreWidget( "ItemBascula", to_string( bascula -> obtenerCodigo() ) );
+            elemento -> establecerTextoEtiqueta( "ItemBasculaNombre", bascula -> obtenerNombre() );
+            elemento -> establecerTextoEtiqueta( "ItemBasculaPuerto", bascula-> obtenerPuerto() );
+            elemento -> establecerTextoEtiqueta( "ItemBasculaVelocidad", to_string( bascula -> obtenerBaudRate() ) + " bps"  );
 
-        // Lo agrega al contenedor y la lista de basculas registradas
-        interfaz.insertarElementoListBox( elemento, "ItemBascula", "ContenedorBasculas", bascula -> obtenerCodigo() );
-        interfaz.agregarOpcionComboBoxText( "BasculasRegistradas", bascula -> obtenerNombre(), NULL );
+            // Lo agrega al contenedor y la lista de basculas registradas
+            interfaz.insertarElementoListBox( elemento, "ItemBascula", "ContenedorBasculas", bascula -> obtenerCodigo() );
+            interfaz.agregarOpcionComboBoxText( "BasculasRegistradas", bascula -> obtenerNombre(), NULL );
 
-        // Elimina el widget creado
-        delete elemento;
+            // Elimina el widget creado
+            delete elemento;
+        }
+
+        // Si no hay basculas registradas muestra un mensaje de vacío
+        if( basculasRegistradas.size() < 1 ){
+            interfaz.mostrarElemento( "MensajeBasculas" );
+            interfaz.ocultarElemento( "ContenedorBasculas" );
+        }
+        else{
+            interfaz.mostrarElemento( "ContenedorBasculas" );
+            interfaz.ocultarElemento( "MensajeBasculas" );
+        }
     }
-
-    // Si no hay basculas registradas muestra un mensaje de vacío
-    if( basculasRegistradas.size() < 1 ){
-        interfaz.mostrarElemento( "MensajeBasculas" );
-        interfaz.ocultarElemento( "ContenedorBasculas" );
-    }
-    else{
-        interfaz.mostrarElemento( "ContenedorBasculas" );
-        interfaz.ocultarElemento( "MensajeBasculas" );
+    catch( runtime_error &re ){
+        throw re;
     }
 }
 
@@ -346,11 +350,11 @@ void basculaRegistrarPeso( string etiquetaPeso, string etiquetaHora )
         if( bascula != nullptr ){
             string peso = pesoString( bascula -> leer(), 2, true );
             interfaz.establecerTextoEtiqueta( etiquetaPeso, peso );
-            interfaz.establecerTextoEtiqueta( etiquetaHora, obtenerHora() );
+            interfaz.establecerTextoEtiqueta( etiquetaHora, tiempo_leer_hora( 1 ) );
         }
         else{
             interfaz.establecerTextoEtiqueta( etiquetaPeso, "0.00 kg" );
-            interfaz.establecerTextoEtiqueta( etiquetaHora, obtenerHora() );
+            interfaz.establecerTextoEtiqueta( etiquetaHora, tiempo_leer_hora( 1 ) );
         }
     }
     catch( exception e ){

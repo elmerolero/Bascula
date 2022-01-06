@@ -14,8 +14,8 @@ void mostrarUsuario();
 void nombreUsuarioOcupado( std::string nombreUsuario );
 void autorizarCambios();
 std::string crearSal();
-std::string crearHash( std::string contrasena );
-void verificarContrasena( std::string contrasena, std::string sal, std::string hash );
+
+void verificarContrasena( std::string contrasena, std::string hash );
 void cambiarContrasenaUsuario();
 void cambiarContrasena( std::string nombreUsuario, std::string contrasena, std::string confirmacion );
 bool existenUsuariosRegistrados();

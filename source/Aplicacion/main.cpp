@@ -4,15 +4,13 @@
 #include <stdexcept>
 using namespace std;
 
-
-
 void actualizarTiempo( GtkWidget *widget, gpointer ptr );
 void establecerUsuario( GtkWidget *widget, gpointer ptr );
 
 int main( int argc, char *argv[] )
 {
     // Activa la aplicacion
-    aplicacionActiva = true;
+    //aplicacionActiva = true;
 
     try{
         // Crea la aplicación 
@@ -26,13 +24,13 @@ int main( int argc, char *argv[] )
         ofstream log;
 
         // Se abre el archivo
-        log.open( "../resources/log.txt", ios_base::out | ios_base::app );
+        log.open( "../recursos/log.txt", ios_base::out | ios_base::app );
         if( !log ){
             throw runtime_error( "Error" );
         }
 
         // Indica el tipo de error generado
-        log << "[Fecha: " << obtenerFecha() << " Hora: " << obtenerHora() << "]: " << e.what() << endl;
+        log << "[Fecha: " << tiempo_leer_fecha_corta() << " Hora: " << tiempo_leer_hora( 1 ) << "]: " << e.what() << endl;
 
         // Cierra el archivo
         log.close();

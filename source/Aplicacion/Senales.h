@@ -8,7 +8,7 @@ extern Signal ventanaPrincipal;
 extern Signal enlaceRegresar;
 
 // 
-extern Signal botonRegistrarEmpresaPropia;
+extern Signal botonInicioRazonSocial;
 extern Signal botonRegistros;
 extern Signal botonUsuarios;
 

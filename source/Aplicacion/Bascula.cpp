@@ -22,6 +22,15 @@ Bascula::Bascula( unordered_map< string, string > *renglon )
 	    throw invalid_argument( "El renglón que se desea asignar está vacío." );
     }
 
+	cout << "Clave: " << (* renglon)[ "clave" ] << endl
+        << "Nombre: " << (* renglon)[ "nombre" ] << endl
+		<< "Puerto: " << (* renglon)[ "puerto" ] << endl
+		<< "Baudrate: " << (* renglon)[ "baudrate" ] << endl
+		<< "Bytesize: " << (* renglon)[ "bytesize" ] << endl
+		<< "Parity: " << stoi( (* renglon)[ "parity" ] ) << endl
+		<< "StopBits: " << (* renglon)[ "stopbits" ] << endl
+		<< "Bytes ignorades: " << (* renglon)[ "ignoredbytes" ] << endl << endl;
+
 	// Establece los datos solicitados
 	establecerCodigo( (* renglon)[ "clave" ] );
     establecerNombre( (* renglon)[ "nombre" ] );
@@ -156,7 +165,7 @@ void Bascula::establecerCodigo( unsigned int codigo )
     catch( invalid_argument &ia ){
         throw invalid_argument( "Se ha especificado un código no válido." );
     }
-}
+} 
 
 unsigned int Bascula::obtenerCodigo() const
 {

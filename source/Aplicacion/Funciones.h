@@ -5,6 +5,7 @@
 #include <list>
 #include <string>
 #include "Ticket.h"
+#include "sha256.h"
 
 extern Registro *registro;
 
@@ -20,5 +21,6 @@ std::string pesoString( double, int, bool );
 std::string encriptar( std::string cadena, int numero );
 std::string desencriptar( std::string cadena, int numero );
 unsigned int obtenerFolioSelector( GtkListBoxRow *row );
+std::string crearHash( std::string contrasena );
 
 #endif

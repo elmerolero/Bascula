@@ -9,6 +9,7 @@
 #include <iostream>
 #include "GestorRegistros.h"
 #include "Vistas.h"
+#include "Producto.h"
 using namespace std;
 
 // Banderas
@@ -16,41 +17,48 @@ bool descuentoCalculado = false;
 
 // Registro a crear
 Registro *registro;
-
-void crearRegistro( GtkWidget *widget, gpointer data )
-{
-	// Convierte el apuntador void a un apuntador ContenedorRegistros
-	ContenedorRegistros *contenedor = static_cast< ContenedorRegistros * >( data );
-
-	// Lee el nombre del nuevo registro
-	string nombreRegistro = interfaz.obtenerTextoEntrada( "EntradaNombreNuevoRegistro" );
-	
-	// Verifica que no exista un registro con ese nombre
-	Registro *registro = contenedor -> buscarRegistroPorNombre( nombreRegistro );
-	if( registro != nullptr ){
-		mostrarMensajeError( "El registro que desea agregar ya existe." );
-		return;
-	}
+ 
+void crearRegistro( GtkWidget *widget, gpointer data ){
+	cout << "crear_registro" << endl;
 
 	try{
-		// Añade el nuevo registro y e valida que hubiera sido creada satisfactoriamente
-		registro = contenedor -> agregarNuevoRegistro( nombreRegistro );
-		if( registro == nullptr ){
-			mostrarMensajeError( "Ha ocurrido un error al crear un nuevo registro en " + contenedor -> obtenerNombrePlural() );
+		// Lee el nombre del nuevo registro
+		string nombreRegistro = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreNuevoRegistro" ) ) );
+		producto_validar_nombre( nombreRegistro );
+
+		// Verifica que no exista un registro con ese nombre
+		stringstream consulta;
+		consulta << "select * from " << (char *)data << " where nombre like '%" << nombreRegistro << "'";
+		database.open( databaseFile );
+		database.query( consulta.str() );
+		database.close();
+
+		if( results.size() > 0 ){
+			cout << "llegue a qui" << endl;
+			app_mostrar_error( "El registro que desea agregar ya existe." );
 			return;
 		}
 
+		consulta.str( "" );
+		consulta << "insert into " << (char *)data << " values( null, '" << nombreRegistro << "', null, null )";
+	   	database.open( databaseFile );
+		database.query( consulta.str() );
+	   	database.close();
+
 		// Actualizar la lista de registros
-		contenedor -> actualizarListaRegistros();
+		//contenedor -> actualizarListaRegistros();
 		
 		// Regresa hacia atrás
 		regresarVista();
+		regresarVista();
 
 		// Muestra que el registro se creo correctamente y vuelve hacia la vista de registros
-		mostrarMensajeError( "Registro creado correctamente." );
+		app_mostrar_error( "Registro creado correctamente." );
+
+		producto_listar_registros( nullptr, nullptr );
 	}
 	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
+		app_mostrar_error( ia.what() );
 	}
 }
 
@@ -72,7 +80,7 @@ void actualizarRegistro( GtkWidget *widget, gpointer data )
 		// Verifica que no exista un registro con el nuevo nombre que desea establecer
 		Registro *coincidencia = contenedor -> buscarRegistroPorNombre( nuevoNombre );
     	if( coincidencia != nullptr ){
-	    	mostrarMensajeError( "Ya existe un registro con ese nombre." );
+	    	app_mostrar_error( "Ya existe un registro con ese nombre." );
 			return;
     	}
 
@@ -87,53 +95,59 @@ void actualizarRegistro( GtkWidget *widget, gpointer data )
 		
 		// Regresar
 		regresarVista();
+		regresarVista();
+
+		producto_listar_registros( nullptr, nullptr );
 
 		// Muestra un mensaje de registro exitoso
-		mostrarMensajeError( "Registro actualizado correctamente." );
+		app_mostrar_error( "Registro actualizado correctamente." );
 	}
 	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
+		app_mostrar_error( ia.what() );
 	}
 }
 
-void eliminarRegistro( GtkWidget *widget, gpointer data )
-{
-	// Obtiene el contenedor del que se desea eliminar el registro
-	ContenedorRegistros *contenedor = static_cast< ContenedorRegistros * >( data );
+void eliminarRegistro( GtkWidget *widget, gpointer data ){
+	// Obtiene el id del registro
+	//unsigned int id = stoi(  );
 
-	// Obtiene la clave del registro seleccionado
-	unsigned int clave = stoi( interfaz.obtenerWidgetSeleccionadoListBox( "ContenedorRegistros" ) );
+	// Comando de consulta
+	stringstream consulta;
 
-	// Recupera el registro por si clave
-	Registro *registro = contenedor -> buscarRegistroPorClave( clave );
-	if( registro == nullptr ){
-		throw runtime_error( "Ocurrió un problema al recuperar el registro seleccionado." );
-	}
-
-	// Elimina el registro obtenido
-	contenedor -> eliminarRegistro( registro );
+	// 
+	/*consulta << "delete * from where id_producto = " 
+			 << gtk_widget_get_name( GTK_WIDGET ( gtk_bin_get_child( GTK_BIN( gtk_list_box_get_selected_row( GTK_LIST_BOX( buscar_objeto( "ContenedorRegistros" ) ) ) ) ) ) )
+			 << */
+	consulta << "delete from " << (char *)data << " where id_producto = " 
+			 << gtk_widget_get_name( GTK_WIDGET ( gtk_bin_get_child( GTK_BIN( gtk_list_box_get_selected_row( GTK_LIST_BOX( buscar_objeto( "ContenedorRegistros" ) ) ) ) ) ) );
+			
+	database.open( databaseFile );
+	database.query( consulta.str() );
+	database.close();
 
 	// Actualiza la vista de registros
-	contenedor -> actualizarListaRegistros();
+	//contenedor -> actualizarListaRegistros();
 
 	// Cierra el mensaje de alerta
-	interfaz.ocultarElemento( "VentanaSiNo" );
+	gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
+
+	regresarVista();
+	producto_listar_registros( nullptr, nullptr );
 }
 
 void cancelarAccion() 
 {
-	interfaz.ocultarElemento( "VentanaSiNo" );
+	gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
 }
 
 // 
-void registroCancelarEdicion( GtkWidget *widget, gpointer ptr )
-{
+void registroCancelarEdicion( GtkWidget *widget, gpointer ptr ){
 	// Oculta el formato de entrada de datos y muestra la etiqueta con el nombre orignal
-	interfaz.ocultarElemento( "EntradaNombreRegistro" );
-	interfaz.mostrarElemento( "EtiquetaNombreRegistro" );
+	gtk_widget_hide( GTK_WIDGET( buscar_objeto( "EntradaNombreRegistro" ) ) );
+	gtk_widget_show( GTK_WIDGET( buscar_objeto( "EtiquetaNombreRegistro" ) ) );
 	
 	// Oculta los botones de control de edicion
-	interfaz.ocultarElemento( "ControlesEdicionRegistro" );
+	gtk_widget_hide( GTK_WIDGET( buscar_objeto( "ControlesEdicionRegistro" ) ) );
 }
 
 // Convierte las letras minúsculas a mayúsculas
@@ -155,12 +169,12 @@ void registrarEmpresa()
 	string nombreEmpresa = interfaz.obtenerTextoEntrada( "EntradaNombreEmpresaPropia" );
 
 	try{
-		registrarNombreEmpresa( nombreEmpresa );
-		cargarNombreEmpresa();
+		//registrarNombreEmpresa( nombreEmpresa );
+		//cargarNombreEmpresa();
 		irHacia( nullptr, (void *)"Inicio" );
 	}
 	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
+		app_mostrar_error( ia.what() );
 	}
 }
 
@@ -212,4 +226,10 @@ unsigned int obtenerFolioSelector( GtkListBoxRow *row )
 {
 	GtkWidget *item = gtk_bin_get_child( GTK_BIN( row ) );
 	return stoi( gtk_widget_get_name( item ) );
+}
+
+string crearHash( std::string contrasena )
+{
+	SHA256 hashTool;
+	return hashTool( contrasena );
 }

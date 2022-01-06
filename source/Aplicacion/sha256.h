@@ -4,6 +4,9 @@
 // see http://create.stephan-brumme.com/disclaimer.html
 //
 
+#ifndef SHA_256
+#define SHA_256
+
 //#include "hash.h"
 #include <string>
 
@@ -72,3 +75,5 @@ class SHA256 //: public Hash
         /// hash, stored as integers
         uint32_t m_hash[HashValues];
 };
+
+#endif

@@ -8,13 +8,14 @@
 #include <string>
 #include <fstream>
 #include "Vistas.h"
+#include "Funciones.h"
 using namespace std;
 
 string nombreUsuario;
 string codigoRecuperacion;
 
-void registrarUsuario()
-{
+void registrarUsuario(){
+	cout << "usuario_registrar" << endl;
 	try{
 		// Obtiene los datos del formulario
 		string nombre = Usuario::validarNombre( interfaz.obtenerTextoEntrada( "EntradaRegistroNombre" ) );
@@ -30,22 +31,21 @@ void registrarUsuario()
 		Usuario::compararContrasenas( contrasena, confirmacion );
 		
 		// Crea la contrasena que se insertará dentro de la base de datos
-		string sal = crearSal();
-		string contrasenaFinal = crearHash( contrasena + sal );
+		string contrasenaFinal = crearHash( contrasena );
 		
 		string administrador = existenUsuariosRegistrados() ? "0" : "1";
 
 		// Registra al usuario en la base de datos
 		database.open( databaseFile );
-		database.query( "insert into usuarios values( '" + nombreUsuario + "', '" +  contrasenaFinal + "', '" + sal + "', '" + nombre + "', '" + apellidos + "', " + administrador + " )" );
+		database.query( "insert into Usuario values( null, '" + nombreUsuario + "', '" +  contrasenaFinal + "', '" + nombre + "', '" + apellidos + "', null, null, null, '" + tiempo_leer_fecha_corta() + "', null, " + administrador + " )" );
 		database.close();
 		
 		// Muestra un mensaje de que efectivamente se registro al usuario y lo redirige a la página de inicio de sesion
-		mostrarMensaje( "¡Bienvenido!" );
+		app_mostrar_mensaje( "¡Bienvenido!" );
 		irA( "IniciarSesion", true );
 	}
 	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() ); 
+		app_mostrar_error( ia.what() ); 
 	}
 }
 
@@ -53,19 +53,19 @@ void actualizarDatosUsuario()
 {
 	try{
 		// Lee la contraseña actual y cierra la ventana
-		interfaz.ocultarElemento( "VentanaEntradaContrasena" );
-		string contrasenaActual = interfaz.obtenerTextoEntrada( "EntradaContrasenaAutorizacion" );
-		interfaz.establecerTextoEntrada( "EntradaContrasenaAutorizacion", "" );
+		ocultar_elemento( "VentanaEntradaContrasena" ); 	
+		string contrasenaActual = obtener_texto_entrada( "EntradaContrasenaAutorizacion" );
+		establecer_texto_entrada( "EntradaContrasenaAutorizacion", "" );
 		
 		// Verifica la autenticidad de la contrasena
-		verificarContrasena( contrasenaActual, usuario.obtenerSal(), usuario.obtenerHash() );
+		verificarContrasena( contrasenaActual, usuario.obtenerHash() );
 		
 		// Obtiene los datos del formulario
-		string nombre = Usuario::validarNombre( interfaz.obtenerTextoEntrada( "EntradaCuentaNombre" ) );
-		string apellidos = Usuario::validarApellidos( interfaz.obtenerTextoEntrada( "EntradaCuentaApellidos" ) );
-		string nombreUsuario = Usuario::validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaCuentaNombreUsuario" ) );
-		string contrasena = interfaz.obtenerTextoEntrada( "EntradaCuentaContrasenaNueva" );
-		string confirmacion = interfaz.obtenerTextoEntrada( "EntradaCuentaContrasenaConfirmacion" );
+		string nombre = Usuario::validarNombre( obtener_texto_entrada( "EntradaCuentaNombre" ) );
+		string apellidos = Usuario::validarApellidos( obtener_texto_entrada( "EntradaCuentaApellidos" ) );
+		string nombreUsuario = Usuario::validarNombreUsuario( obtener_texto_entrada( "EntradaCuentaNombreUsuario" ) );
+		string contrasena = obtener_texto_entrada( "EntradaCuentaContrasenaNueva" );
+		string confirmacion = obtener_texto_entrada( "EntradaCuentaContrasenaConfirmacion" );
 		
 		// ¿Se introdujo un nombre de usuario diferente?
 		if( nombreUsuario.compare( usuario.obtenerNombreUsuario() ) != 0 ){
@@ -89,23 +89,23 @@ void actualizarDatosUsuario()
 
 		// Actualiza la información en la base de datos
 		database.open( databaseFile );
-		database.query( "update usuarios set nombre = '" + usuario.obtenerNombre() + "', apellidos = '" + usuario.obtenerApellidos() + "', nombre_usuario = '" + usuario.obtenerNombreUsuario() + "' where nombre_usuario = '" + usuario.obtenerNombreUsuario() + "'" );
+		database.query( "update Usuario set nombre = '" + usuario.obtenerNombre() + "', apellidos = '" + usuario.obtenerApellidos() + "', pseudonimo = '" + usuario.obtenerNombreUsuario() + "' where pseudonimo = '" + usuario.obtenerNombreUsuario() + "'" );
 		database.close();
 		
 		// Actuliza los datos de la interfaz
 		interfaz.establecerTextoEtiqueta( "NombreUsuario", usuario.obtenerNombre() + "\n" + usuario.obtenerApellidos() );
 		
 		// Muestra que el registro fue exitoso
-		mostrarMensaje( "Datos actualizados de forma exitosa." );
+		app_mostrar_mensaje( "Datos actualizados de forma exitosa." );
 		vistaCuenta( nullptr, nullptr );
 	}
 	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
+		app_mostrar_error( ia.what() );
 	}
 }
 
-void iniciarSesion()
-{
+void iniciarSesion(){
+	cout << "iniciar_sesion" << endl;
 	// Conecta con la base de datos
 	database.open( databaseFile );
 		
@@ -115,35 +115,34 @@ void iniciarSesion()
 		string contrasena = Usuario::validarContrasena( interfaz.obtenerTextoEntrada( "EntradaContrasena" ) );
 		
 		// Busca en la base de datos el usuario solicitado
-		string consulta = "select * from usuarios where nombre_usuario = '" + nombreUsuario + "'";
+		string consulta = "select * from Usuario where pseudonimo = '" + nombreUsuario + "'";
 		database.query( consulta );
-		
+		database.close();
+
 		// Si hay resultados (usuario encontrado)
 		if( results.size() > 0 ){
 			// Obtiene la contraseña y la sal
 			string hash = (* results.at( 0 ))[ "contrasena" ];
-			string sal = (* results.at( 0 ))[ "sal" ];
 			string nombre = (* results.at( 0 ))[ "nombre" ];
 			string apellidos = (* results.at( 0 ))[ "apellidos" ];
 			bool administrador = stoi( (* results.at( 0 ))[ "administrador" ] );
 			
 			// Verifica la autenticidad de la contrasena
-			verificarContrasena( contrasena, sal, hash );
+			verificarContrasena( contrasena, hash );
 			
 			// Establece los datos restantes
 			usuario.establecerNombreUsuario( nombreUsuario );
 			usuario.establecerNombre( nombre );
 			usuario.establecerApellidos( apellidos );
 			usuario.establecerHash( hash );
-			usuario.establecerSal( sal );
 			usuario.establecerAdministrador( administrador );
-			
+
 			// Muestra al usuario
 			mostrarUsuario();
 			
 			// Redirige hacia la vista de inicio
 			irA( "Inicio", true );
-			
+
 			// Carga la información
 			cargarInformacion();
 			
@@ -154,17 +153,15 @@ void iniciarSesion()
 
 			// Manda a conectar todas las señales de las vistas
         	conectarSenales();
+			
 		}
 		else{
-			mostrarMensajeError( "El usuario " + nombreUsuario + " no está registrado." );
+			app_mostrar_error( "El usuario " + nombreUsuario + " no está registrado." );
 		}
 	}
 	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
+		app_mostrar_error( ia.what() );
 	}
-	
-	// Cierra la conexión
-	database.close();
 }
 
 void mostrarUsuario()
@@ -178,7 +175,7 @@ void nombreUsuarioOcupado( std::string nombreUsuario )
 	// Abre la base de datos
 	database.open( databaseFile );
 	
-	string consulta = "select * from usuarios where nombre_usuario = '" + nombreUsuario + "'";
+	string consulta = "select * from Usuario where pseudonimo = '" + nombreUsuario + "'";
 	database.query( consulta );
 	if( results.size() > 0 ){
 		throw invalid_argument( "El nombre de usuario que deseas registrar ya está en uso." );
@@ -210,11 +207,11 @@ string crearSal()
 	return sal.str();
 }
 
-void verificarContrasena( string contrasena, string sal, string hash )
+void verificarContrasena( string contrasena, string hash )
 {
 	// Realiza el hash para esa contrasena
 	SHA256 hashTool;
-	string inputHash = hashTool( contrasena + sal );
+	string inputHash = hashTool( contrasena );
 	
 	// Realiza la comparativa del hash creado con la del hash que se encuentra en la base de datos
 	if( inputHash.compare( hash ) != 0 ){
@@ -229,12 +226,11 @@ void cambiarContrasena( string usuario, string contrasena, string confirmacion )
 		Usuario::compararContrasenas( contrasena, confirmacion );
 
 		// Crea la contrasena que se insertará dentro de la base de datos
-		string sal = crearSal();
-		string contrasenaFinal = crearHash( contrasena + sal );
+		string contrasenaFinal = crearHash( contrasena );
 
 		// Actualiza los datos de sal, de la nueva contraseña y elimina el código de recuperación
 		database.open( databaseFile );
-		database.query( "update usuarios set contrasena = '" + contrasenaFinal + "', sal = '" + sal + "' where nombre_usuario = '" + usuario + "';"  );
+		database.query( "update Usuario set contrasena = '" + contrasenaFinal + "'" + " where pseudonimo = '" + usuario + "';"  );
 		database.close();
 	}
 	catch( exception &ex ){
@@ -246,7 +242,7 @@ void cambiarContrasenaUsuario()
 {
 	try{
 		if( codigoRecuperacion.empty() ){
-			mostrarMensajeError( "Ha ocurrido un error relacionado con el código de seguridad." );
+			app_mostrar_error( "Ha ocurrido un error relacionado con el código de seguridad." );
 			return;
 		}
 
@@ -268,30 +264,27 @@ void cambiarContrasenaUsuario()
 		codigoRecuperacion.clear();
 
 		// Indica que la contraseña fue reiniciada exitosamente
-		mostrarMensaje( "Cambio de contraseña exitoso." );
+		app_mostrar_mensaje( "Cambio de contraseña exitoso." );
 
 		// Redirige al inicio de sesión
 		irA( "IniciarSesion", true );
 	}
 	catch( invalid_argument &ia ){
-		mostrarMensajeError( ia.what() );
+		app_mostrar_error( ia.what() );
 	}
 }
 
 // Indica si se han registrado usuarios en el programa
-bool existenUsuariosRegistrados()
-{
+bool existenUsuariosRegistrados(){
+	cout << "usuario_existe" << endl;
+
 	// Consulta los usuarios registrados cuyo nombre de usuario no sea 'admin'
 	database.open( databaseFile );
-	database.query( "select * from usuarios where nombre_usuario != 'admin'" );
+	database.query( "select * from Usuario where pseudonimo != 'administrador'" );
 	database.close();
 
 	// Retorna si hubo resultados
 	return results.size() > 0;
 }
 
-string crearHash( std::string contrasena )
-{
-	SHA256 hashTool;
-	return hashTool( contrasena );
-}
+

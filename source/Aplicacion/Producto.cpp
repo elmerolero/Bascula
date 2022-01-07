@@ -177,9 +177,8 @@ void producto_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
 	unsigned int folio = obtenerFolioSelector( row );
 	
 	// Obtiene el folio
-	string registro = (char *)data;
 	database.open( databaseFile );
-	database.query( "select * from " + registro + " where id_producto = " + to_string( folio ) );
+	database.query( "select * from Producto where id_producto = " + to_string( folio ) );
 	database.close();
 
 	if( results.size() > 0 ){
@@ -207,9 +206,8 @@ void producto_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
 			gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenRegistroConsulta" ) ), "../recursos/imagenes/iconos/Producto.png" );
 		}
 		else{
-			string ruta = "../recursos/imagenes/";
-			ruta = ruta + (char *)data + "s/" + (* resultados)[ "imagen" ];
-			GdkPixbuf *imagen = imagen_cargar_escalar( ruta.c_str(), 180, 180 );
+			string ruta = "../recursos/imagenes/productos/";
+			GdkPixbuf *imagen = imagen_cargar_escalar( ( ruta + (* resultados)[ "imagen" ] ).c_str(), 180, 180 );
 			gtk_image_set_from_pixbuf( GTK_IMAGE(  buscar_objeto( "ImagenRegistroConsulta" ) ), imagen );
 		}
 
@@ -341,7 +339,7 @@ void producto_conectar_senales( void ){
     senal_producto_confirmar_eliminar = g_signal_connect( buscar_objeto( "BotonSi"), "clicked", G_CALLBACK( producto_eliminar ), nullptr );
 
     // Señales
-    senal_imagen_seleccionar = g_signal_connect( buscar_objeto( "EnlaceCambiarFoto" ), "activate-link", G_CALLBACK( seleccionar_archivo ), nullptr );
+    senal_imagen_seleccionar = g_signal_connect( buscar_objeto( "EnlaceProductoCambiarFoto" ), "activate-link", G_CALLBACK( seleccionar_archivo ), nullptr );
     senal_imagen_guardar = g_signal_connect( buscar_objeto( "BotonGuardarEdicionImagen" ), "clicked", G_CALLBACK( producto_escribir_imagen ), nullptr );
     senal_imagen_cancelar = g_signal_connect( buscar_objeto( "BotonCancelarEdicionImagen" ), "clicked", G_CALLBACK( imagen_cancelar ), nullptr );
     senal_imagen_descartar = g_signal_connect( buscar_objeto( "BotonSi" ), "clicked", G_CALLBACK( producto_cancelar_edicion ), nullptr );

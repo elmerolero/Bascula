@@ -127,6 +127,10 @@ void producto_editar( GtkWidget *widget, gpointer info ){
             }
 		}
 
+        // Conecta la señal de confirmación descartar cambios
+        g_signal_handler_disconnect( buscar_objeto( "BotonSi" ), senal_producto_confirmar_eliminar );
+        senal_imagen_descartar = g_signal_connect( buscar_objeto( "BotonSi" ), "clicked", G_CALLBACK( producto_cancelar_edicion ), nullptr );
+
 		irA( "ProductoEditar", false );
 	}
 	catch( invalid_argument &ia ){
@@ -225,7 +229,7 @@ void producto_escribir_imagen( GtkWidget *widget, gpointer info ){
     stringstream s;
     s << gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "RegistroClaveEditar" ) ) ) 
       << gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "ProductoNombreEditar" ) ) ) << intAleatorio( motor );
-    string producto_imagen = "../recursos/imagenes/productos/" + crearHash( s.str() ) + ".png";
+    string producto_imagen = crearHash( s.str() ) + ".png";
 
     // Guarda la selección temporal
     imagen_temporal_guardar( producto_imagen );
@@ -243,21 +247,47 @@ void producto_guardar_cambios( GtkWidget *widget, gpointer info ){
     // Realiza la insercion
     stringstream consulta;
     consulta << "update Producto set nombre = '" << nombre << "', "
-             << "descripcion = '" << descripcion << "', "
-             << "imagen = '" << ( imagen_temporal != nullptr && !nombreTemporal.empty() ? nombreTemporal : "null" ) << "' "
+             << "descripcion = '" << descripcion << "' " 
              << "where id_producto = " << clave;
+             
             
     database.open( databaseFile );
     database.query( consulta.str() );
     database.close();
 
+    // Guarda el archivo del nuevo producto
+    if( imagen_temporal != nullptr && !nombreTemporal.empty() ){
+        // Guarda la imagen editada
+        imagen_guardar( "../recursos/imagenes/productos/" + nombreTemporal );
+
+        consulta.str( "" );
+
+        // Registra el nombre de la imagen
+        consulta << "update Producto set imagen = '" << nombreTemporal << "' where id_producto = " << clave;
+        database.open( databaseFile );
+        database.query( consulta.str() );
+        database.close();
+
+        // Cancela la imagen
+        imagen_cancelar();
+    }
+
     // Cancela el resto
     producto_cancelar_edicion();
+
+    //
+    producto_actualizar_registros();
+
+    // Muestra el mensaje de que se actualizó la información del registro
+    app_mostrar_error( "Registro editado correctamente." );
+
+    // Regresa la vista
+    regresarVista();
 }
 
 void producto_descartar_cambios( GtkWidget *widget, gpointer info ){
     // 
-    if( !nombreTemporal.empty() /*|| producto_existen_cambios()*/ ){
+    if( !nombreTemporal.empty() || producto_existen_cambios() ){
         app_alerta( nullptr, (void *)"¿Desea descartar los cambios realizados?" );
         return;
     }
@@ -270,20 +300,34 @@ void producto_cancelar_nuevo( GtkWidget *widget, gpointer info ){
 }
 
 void producto_cancelar_edicion(){
-    // Cancela las señales
-    g_signal_handler_disconnect( buscar_objeto( "EnlaceProductoCambiarFoto" ), senal_imagen_seleccionar );
-    g_signal_handler_disconnect( buscar_objeto( "BotonGuardarEdicionImagen" ), senal_imagen_guardar );
-    g_signal_handler_disconnect( buscar_objeto( "BotonCancelarEdicionImagen" ), senal_imagen_cancelar );
+    // Desconecta las señales
     g_signal_handler_disconnect( buscar_objeto( "BotonSi" ), senal_imagen_descartar );
-    g_signal_handler_disconnect( buscar_objeto( "ProductoEdicionGuardar" ), senal_imagen_continuar );
-    g_signal_handler_disconnect( buscar_objeto( "ProductoEdicionCancelar" ), senal_imagen_omitir );
-
-    senal_imagen_seleccionar = 0;
-    senal_imagen_guardar = 0;
-    senal_movimiento = 0;
+    senal_producto_confirmar_eliminar = g_signal_connect( buscar_objeto( "BotonSi" ), "clicked", G_CALLBACK( producto_eliminar ), nullptr );
 
     // 
     imagen_cancelar();
+}
+
+bool producto_existen_cambios( void ){
+    stringstream consulta;
+    consulta << "select * from Producto where id_producto = " << gtk_label_get_text( GTK_LABEL( buscar_objeto( "RegistroClaveEditar" ) ) );
+
+    database.open( databaseFile );
+    database.query( consulta.str() );
+    database.close();
+
+    if( results.size() > 0 ){
+        unordered_map< string, string > *resultados = results.at( 0 );
+        if( (* resultados)[ "nombre" ].compare( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "ProductoNombreEditar" ) ) ) ) != 0 ){
+            return true;
+        }
+
+        if( (* resultados)[ "descripcion" ].compare( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "ProductoDescripcionEditar" ) ) ) ) != 0 ){
+            return true;
+        }
+    }
+
+    return false;
 }
 
 void producto_actualizar_registros( void ){
@@ -342,9 +386,9 @@ void producto_conectar_senales( void ){
     senal_imagen_seleccionar = g_signal_connect( buscar_objeto( "EnlaceProductoCambiarFoto" ), "activate-link", G_CALLBACK( seleccionar_archivo ), nullptr );
     senal_imagen_guardar = g_signal_connect( buscar_objeto( "BotonGuardarEdicionImagen" ), "clicked", G_CALLBACK( producto_escribir_imagen ), nullptr );
     senal_imagen_cancelar = g_signal_connect( buscar_objeto( "BotonCancelarEdicionImagen" ), "clicked", G_CALLBACK( imagen_cancelar ), nullptr );
-    senal_imagen_descartar = g_signal_connect( buscar_objeto( "BotonSi" ), "clicked", G_CALLBACK( producto_cancelar_edicion ), nullptr );
-    senal_imagen_continuar = g_signal_connect( buscar_objeto( "ProductoEdicionGuardar" ), "clicked", G_CALLBACK( producto_guardar_cambios ), nullptr );
     senal_imagen_omitir = g_signal_connect( buscar_objeto( "ProductoEdicionCancelar" ), "clicked", G_CALLBACK( producto_descartar_cambios ), nullptr );
+    //senal_imagen_descartar = g_signal_connect( buscar_objeto( "BotonSi" ), "clicked", G_CALLBACK( producto_cancelar_edicion ), nullptr );
+    senal_imagen_continuar = g_signal_connect( buscar_objeto( "ProductoEdicionGuardar" ), "clicked", G_CALLBACK( producto_guardar_cambios ), nullptr );
     enlace_salir = g_signal_connect( buscar_objeto( "EnlaceRegresar" ), "activate-link", G_CALLBACK( producto_desconectar_senales ), nullptr );
 }
  

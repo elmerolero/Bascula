@@ -9,6 +9,7 @@
 #include <stdexcept>
 #include <Windows.h>
 #include <cmath>
+#include "Widget.h"
 
 // Tamaño de l
 #define TAMANIO_FOTO 256
@@ -29,12 +30,13 @@ extern guint senal_movimiento;
 extern guint senal_dibujado;
 
 // Acciones
-extern guint senal_imagen_seleccionar;
-extern guint senal_imagen_guardar;
+extern Signal senal_imagen_guardar_edicion;
+extern Signal senal_imagen_cancelar_edicion;
+/*extern guint senal_imagen_guardar;
 extern guint senal_imagen_cancelar;
 extern guint senal_imagen_descartar;
 extern guint senal_imagen_continuar;
-extern guint senal_imagen_omitir;
+extern guint senal_imagen_omitir;*/
 
 extern int imagen_posicion_x;
 extern int imagen_posicion_y;
@@ -53,7 +55,7 @@ void imagen_abrir( ImagenCairo *imagen, std::string nombreArchivo );
 gboolean imagen_mostrar( GtkWidget *widget, cairo_t *cr, gpointer data );
 
 // Guarda la imagen editada en una ruta específica
-void imagen_guardar( std::string rutoArchivo );
+void imagen_guardar( std::string rutaArchivo );
 
 // Mueve la imagen de acuerdo el mouse
 gboolean imagen_mover( GtkWidget* widget, GdkEventButton evento, gpointer data );

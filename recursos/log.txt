@@ -36,3 +36,4 @@
 [Fecha: 2022-01-05 Hora: 23:19:24 ]: basic_string::_M_construct null not valid
 [Fecha: 2022-01-05 Hora: 23:52:50 ]: Error querying. Error: incomplete input
 [Fecha: 2022-01-06 Hora: 00:07:05 ]: Error querying. Error: incomplete input
+[Fecha: 2022-01-07 Hora: 18:05:23 ]: Error querying. Error: unrecognized token: "24update"

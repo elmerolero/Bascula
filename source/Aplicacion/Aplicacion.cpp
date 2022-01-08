@@ -8,9 +8,13 @@
 #include "Senales.h"
 #include "Sesion.h"
 #include "Imagen.h"
+#include "Vistas.h"
+#include "RegistrosInternos.h"
+#include "RegistrosPublicos.h"
 #include "GestorRegistros.h"
 #include "GestorBasculas.h"
 #include "Producto.h"
+#include "Empresa.h"
 #include <random>
 using namespace std;
 
@@ -25,11 +29,7 @@ vector< string > pilaVistas;
 
 struct tm tiempo;
 
-guint senal_domicilio_aceptar = 0;
-guint senal_domicilio_cancelar = 0;
-
-void iniciar( GtkApplication *aplicacion, gpointer informacion )
-{
+void iniciar( GtkApplication *aplicacion, gpointer informacion ){
     try{
         // Elemento para obtener los errores que ocurran al cargar el widget
         GError *error = nullptr;
@@ -47,7 +47,7 @@ void iniciar( GtkApplication *aplicacion, gpointer informacion )
         GObject *objeto = gtk_builder_get_object( builder, "VentanaPrincipal" );
         gtk_application_add_window( aplicacion, GTK_WINDOW( objeto ) );
         gtk_widget_show( GTK_WIDGET( objeto ) );
-        conectar_senal( ventanaPrincipal, nullptr );
+        conectar_senal( ventanaPrincipal, G_CALLBACK( gtk_widget_destroy ), nullptr );
 
         // Agrega los eventos a área edición
         objeto = gtk_builder_get_object( builder, ( "AreaEdicion" ) );
@@ -80,310 +80,6 @@ void iniciar( GtkApplication *aplicacion, gpointer informacion )
         string error = "<- Aplicacion::iniciar() ";
         throw runtime_error( error + re.what() );
     }
-}
-
-void empresa_leer_informacion( void ){
-    cout << "empresa_leer_informacion" << endl;
-    // Obtiene los datos de la empresa
-    database.open( databaseFile );
-    database.query( "select * from EmpresaPropia" );
-    database.close();
-
-    // ¿Hay empresa registrada?
-    if( results.size() > 0 ){
-        // Establece el nombre de la empresa
-        empresa_razon_social = (* results.at( 0 ))[ "razon_social" ];
-        empresa_rfc = ( (* results.at( 0 ))[ "RFC" ].compare( "null" ) != 0 ? (* results.at( 0 ))[ "RFC" ] : "" );
-        empresa_imagen = ( (* results.at( 0 ))[ "imagen" ].compare( "null" ) != 0 ? (* results.at( 0 ))[ "imagen" ] : "" );
-
-        // Actualiza el nombre de la empresa
-        gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreEmpresa" ) ), empresa_razon_social.c_str() );
-        gtk_widget_show( GTK_WIDGET( buscar_objeto( "NombreEmpresa" ) ) );
-    }
-    else{
-        irA( "RegistrarEmpresa", true );
-        empresa_inicio_senales_conectar();
-        //irHacia( nullptr, (void *)"RegistrarEmpresa" );
-    }
-}
-
-void empresa_inicio_senales_conectar(){
-    // Razón social
-    conectar_senal( botonInicioRazonSocial, nullptr );
-
-    // Selección y edición de imagen
-    senal_imagen_seleccionar = g_signal_connect ( buscar_objeto( "InicioAgregarFotoEmpresa" ), "clicked", G_CALLBACK( seleccionar_archivo ), nullptr );
-    senal_imagen_guardar = g_signal_connect( buscar_objeto( "BotonGuardarEdicionImagen" ), "clicked", G_CALLBACK( empresa_escribir_imagen ), nullptr );
-    senal_imagen_cancelar = g_signal_connect( buscar_objeto( "BotonCancelarEdicionImagen" ), "clicked", G_CALLBACK( imagen_cancelar ), nullptr );
-    senal_imagen_descartar = g_signal_connect( buscar_objeto( "BotonSi" ), "clicked", G_CALLBACK( empresa_inicio_imagen_omitir_confirmacion ), nullptr );
-    senal_imagen_continuar = g_signal_connect( buscar_objeto( "InicioContinuarConfiguracion" ), "clicked", G_CALLBACK( empresa_inicio_imagen ), nullptr );
-    senal_imagen_omitir = g_signal_connect( buscar_objeto( "InicioOmitirFotoEmpresa" ), "clicked", G_CALLBACK( empresa_inicio_imagen_omitir ), nullptr );
-    senal_domicilio_aceptar = g_signal_connect( buscar_objeto( "DomicilioAgregar"), "clicked", G_CALLBACK( empresa_domicilio_agregar ), nullptr );
-    senal_domicilio_cancelar = g_signal_connect( buscar_objeto( "DomicilioCancelar" ), "clicked", G_CALLBACK( empresa_domicilio_cancelar ), nullptr );
-
-    gtk_button_set_label( GTK_BUTTON( buscar_objeto( "DomicilioCancelar" ) ), "Omitir" );
-}
-
-void empresa_senales_desconectar(){
-    g_signal_handler_disconnect( buscar_objeto( "InicioAgregarFotoEmpresa" ), senal_imagen_seleccionar );
-    g_signal_handler_disconnect( buscar_objeto( "BotonGuardarEdicionImagen" ), senal_imagen_guardar );
-    g_signal_handler_disconnect( buscar_objeto( "BotonCancelarEdicionImagen" ), senal_imagen_cancelar );
-    g_signal_handler_disconnect( buscar_objeto( "BotonSi" ), senal_imagen_descartar );
-    g_signal_handler_disconnect( buscar_objeto( "InicioContinuarConfiguracion" ), senal_imagen_continuar );
-    g_signal_handler_disconnect( buscar_objeto( "InicioOmitirFotoEmpresa" ), senal_imagen_omitir );
-    g_signal_handler_disconnect( buscar_objeto( "DomicilioAgregar" ), senal_domicilio_aceptar );
-    g_signal_handler_disconnect( buscar_objeto( "DomicilioCancelar" ), senal_domicilio_cancelar );
-    senal_imagen_seleccionar = 0;
-    senal_imagen_guardar = 0;
-    senal_movimiento = 0;
-}
-
-string empresa_validar_razon_social( string razon_social ){
-    // Formato para validar la información
-    regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ.\\s]*" );
-
-    // Verifica que cumpla con las características dadas
-    if( razon_social.empty() ){
-        throw invalid_argument( "Es necesario registrar un nombre para su negocio." );
-    }
-
-    if( razon_social.size() > 100 ){
-        throw invalid_argument( "El nombre excede la cantidad de caracteres permitidos." );
-    }
-
-    if( !regex_match( razon_social, formato ) ){
-        throw invalid_argument( "El nombre introducido no es válido." );
-    }
-
-    return razon_social;
-}
-
-void empresa_inicio_registrar( GtkWidget *widget, gpointer info ){
-    cout << "empresa_inicio_registrar" << endl;
-    try{
-        // Establece la razón social
-        empresa_razon_social = empresa_validar_razon_social( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaInicioRazonSocial" ) ) ) );
-    
-        // 
-        database.open( databaseFile );
-        database.query( "select * from EmpresaPropia where id_empresa = 1" );
-        if( results.empty() ){
-            database.query( "insert into EmpresaPropia values( 1, '" + empresa_razon_social + "', null, null )" );
-        }
-        else{
-            database.query( "update EmpresaPropia set razon_social = '" + empresa_razon_social + "' where id_empresa = 1" );
-        }
-        database.close();
-
-        // Dirige hacia la siguiente vista
-        irA( "AgregarImagenEmpresaPropia", false );         
-    }
-    catch( invalid_argument &ia ){
-        app_mostrar_error( ia.what() );
-    }
-}
-
-void empresa_inicio_imagen( GtkWidget *widget, gpointer info ){
-    try{
-        // Verifica que se estableció un archivo
-        if( nombreTemporal.empty() ){
-            app_mostrar_error( "No se ha establecido una imagen." );
-            return;
-        }
-
-        // Guarda la ubicación del archivo
-        database.open( databaseFile );
-        database.query( "update EmpresaPropia set imagen = '" + nombreTemporal + "' where id_empresa = 1" );
-        database.close();
-
-        // Guarda la imagen
-        cairo_surface_write_to_png( imagen_temporal, nombreTemporal.c_str() );
-        if( imagen_temporal != nullptr ){
-            cairo_surface_destroy( imagen_temporal );
-            imagen_temporal = nullptr;
-        }
-
-        // Redirige a la siguiente vista
-        irA( "AgregarDomicilio", false );
-    }
-    catch( invalid_argument &ia ){
-        app_mostrar_error( ia.what() );
-    }
-}
-
-void empresa_inicio_imagen_omitir( GtkWidget *widget, gpointer info ){
-    // Si hay imagen seleccionada, lanza una alerta para descartar la imagen seleccionada
-    if( !nombreTemporal.empty() ){
-        app_alerta( nullptr, (char *)"¿Desea descartar la imagen que\nseleccionó anteriormente?" );
-        return;
-    }
-    
-    // Redirige a la siguiente vista
-    irA( "AgregarDomicilio", false );
-}
-
-void empresa_inicio_imagen_omitir_confirmacion( GtkWidget *widget, gpointer info ){
-    // Elimina el nombre del archivo
-    empresa_razon_social.clear();
-
-    // Si se estableció imagen
-    if( !nombreTemporal.empty() ){
-        // Elimina el archivo de imagen
-        remove( nombreTemporal.c_str() );
-
-        // Limpia el string
-        nombreTemporal.clear();
-    }
-
-    // Destruye la imagen temporal
-    if( imagen_temporal != nullptr ){
-        cairo_surface_destroy( imagen_temporal );
-        imagen_temporal = nullptr;
-    }
-
-    // Redirige a la siguiente vista
-    irA( "AgregarDomicilio", false );
-}
-
-string domicilio_validar_lugar( std::string objeto, bool obligatorio ){
-    // Formato que permite el nombre de un lugar
-    regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ\\s]*" );
-
-    // Obtiene la información del campo solicitado
-    string informacion = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( objeto ) ) );
-    string nombre_campo = gtk_widget_get_name( GTK_WIDGET( buscar_objeto( objeto ) ) );
-
-    // Verifica si es obligario y no esta vacío
-    if( obligatorio && informacion.empty() ){
-        throw invalid_argument( "Es necesario registrar " + nombre_campo + "." );
-    }
-
-    // Se asegura que esté dentro del tamaño establecido
-    if( informacion.size() > 100 ){
-        throw invalid_argument( "El tamaño del " + nombre_campo + " excede el número de caracteres permitidos." );
-    }
-
-    // Verifica que solo tiene caracteres permitidos
-    if( !regex_match( informacion, formato ) ){
-        throw invalid_argument( "Se está registrando un " + nombre_campo + " inválido." );
-    }
-
-    return informacion;
-}
-
-string domicilio_validar_numero( std::string numero, bool obligatorio ){
-    // Formato que permite el nombre de un lugar
-    regex formato( "[0-9a-zA-ZÑñáéíóúÁÉÍÓÚ\\s-]*" );
-
-    // Obtiene la información del campo solicitado
-    string informacion = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( numero ) ) );
-    string nombre_campo = gtk_widget_get_name( GTK_WIDGET( buscar_objeto( numero ) ) );
-
-    // Verifica si es obligario y no esta vacío
-    if( obligatorio && informacion.empty() ){
-        throw invalid_argument( "Es necesario registrar " + nombre_campo + "." );
-    }
-
-    // Se asegura que esté dentro del tamaño establecido
-    if( informacion.size() > 10 ){
-        throw invalid_argument( "El tamaño del " + nombre_campo + " excede el número de caracteres permitidos." );
-    }
-
-    // Verifica que solo tiene caracteres permitidos
-    if( !regex_match( informacion, formato ) ){
-        throw invalid_argument( "Se está registrando un " + nombre_campo + " inválido." );
-    }
-
-    return informacion;
-}
-
-std::string domicilio_validar_descripcion( std::string descripcion ){
-    // Formato que permite el nombre de un lugar
-    regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ\\s]*" );
-
-    // Obtiene la información del campo solicitado
-    string informacion = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( descripcion ) ) );
-
-    // Se asegura que esté dentro del tamaño establecido
-    if( informacion.size() > 300 ){
-        throw invalid_argument( "El tamaño de la descripción excede el número de caracteres permitidos." );
-    }
-
-    // Verifica que solo tiene caracteres permitidos
-    if( !regex_match( informacion, formato ) ){
-        throw invalid_argument( "Se está registrando una descripción no inválida." );
-    }
-
-    return informacion;
-}
-
-void empresa_domicilio_agregar( GtkWidget *widget, gpointer info ){
-    try{
-        // Consulta 
-        stringstream consulta;
-
-        // Establece la consulta a la base de datos
-        consulta << "insert into DomicilioEmpresaPropia values( null, 1, '"
-                 << domicilio_validar_lugar( "DomicilioCalle", true ) << "', '"
-                 << domicilio_validar_numero( "DomicilioNumero", true ) << "', '"
-                 << domicilio_validar_numero( "DomicilioNumeroInterior", false ) << "', '"
-                 << domicilio_validar_lugar( "DomicilioColonia", true ) << "', "
-                 << stoi( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "DomicilioCodigoPostal" ) ) ) ) << ", '"
-                 << domicilio_validar_lugar( "DomicilioMunicipio", true ) << "', '"
-                 << domicilio_validar_lugar( "DomicilioEstado" , true ) << "', '"
-                 << domicilio_validar_lugar( "DomicilioPais", true ) << "', '"
-                 << domicilio_validar_descripcion( "DomicilioDescripcion" )
-                 << "' )";
-        
-        cout << consulta.str() << endl;
-
-        // Realiza la consulta
-        database.open( databaseFile );
-        database.query( consulta.str() );
-        database.close();
-
-        app_mostrar_mensaje( "Datos de la empresa registrados exitosamente." );
-        irA( "Inicio", true ); 
-
-        empresa_senales_desconectar();
-    }
-    catch( invalid_argument &ia ){
-        // Obtiene el mensaje de error
-        string what = ia.what();
-
-        // Verifica que sea error stoi
-        if( what.compare( "stoi" ) == 0 ){
-            app_mostrar_error( "Código Postal no válido." );
-        }
-        else{
-            app_mostrar_error( what );
-        }
-    }
-}
-
-void empresa_domicilio_cancelar( GtkWidget *widget, gpointer info ){
-    //
-    empresa_senales_desconectar();
-
-    app_mostrar_mensaje( "Puede agregar o actualizar los datos de\nla empresa mas adelante en configuración." );
-    irA( "Inicio", true );
-}
-
-void empresa_escribir_imagen( GtkWidget *widget, gpointer info ){
-    // Motor para generar numeros aleatorios
-    default_random_engine motor( static_cast< unsigned int >( time( 0 ) ) );
-    uniform_int_distribution< unsigned int > intAleatorio;
-
-    // Crea el nombre del archivo
-    stringstream s;
-    s << empresa_razon_social << intAleatorio( motor );
-    string empresa_imagen = "../recursos/imagenes/empresas/" + crearHash( s.str() ) + ".png";
-
-    // Guarda la selección temporal
-    imagen_temporal_guardar( empresa_imagen );
-
-    // Carga la nueva imagen
-    gtk_image_set_from_surface( GTK_IMAGE( buscar_objeto( "ImagenEmpresaInicio" ) ), imagen_temporal );
 }
 
 // Carga la información necesaria
@@ -428,78 +124,78 @@ void cargarInformacion()
 void conectarSenalesBase()
 {
     // Enlace regresar
-    conectar_senal( enlaceRegresar, nullptr );
+    conectar_senal( enlaceRegresar, G_CALLBACK( regresarVista ), nullptr );
 
     // Señales de la vista de inicio de sesion
-    conectar_senal( enlaceRegistrarNuevoUsuario, (void *)"RegistrarUsuario" );
-    conectar_senal( enlaceRecuperarContrasena, (void *)"RecuperarContrasena" );
-    conectar_senal( botonIniciarSesion, nullptr );
-    conectar_senal( entradaContrasena, nullptr );
+    conectar_senal( enlaceRegistrarNuevoUsuario, G_CALLBACK( irHacia ), (void *)"RegistrarUsuario" );
+    conectar_senal( enlaceRecuperarContrasena, G_CALLBACK( irHacia ), (void *)"RecuperarContrasena" );
+    conectar_senal( botonIniciarSesion, G_CALLBACK( iniciarSesion ), nullptr );
+    conectar_senal( entradaContrasena, iniciarSesion, nullptr );
     
     // Señales de la vista de registro de usuario
-    conectar_senal( botonRegistrarUsuario, nullptr );
+    conectar_senal( botonRegistrarUsuario, registrarUsuario, nullptr );
     
     // Señales de recuperacion de contraseña
-    conectar_senal( botonReemplazarContrasena, nullptr );
-    conectar_senal( entradaRecuperacionCodigoSeguridad, nullptr );
-    conectar_senal( botonCambiarContrasena, nullptr );
-	conectar_senal( entradaReemplazarConfirmacion, nullptr );
+    conectar_senal( botonReemplazarContrasena, G_CALLBACK( validarCodigoRecuperacion ), nullptr );
+    conectar_senal( entradaRecuperacionCodigoSeguridad, G_CALLBACK( validarCodigoRecuperacion ), nullptr );
+    conectar_senal( botonCambiarContrasena, G_CALLBACK( cambiarContrasenaUsuario ), nullptr );
+	conectar_senal( entradaReemplazarConfirmacion, G_CALLBACK( cambiarContrasenaUsuario ), nullptr );
 
     // Ventana que contiene un mensaje
-    conectar_senal( botonAceptar, nullptr );
+    conectar_senal( botonAceptar, G_CALLBACK( app_aceptar_mensaje ), nullptr );
 }
 
 // Conecta las señales de cada una de las vistas
 void conectarSenales()
 {
     // Vista Inicio
-    conectar_senal( botonBascula, (void *)"Bascula" );
-    conectar_senal( enlaceCreditos, (void *)"Creditos" );
-    conectar_senal( enlaceCuenta, nullptr );
-    conectar_senal( botonConfiguracion, nullptr );
+    conectar_senal( botonBascula, G_CALLBACK( irHacia ), (void *)"Bascula" );
+    conectar_senal( enlaceCreditos, G_CALLBACK( irHacia ), (void *)"Creditos" );
+    conectar_senal( enlaceCuenta, G_CALLBACK( vistaCuenta ), nullptr );
+    conectar_senal( botonConfiguracion, G_CALLBACK( vistaConfiguracion ), nullptr );
     
     // Barra de usuario
-    conectar_senal( botonActualizarCuenta, nullptr );
+    conectar_senal( botonActualizarCuenta, G_CALLBACK( autorizarCambios ), nullptr );
 
     // Vista seleccion servicio
-    conectar_senal( botonBasculaPublica, nullptr );
-    conectar_senal( botonBasculaInterna, nullptr );
+    conectar_senal( botonBasculaPublica, G_CALLBACK( vistaBasculaPublica ), nullptr );
+    conectar_senal( botonBasculaInterna, G_CALLBACK( vistaBasculaInterna ), nullptr );
     
     // Nuevo para ticket interno
-    conectar_senal( botonLeerPesoBrutoInterno, nullptr );
-    conectar_senal( botonLeerPesoTaraInterno, nullptr);
-    conectar_senal( botonRegistrarPendienteInterno, nullptr );
-    conectar_senal( botonFinalizarPendienteInterno, nullptr );
-    conectar_senal( entradaNumeroPlacasInterno, nullptr );
-    conectar_senal( botonCalcularDescuento, nullptr );
-    conectar_senal( opcionDescuentoInterno, nullptr );
-    conectar_senal( opcionRegistraEntrada, nullptr );
+    conectar_senal( botonLeerPesoBrutoInterno, G_CALLBACK( vistaLeerPesoBruto ), nullptr );
+    conectar_senal( botonLeerPesoTaraInterno, G_CALLBACK( vistaLeerPesoTara ), nullptr);
+    conectar_senal( botonRegistrarPendienteInterno, G_CALLBACK( internoRegistrarPendiente ), nullptr );
+    conectar_senal( botonFinalizarPendienteInterno, G_CALLBACK( internoFinalizarPendiente ), nullptr );
+    conectar_senal( entradaNumeroPlacasInterno, G_CALLBACK( convertirMayusculas ), nullptr );
+    conectar_senal( botonCalcularDescuento, G_CALLBACK( internoActualizarPesoNeto ), nullptr );
+    conectar_senal( opcionDescuentoInterno, G_CALLBACK( internoHabilitarDescuento ), nullptr );
+    conectar_senal( opcionRegistraEntrada, G_CALLBACK( internoSeleccionarTipo ), nullptr );
 
     // Nuevo para ticket publico
-    conectar_senal( entradaNumeroPlacasPublico, nullptr );
-    conectar_senal( botonLeerPesoBrutoPublico, nullptr );
-    conectar_senal( botonLeerPesoTaraPublico, nullptr );
-    conectar_senal( botonRegistrarPendientePublico, nullptr );
-    conectar_senal( botonFinalizarPendientePublico, nullptr );
+    conectar_senal( entradaNumeroPlacasPublico, G_CALLBACK( convertirMayusculas ), nullptr );
+    conectar_senal( botonLeerPesoBrutoPublico, G_CALLBACK( vistaLeerPesoBrutoPublico ), nullptr );
+    conectar_senal( botonLeerPesoTaraPublico, G_CALLBACK( vistaLeerPesoTaraPublico ), nullptr );
+    conectar_senal( botonRegistrarPendientePublico, G_CALLBACK( publicoRegistrarPendiente ), nullptr );
+    conectar_senal( botonFinalizarPendientePublico, G_CALLBACK( publicoFinalizarPendiente ), nullptr );
      
     // Vista que solicita la contrasena
-    conectar_senal( botonPermitirCambios, nullptr );
+    conectar_senal( botonPermitirCambios, G_CALLBACK( actualizarDatosUsuario ), nullptr );
 
     // Vista de configuración
-    conectar_senal( botonGuardarConfiguracion, nullptr );
+    conectar_senal( botonGuardarConfiguracion, G_CALLBACK( guardarConfiguracion ), nullptr );
 
     // Consultar registro interno
-    conectar_senal( imprimirRegistroInterno, nullptr );
+    conectar_senal( imprimirRegistroInterno, G_CALLBACK( internoImprimirSeleccionado ), nullptr );
 
     // Vista de configuración de báscula
-    conectar_senal( botonGuardarBascula, nullptr );
-    conectar_senal( basculaSeleccionada, nullptr );
-    conectar_senal( botonBasculaAgregar, nullptr );
-    conectar_senal( botonBasculaEliminar, nullptr );
+    //conectar_senal( botonGuardarBascula, nullptr );
+    conectar_senal( basculaSeleccionada, G_CALLBACK( vistaBascula ), nullptr );
+    conectar_senal( botonBasculaAgregar, G_CALLBACK( vistaBasculaEdicion ), nullptr );
+    conectar_senal( botonBasculaEliminar, G_CALLBACK( vistaBasculaEliminar ), nullptr );
 
     // Ventana lectora de peso
-    conectar_senal( ventanaLectorPeso, nullptr );
-    conectar_senal( botonCancelarPeso, nullptr );
+    conectar_senal( ventanaLectorPeso, G_CALLBACK( basculaCerrarLector ), nullptr );
+    conectar_senal( botonCancelarPeso, G_CALLBACK( basculaCerrarLector ), nullptr );
 }
 
 //
@@ -507,30 +203,30 @@ void conectarSenalesAdministrador(){
     // Vista de registro de empresa (primer inicio)
 
     // Vista de registros
-    conectar_senal( botonRegistros, (void *)"Registros" );
-    conectar_senal( botonUsuarios, nullptr );
+    conectar_senal( botonRegistros, G_CALLBACK( irHacia ), (void *)"Registros" );
+    conectar_senal( botonUsuarios, G_CALLBACK( vistaConsultarUsuarios ), nullptr );
 
     // Vista Registros
-    conectar_senal( botonRegistrosEmpresas, (void *)(&empresas) );
-    conectar_senal( botonRegistrosProductos, (void *)(&productos) );
-    conectar_senal( botonRegistrosPesajesInternos, nullptr );
-    conectar_senal( botonRegistrosBasculaPublica, nullptr );
+    conectar_senal( botonRegistrosEmpresas, G_CALLBACK( vista_registros ), (void *)(&empresas) );
+    conectar_senal( botonRegistrosProductos, G_CALLBACK( producto_listar_registros ), (void *)(&productos) );
+    conectar_senal( botonRegistrosPesajesInternos, G_CALLBACK( vistaConsultarPesajesInternos ), nullptr );
+    conectar_senal( botonRegistrosBasculaPublica, G_CALLBACK( vistaConsultarPesajesPublicos ), nullptr );
 
     // Vista de listado de registros
-    conectar_senal( botonRegistroCancelarEdicion, nullptr );
-    conectar_senal( botonNo, nullptr );
+    //conectar_senal( botonRegistroCancelarEdicion, nullptr );
+    conectar_senal( botonNo, G_CALLBACK( cancelarAccion ), nullptr );
 
     // Vista de ticket interno
-    conectar_senal( eliminarRegistroInterno, nullptr );
+    //conectar_senal( eliminarRegistroInterno, nullptr );
 
     // Vista de ticket interno
-    conectar_senal( eliminarRegistroPublico, nullptr );
+    //conectar_senal( eliminarRegistroPublico, nullptr );
 
     // Vista de administración de usuarios
-	conectar_senal( entradaConsultarUsuario, nullptr );
-	conectar_senal( botonConsultarUsuario, nullptr );
-    conectar_senal( botonObtenerCodigoRecuperacion, nullptr );
-    conectar_senal( usuarioAdministrador, nullptr );
+	conectar_senal( entradaConsultarUsuario, G_CALLBACK( vistaConsultarUsuario ), nullptr );
+	conectar_senal( botonConsultarUsuario, G_CALLBACK( vistaConsultarUsuario ), nullptr );
+    conectar_senal( botonObtenerCodigoRecuperacion, G_CALLBACK( generarCodigoRecuperacion ), nullptr );
+    conectar_senal( usuarioAdministrador, G_CALLBACK( actualizarEstadoAdministrador ), nullptr );
 }
 
 // Muestra una alerta con el mensaje indicado

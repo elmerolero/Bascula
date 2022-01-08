@@ -22,9 +22,9 @@ int imagen_ultimo_y = 0;
 guint senal_presionado = 0;
 guint senal_movimiento = 0;
 guint senal_dibujado = 0;
-guint senal_imagen_seleccionar = 0;
-guint senal_imagen_guardar = 0;
-guint senal_imagen_cancelar = 0;
+
+guint senal_imagen_guardar_edicion = { "BotonGuardarEdicionImagen", "clicked", 0 };
+guint senal_imagen_cancelar_edicion = { "BotonCancelarEdicionImagen", "clicked", 0 };
 guint senal_imagen_descartar = 0;
 guint senal_imagen_continuar = 0;
 guint senal_imagen_omitir = 0;

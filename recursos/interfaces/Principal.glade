@@ -3090,7 +3090,7 @@ Interno</property>
                           </packing>
                         </child>
                         <child>
-                          <!-- n-columns=1 n-rows=1 -->
+                          <!-- n-columns=1 n-rows=2 -->
                           <object class="GtkGrid" id="ProductoEditar">
                             <property name="name">Editar</property>
                             <property name="can-focus">False</property>
@@ -3105,7 +3105,7 @@ Interno</property>
                             <property name="row-spacing">5</property>
                             <property name="column-spacing">15</property>
                             <child>
-                              <!-- n-columns=2 n-rows=2 -->
+                              <!-- n-columns=2 n-rows=1 -->
                               <object class="GtkGrid" id="FormularioEdicionRegistro">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
@@ -3171,6 +3171,7 @@ Interno</property>
                                         <property name="can-focus">True</property>
                                         <property name="halign">center</property>
                                         <property name="hexpand">True</property>
+                                        <property name="max-length">35</property>
                                         <property name="width-chars">26</property>
                                       </object>
                                       <packing>
@@ -3200,6 +3201,7 @@ Interno</property>
                                         <property name="can-focus">True</property>
                                         <property name="halign">center</property>
                                         <property name="hexpand">True</property>
+                                        <property name="max-length">200</property>
                                         <property name="width-chars">26</property>
                                       </object>
                                       <packing>
@@ -3211,47 +3213,6 @@ Interno</property>
                                   <packing>
                                     <property name="left-attach">1</property>
                                     <property name="top-attach">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkBox" id="ControlesEdicionRegistro">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">center</property>
-                                    <property name="margin-top">25</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="spacing">15</property>
-                                    <child>
-                                      <object class="GtkButton" id="ProductoEdicionCancelar">
-                                        <property name="label" translatable="yes">Cancelar</property>
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="receives-default">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkButton" id="ProductoEdicionGuardar">
-                                        <property name="label" translatable="yes"> Guardar </property>
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="receives-default">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">1</property>
-                                    <property name="width">2</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -3304,13 +3265,53 @@ Interno</property>
                                   <packing>
                                     <property name="left-attach">0</property>
                                     <property name="top-attach">0</property>
-                                    <property name="height">2</property>
                                   </packing>
                                 </child>
                               </object>
                               <packing>
                                 <property name="left-attach">0</property>
                                 <property name="top-attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="ControlesEdicionRegistro">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">center</property>
+                                <property name="valign">center</property>
+                                <property name="hexpand">True</property>
+                                <property name="vexpand">True</property>
+                                <property name="spacing">15</property>
+                                <child>
+                                  <object class="GtkButton" id="ProductoEdicionCancelar">
+                                    <property name="label" translatable="yes">Cancelar</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="ProductoEdicionGuardar">
+                                    <property name="label" translatable="yes"> Guardar </property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">1</property>
                               </packing>
                             </child>
                           </object>
@@ -6702,7 +6703,7 @@ agregarla en los documentos generados  por la aplicación.</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkButton" id="InicioContinuarConfiguracion">
+                                      <object class="GtkButton" id="InicioAgregrFotoEmpresa">
                                         <property name="label" translatable="yes">Seguir</property>
                                         <property name="visible">True</property>
                                         <property name="can-focus">True</property>

@@ -16,6 +16,7 @@ void producto_descartar_cambios( GtkWidget *widget, gpointer info );
 void producto_guardar_cambios( GtkWidget *widget, gpointer info );
 void producto_cancelar_nuevo( GtkWidget *widget, gpointer info );
 void producto_cancelar_edicion();
+bool producto_existen_cambios( void );
 void producto_actualizar_registros( void );
 void producto_conectar_senales( void );
 void producto_desconectar_senales( GtkWidget *widget, gpointer info );

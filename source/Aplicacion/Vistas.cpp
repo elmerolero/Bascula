@@ -49,15 +49,15 @@ void vista_registros( GtkWidget *widget, gpointer ptr ){
 	registros -> actualizarListaRegistros();
 	
 	// Vistas  
-	conectar_senal( botonRegistroVistaConsultar, ptr );
-	conectar_senal( botonRegistroVistaNuevo, (void *)"NuevoRegistro" );
-	conectar_senal( botonRegistroVistaEditar, ptr );
-	conectar_senal( botonRegistroVistaEliminar, nullptr );
+	conectar_senal( botonRegistroVistaConsultar, G_CALLBACK( crearRegistro ), ptr );
+	conectar_senal( botonRegistroVistaNuevo, G_CALLBACK( irHacia ), (void *)"NuevoRegistro" );
+	conectar_senal( botonRegistroVistaEditar, G_CALLBACK( vistaRegistroEditar ), (void *)ptr );
+	conectar_senal( botonRegistroVistaEliminar, G_CALLBACK( vistaRegistroEliminar ), nullptr );
 
 	// Acciones
-	conectar_senal( botonRegistroGuardarNuevo, ptr );
-	conectar_senal( botonRegistroGuardarEdicion, ptr );
-    conectar_senal( botonSi, ptr );
+	//conectar_senal( botonRegistroGuardarNuevo, ptr );
+	conectar_senal( botonRegistroGuardarEdicion, G_CALLBACK( actualizarRegistro ), ptr );
+    conectar_senal( botonSi, G_CALLBACK( eliminarRegistro ), ptr );
 }
 
 void vistaRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data ){

@@ -30,7 +30,7 @@ GObject *buscar_objeto( string id ){
     return gtk_builder_get_object( builder, id.c_str() );
 }
 
-void conectar_senal( Signal &senal, gpointer data ){
+void conectar_senal( Signal &senal, GCallback callback, gpointer data ){
     cout << "conectar_senal" << endl;
     // Si hay una señal asociada al mismo, la desconecta
     if( senal.id > 0 ){
@@ -41,7 +41,7 @@ void conectar_senal( Signal &senal, gpointer data ){
     GObject *objeto = gtk_builder_get_object( builder, senal.object.c_str() );
 
     // Conecta la señal dada y la función dada con ese objeto
-    senal.id = g_signal_connect( objeto, senal.type.c_str(), senal.callback, data );
+    senal.id = g_signal_connect( objeto, senal.type.c_str(), callback, data );
 }
 
 void desconectar_senal( Signal &senal ){

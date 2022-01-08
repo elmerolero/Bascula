@@ -979,7 +979,7 @@ introdúcelo aquí para reestablecer tu contraseña.</property>
                           </packing>
                         </child>
                         <child>
-                          <!-- n-columns=3 n-rows=3 -->
+                          <!-- n-columns=1 n-rows=3 -->
                           <object class="GtkGrid" id="Inicio">
                             <property name="name">Inicio</property>
                             <property name="can-focus">False</property>
@@ -1092,24 +1092,6 @@ introdúcelo aquí para reestablecer tu contraseña.</property>
                                 <property name="left-attach">0</property>
                                 <property name="top-attach">0</property>
                               </packing>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
-                            </child>
-                            <child>
-                              <placeholder/>
                             </child>
                           </object>
                           <packing>

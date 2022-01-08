@@ -8,14 +8,13 @@ struct Signal
 {
     std::string object;
     std::string type;
-    GCallback callback;
     guint id;
 };
 
 extern GtkBuilder *builder;
 
 //void leer_Widget_seleccionado_listbox( std::string id );
-void conectar_senal( Signal &senal, gpointer data );
+void conectar_senal( Signal &senal, GCallback callback, gpointer data );
 void desconectar_senal( Signal &senal );
 void mostrar_elemento( std::string id );
 void ocultar_elemento( std::string id );

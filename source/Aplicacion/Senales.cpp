@@ -10,7 +10,6 @@
 #include "Widget.h"
 
 Signal ventanaPrincipal{ "VentanaPrincipal", "destroy", 0 };
-Signal botonInicioRazonSocial{ "BotonRegistrarEmpresaPropia", "clicked", 0 }; //, G_CALLBACK( empresa_inicio_registrar )
 
 Signal botonRegistros{ "BotonRegistros", "clicked", 0 };
 Signal botonUsuarios{ "BotonUsuarios", "clicked", 0 };

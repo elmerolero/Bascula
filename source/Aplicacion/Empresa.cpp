@@ -9,11 +9,33 @@
 #include <random>
 using namespace std;
 
-Signal senal_empresa_imagen_seleccionar = { "InicioAgregarFotoEmpresa", "clicked", 0 };
-Signal senal_empresa_imagen_guardar = { "InicioGuardaFotoEmpresa", "clicked", 0 };
-Signal senal_empresa_imagen_cancelar = { "InicioOmitirFotoEmpresa", "clicked", 0 };
+Signal botonInicioRazonSocial{ "BotonRegistrarEmpresaPropia", "clicked", 0 };
+
+Signal senal_empresa_inicio_imagen_seleccionar = { "InicioSeleccionarFotoEmpresa", "clicked", 0 };
+Signal senal_empresa_inicio_imagen_guardar = { "InicioAgregarFotoEmpresa", "clicked", 0 };
+Signal senal_empresa_inicio_imagen_cancelar = { "InicioOmitirFotoEmpresa", "clicked", 0 };
 Signal senal_empresa_domicilio_guardar = { "DomicilioAgregar", "clicked", 0 };
 Signal senal_empresa_domicilio_cancelar = { "DomicilioCancelar", "clicked", 0 };
+
+void empresa_inicio_senales_conectar(){
+    // Razón social
+    conectar_senal( botonInicioRazonSocial, G_CALLBACK( empresa_inicio_registrar ), nullptr );
+    
+    // 
+    conectar_senal( senal_empresa_inicio_imagen_guardar, G_CALLBACK( empresa_inicio_imagen ), nullptr );
+    conectar_senal( senal_empresa_inicio_imagen_cancelar, G_CALLBACK( empresa_inicio_imagen_omitir ), nullptr );
+    conectar_senal( botonSi, G_CALLBACK( empresa_inicio_imagen_omitir_confirmacion ), nullptr );
+    conectar_senal( senal_empresa_domicilio_guardar, G_CALLBACK( empresa_domicilio_agregar ), nullptr );
+    conectar_senal( senal_empresa_domicilio_cancelar, G_CALLBACK( empresa_domicilio_cancelar ), nullptr );
+
+    // Selección y edición de imagen
+    conectar_senal( senal_empresa_inicio_imagen_seleccionar, G_CALLBACK( seleccionar_archivo ), nullptr );
+    conectar_senal( senal_imagen_guardar_edicion, G_CALLBACK( empresa_inicio_imagen_escribir ), nullptr );
+    conectar_senal( senal_imagen_cancelar_edicion, G_CALLBACK( imagen_cancelar ), nullptr );
+
+    // 
+    gtk_button_set_label( GTK_BUTTON( buscar_objeto( "DomicilioCancelar" ) ), "Omitir" );
+}
 
 void empresa_leer_informacion( void ){
     cout << "empresa_leer_informacion" << endl;
@@ -86,6 +108,7 @@ void empresa_inicio_registrar( GtkWidget *widget, gpointer info ){
 }
 
 void empresa_inicio_imagen( GtkWidget *widget, gpointer info ){
+    cout << "empresa_inicio_imagen" << endl;
     try{
         // Verifica que se estableció un archivo
         if( nombreTemporal.empty() ){
@@ -143,11 +166,16 @@ void empresa_inicio_imagen_omitir_confirmacion( GtkWidget *widget, gpointer info
         imagen_temporal = nullptr;
     }
 
+    // Cierra el mensaje
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
+
     // Redirige a la siguiente vista
     irA( "AgregarDomicilio", false );
 }
 
-void empresa_escribir_imagen( GtkWidget *widget, gpointer info ){
+void empresa_inicio_imagen_escribir( GtkWidget *widget, gpointer info ){
+    cout << "empresa_inicio_imagen_escribir" << endl;
+
     // Motor para generar numeros aleatorios
     default_random_engine motor( static_cast< unsigned int >( time( 0 ) ) );
     uniform_int_distribution< unsigned int > intAleatorio;
@@ -155,31 +183,13 @@ void empresa_escribir_imagen( GtkWidget *widget, gpointer info ){
     // Crea el nombre del archivo
     stringstream s;
     s << empresa_razon_social << intAleatorio( motor );
-    string empresa_imagen = "../recursos/imagenes/empresas/" + crearHash( s.str() ) + ".png";
+    string empresa_imagen = crearHash( s.str() ) + ".png";
 
     // Guarda la selección temporal
     imagen_temporal_guardar( empresa_imagen );
 
     // Carga la nueva imagen
     gtk_image_set_from_surface( GTK_IMAGE( buscar_objeto( "ImagenEmpresaInicio" ) ), imagen_temporal );
-}
-
-void empresa_inicio_senales_conectar(){
-    // Razón social
-    conectar_senal( botonInicioRazonSocial, G_CALLBACK( empresa_inicio_registrar ), nullptr );
-    
-    // Selección y edición de imagen
-    conectar_senal( senal_imagen_guardar_edicion, G_CALLBACK( empresa_escribir_imagen ), nullptr );
-    conectar_senal( senal_imagen_cancelar_edicion, G_CALLBACK( imagen_cancelar ), nullptr );
-    conectar_senal( senal_empresa_imagen_seleccionar, G_CALLBACK( seleccionar_archivo ), nullptr );
-    conectar_senal( senal_empresa_imagen_guardar, G_CALLBACK( empresa_inicio_imagen ), nullptr );
-    conectar_senal( senal_empresa_imagen_cancelar, G_CALLBACK( empresa_inicio_imagen_omitir ), nullptr );
-    conectar_senal( botonSi, G_CALLBACK( empresa_inicio_imagen_omitir_confirmacion ), nullptr );
-    conectar_senal( senal_empresa_domicilio_guardar, G_CALLBACK( empresa_domicilio_agregar ), nullptr );
-    conectar_senal( senal_empresa_domicilio_cancelar, G_CALLBACK( empresa_domicilio_cancelar ), nullptr );
-
-    // 
-    gtk_button_set_label( GTK_BUTTON( buscar_objeto( "DomicilioCancelar" ) ), "Omitir" );
 }
 
 void empresa_senales_desconectar(){

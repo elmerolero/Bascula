@@ -6,7 +6,6 @@
 #include <iostream>
 #include <stdexcept>
 #include <cmath>
-#include "Widget.h"
 using namespace std;
 
 ImagenCairo imagen;             // Imagen original
@@ -23,8 +22,8 @@ guint senal_presionado = 0;
 guint senal_movimiento = 0;
 guint senal_dibujado = 0;
 
-guint senal_imagen_guardar_edicion = { "BotonGuardarEdicionImagen", "clicked", 0 };
-guint senal_imagen_cancelar_edicion = { "BotonCancelarEdicionImagen", "clicked", 0 };
+Signal senal_imagen_guardar_edicion = { "BotonGuardarEdicionImagen", "clicked", 0 };
+Signal senal_imagen_cancelar_edicion = { "BotonCancelarEdicionImagen", "clicked", 0 };
 guint senal_imagen_descartar = 0;
 guint senal_imagen_continuar = 0;
 guint senal_imagen_omitir = 0;

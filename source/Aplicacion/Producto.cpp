@@ -11,17 +11,52 @@
 #include <regex>
 using namespace std;
 
-guint senal_producto_guardar_nuevo = 0;
-guint senal_producto_nuevo = 0;
-guint senal_producto_cancelar_nuevo = 0;
-guint senal_producto_editar = 0;
-guint senal_producto_eliminar = 0;
-guint senal_producto_confirmar_eliminar = 0;
-guint senal_producto_seleccionar = 0;
+Signal senal_producto_imagen_seleccionar = { "EnlaceProductoCambiarFoto", "activate-link", 0 };
 
+Signal senal_producto_nuevo = { "BotonRegistroNuevo", "clicked", 0 };
+Signal senal_producto_guardar_nuevo = { "BotonRegistroGuardarNuevo", "clicked", 0 };
+Signal senal_producto_cancelar_nuevo = { "BotonRegistroCancelarNuevo", "clicked", 0 };
 
+Signal senal_producto_editar = { "BotonRegistroEditar", "clicked", 0 };
+Signal senal_producto_guardar_edicion = { "ProductoEdicionGuardar", "clicked", 0 };
+Signal senal_producto_cancelar_edicion = { "ProductoEdicionCancelar", "clicked", 0 };
+Signal senal_producto_eliminar = { "BotonRegistroEliminar", "clicked", 0 };
+Signal senal_producto_seleccionar = { "ContenedorRegistros", "row-activated", 0 };
 
-guint enlace_salir = 0;
+Signal senal_producto_buscar = { "BuscadorRegistros", "search-changed" };
+
+void producto_conectar_senales( void ){
+    const char *mensaje = "ALERTA: Si el existen registros de pesaje que hagan\nreferencia a este registro, también serán eliminados.\n¿Estás seguro que deseas hacerlo?";
+
+    // Vista de listado de productos
+    conectar_senal( senal_producto_nuevo, G_CALLBACK( irHacia ), (void *)"NuevoRegistro" );                 // Crea nuevo producto
+    conectar_senal( senal_producto_guardar_nuevo, G_CALLBACK( producto_nuevo ), nullptr );                  // Guarda el nuevo producto
+    conectar_senal( senal_producto_cancelar_nuevo, G_CALLBACK( regresarVista ), nullptr );        // Cancela la creación del nuevo producot
+    conectar_senal( senal_producto_editar, G_CALLBACK( producto_editar ), nullptr );                        // Edita el producto seleccionado
+    conectar_senal( senal_producto_cancelar_edicion, G_CALLBACK( producto_descartar_cambios ), nullptr );   // Cancela la edicion del producto seleccionado
+    conectar_senal( senal_producto_guardar_edicion, G_CALLBACK( producto_guardar_edicion ), nullptr );      // Guarda los cambios de la edición del producto seleccionado
+    conectar_senal( senal_producto_eliminar, G_CALLBACK( app_alerta ), (void *)mensaje );            // Lanza una alerta de eliminación del producto seleccionado
+    conectar_senal( senal_producto_seleccionar, G_CALLBACK( producto_seleccionar ), nullptr );              // Selecciona un producto
+    conectar_senal( botonSi, G_CALLBACK( producto_eliminar ), nullptr );
+    conectar_senal( senal_producto_buscar, G_CALLBACK( producto_buscar ), nullptr );
+
+    // Señales
+    conectar_senal( senal_producto_imagen_seleccionar, G_CALLBACK( seleccionar_archivo ), nullptr );
+    conectar_senal( senal_imagen_guardar_edicion, G_CALLBACK( producto_escribir_imagen ), nullptr );
+    conectar_senal( senal_imagen_cancelar_edicion, G_CALLBACK( imagen_cancelar ), nullptr );
+}
+ 
+void producto_desconectar_senales( GtkWidget *widget, gpointer info ){
+    // Cancela las señales
+    desconectar_senal( senal_producto_nuevo );
+    desconectar_senal( senal_producto_guardar_nuevo );
+    desconectar_senal( senal_producto_cancelar_nuevo );
+    desconectar_senal( senal_producto_editar );
+    desconectar_senal( senal_producto_cancelar_edicion );
+    desconectar_senal( senal_producto_guardar_edicion );
+    desconectar_senal( senal_producto_eliminar );
+    desconectar_senal( senal_producto_seleccionar );
+}
 
 void producto_validar_nombre( string nombre ){
     // Revisa el formato
@@ -40,6 +75,9 @@ void producto_listar_registros( GtkWidget *widget, gpointer info ){
     // Actualiza la lista de registros
     producto_actualizar_registros();
 
+    // Conecta las señales
+    conectar_senal( botonSi, G_CALLBACK( producto_eliminar ), nullptr );
+    
     // Conecta las señales
     producto_conectar_senales();
 
@@ -112,6 +150,7 @@ void producto_editar( GtkWidget *widget, gpointer info ){
 			// Estabece los datos del formulario
 			gtk_label_set_text( GTK_LABEL( buscar_objeto( "RegistroClaveEditar" ) ), (* resultado )[ "id_producto" ].c_str() );
 			gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "ProductoNombreEditar" ) ), (* resultado )[ "nombre" ].c_str() );
+            gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "ProductoDescripcionEditar" ) ), "" );
 			if( (* resultado)[ "descripcion" ].compare( "null" ) != 0 ){
 				gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "ProductoDescripcionEditar" ) ), (* resultado )[ "descripcion" ].c_str() );
 			}
@@ -128,8 +167,8 @@ void producto_editar( GtkWidget *widget, gpointer info ){
 		}
 
         // Conecta la señal de confirmación descartar cambios
-        g_signal_handler_disconnect( buscar_objeto( "BotonSi" ), senal_producto_confirmar_eliminar );
-        senal_imagen_descartar = g_signal_connect( buscar_objeto( "BotonSi" ), "clicked", G_CALLBACK( producto_cancelar_edicion ), nullptr );
+        conectar_senal( enlaceRegresar, G_CALLBACK( producto_descartar_cambios ), nullptr );
+        conectar_senal( botonSi, G_CALLBACK( producto_cancelar_edicion ), nullptr );
 
 		irA( "ProductoEditar", false );
 	}
@@ -157,11 +196,21 @@ void producto_eliminar( GtkWidget *widget, gpointer data ){
 	// Comando de consulta
 	stringstream consulta;
 
+    // Elimina la imagen del producto
+    
+    consulta << "select * from Producto where id_producto = " << id;
+    database.open( databaseFile );
+    database.query( consulta.str() );
+    if( results.size() > 0 && (* results.at( 0 ))[ "imagen" ].compare( "null" ) != 0 ){
+        remove( ("../recursos/imagenes/productos/" + (* results.at( 0 ))[ "imagen" ]).c_str() );
+    }
+
 	// Elimina las dependencias del producto
-	/*consulta << "delete * from where id_producto = " 
+	/*consulta << "delete from where id_producto = " 
 			 << gtk_widget_get_name( GTK_WIDGET ( gtk_bin_get_child( GTK_BIN( gtk_list_box_get_selected_row( GTK_LIST_BOX( buscar_objeto( "ContenedorRegistros" ) ) ) ) ) ) )
 			 << */
     // Elimina el producto
+    consulta.str( "" );
 	consulta << "delete from Producto where id_producto = " << id;
 			
 	database.open( databaseFile );
@@ -221,13 +270,15 @@ void producto_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
 }
 
 void producto_escribir_imagen( GtkWidget *widget, gpointer info ){
+    cout << "producto_escribir_imagen" << endl;
+
     // Motor para generar numeros aleatorios
     default_random_engine motor( static_cast< unsigned int >( time( 0 ) ) );
     uniform_int_distribution< unsigned int > intAleatorio;
 
     // Crea el nombre del archivo
     stringstream s;
-    s << gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "RegistroClaveEditar" ) ) ) 
+    s << gtk_label_get_text( GTK_LABEL( buscar_objeto( "RegistroClaveEditar" ) ) ) 
       << gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "ProductoNombreEditar" ) ) ) << intAleatorio( motor );
     string producto_imagen = crearHash( s.str() ) + ".png";
 
@@ -238,7 +289,9 @@ void producto_escribir_imagen( GtkWidget *widget, gpointer info ){
     gtk_image_set_from_surface( GTK_IMAGE( buscar_objeto( "ImagenProductoEditar" ) ), imagen_temporal );
 }
 
-void producto_guardar_cambios( GtkWidget *widget, gpointer info ){
+void producto_guardar_edicion( GtkWidget *widget, gpointer info ){
+    cout << "producto_guardar_edicion" << endl;
+
     // Obtiene la información del formulario
     string clave = gtk_label_get_text( GTK_LABEL( buscar_objeto( "RegistroClaveEditar" ) ) );
     string nombre = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "ProductoNombreEditar" ) ) );
@@ -249,7 +302,6 @@ void producto_guardar_cambios( GtkWidget *widget, gpointer info ){
     consulta << "update Producto set nombre = '" << nombre << "', "
              << "descripcion = '" << descripcion << "' " 
              << "where id_producto = " << clave;
-             
             
     database.open( databaseFile );
     database.query( consulta.str() );
@@ -257,14 +309,35 @@ void producto_guardar_cambios( GtkWidget *widget, gpointer info ){
 
     // Guarda el archivo del nuevo producto
     if( imagen_temporal != nullptr && !nombreTemporal.empty() ){
-        // Guarda la imagen editada
-        imagen_guardar( "../recursos/imagenes/productos/" + nombreTemporal );
+        // Variables de entrada
+        string ruta_nuevo = "../recursos/imagenes/productos/" + nombreTemporal;
+        string ruta_anterior;
 
+        // Obtiene el nombre anterior de la imagen
         consulta.str( "" );
-
-        // Registra el nombre de la imagen
-        consulta << "update Producto set imagen = '" << nombreTemporal << "' where id_producto = " << clave;
+        consulta << "select imagen from producto where id_producto = " << clave;
         database.open( databaseFile );
+        database.query( consulta.str() );
+
+        if( results.size() > 0 && (* results.at( 0 ))[ "imagen" ].compare( "null" ) != 0 ){
+            cout << "llego aquí" << endl;
+            // Construye la ruta en la que se guardará el archivo nuevo y en la que se guardaba el archivo anterior
+            ruta_anterior = "../recursos/imagenes/productos/" + (* results.at( 0 ))[ "imagen" ];
+
+            // Si la ruta anterior es distinta de la ruta nueva se elimina el archivo anterior
+            if( ruta_nuevo.compare( ruta_anterior ) != 0 ){
+                cout << "Eliminando " << ruta_anterior << endl;
+                remove( ruta_anterior.c_str() );
+            }
+        }
+
+        // Guarda la imagen editada
+        imagen_guardar( ruta_nuevo );
+
+        // Registra el nuevo nombre de la imagen
+        consulta.str( "" );
+        consulta << "update Producto set imagen = '" << nombreTemporal << "' where id_producto = " << clave;
+        cout << clave << endl;
         database.query( consulta.str() );
         database.close();
 
@@ -272,40 +345,52 @@ void producto_guardar_cambios( GtkWidget *widget, gpointer info ){
         imagen_cancelar();
     }
 
-    // Cancela el resto
-    producto_cancelar_edicion();
-
     //
     producto_actualizar_registros();
 
     // Muestra el mensaje de que se actualizó la información del registro
     app_mostrar_error( "Registro editado correctamente." );
 
-    // Regresa la vista
-    regresarVista();
+    // Cancela el resto
+    producto_cancelar_edicion();
 }
 
+/************************************************************************************************
+ * Producto Descartar Cambios                                                                   *
+ * Punto intermedio entre la cancelación de la edición y la lista de registros                  *
+ * Permite revisar si se realizó algún cambio.                                                  *
+ * **********************************************************************************************/
 void producto_descartar_cambios( GtkWidget *widget, gpointer info ){
-    // 
+    cout << "producto_descartar_cambios" << endl;
+    // ¿Se estableció o cambió una imagen o se realizó un cambio en la información del registro?
     if( !nombreTemporal.empty() || producto_existen_cambios() ){
+        // Lanza una alerta y regresa
         app_alerta( nullptr, (void *)"¿Desea descartar los cambios realizados?" );
         return;
     }
 
+    // Cancela la edición
     producto_cancelar_edicion();
 }
 
-void producto_cancelar_nuevo( GtkWidget *widget, gpointer info ){
-    regresarVista();
-}
-
+/***********************************************************************************************
+ * Producto Cancelar Edición                                                                   *
+ * Cancela la edición de un producto seleccionado.                                             *
+ * *********************************************************************************************/
 void producto_cancelar_edicion(){
-    // Desconecta las señales
-    g_signal_handler_disconnect( buscar_objeto( "BotonSi" ), senal_imagen_descartar );
-    senal_producto_confirmar_eliminar = g_signal_connect( buscar_objeto( "BotonSi" ), "clicked", G_CALLBACK( producto_eliminar ), nullptr );
+    cout << "producto_cancelar_edicion" << endl;
+    // Establece la señal para eliminar registros de la vista anterior
+    conectar_senal( botonSi, G_CALLBACK( producto_eliminar ), nullptr ); 
 
-    // 
+    // Cancela la edición de imagen
     imagen_cancelar();
+
+    // Oculta la alerta que lanzó
+    conectar_senal( enlaceRegresar, G_CALLBACK( regresarVista ), nullptr );
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
+
+    // Regresa a la vista anterior
+    regresarVista();
 }
 
 bool producto_existen_cambios( void ){
@@ -330,7 +415,14 @@ bool producto_existen_cambios( void ){
     return false;
 }
 
+/***********************************************************************************************
+ * Producto Actualizar Registros                                                               *
+ * Obtiene todos los productos registrados y los coloca en el contenedor de registros,         *
+ * formando una lista de elementos seleccionables que se pueden seleccionar editar y eliminar  *
+ * El contenedor de registros tiene el nombre "ContenedorRegistros" en el archivo de interfaz. *
+ * *********************************************************************************************/
 void producto_actualizar_registros( void ){
+    cout << "producto_actualizar_registros" << endl;
     // Limpia el contenedor
     limpiar_contenedor( "ContenedorRegistros" );
     
@@ -372,36 +464,50 @@ void producto_actualizar_registros( void ){
     }
 }
 
-void producto_conectar_senales( void ){
-    // Vista de listado de productos
-    senal_producto_guardar_nuevo = g_signal_connect( buscar_objeto( "BotonRegistroGuardarNuevo" ), "clicked", G_CALLBACK( producto_nuevo ), nullptr );
-    senal_producto_nuevo = g_signal_connect( buscar_objeto( "BotonRegistroNuevo" ), "clicked", G_CALLBACK( irHacia ), (void *)"NuevoRegistro" );
-    senal_producto_cancelar_nuevo = g_signal_connect( buscar_objeto( "BotonRegistroCancelarNuevo" ), "clicked", G_CALLBACK( producto_cancelar_nuevo ), nullptr );
-    senal_producto_editar = g_signal_connect( buscar_objeto( "BotonRegistroEditar" ), "clicked", G_CALLBACK( producto_editar ), nullptr );
-    senal_producto_eliminar = g_signal_connect( buscar_objeto( "BotonRegistroEliminar" ), "clicked", G_CALLBACK( app_alerta ), (void *)"ALERTA: Si el existen registros de pesaje que hagan\nreferencia a este registro, también serán eliminados.\n¿Estás seguro que deseas hacerlo?" );
-    senal_producto_seleccionar = g_signal_connect( buscar_objeto( "ContenedorRegistros" ), "row-activated", G_CALLBACK( producto_seleccionar ), nullptr );
-    senal_producto_confirmar_eliminar = g_signal_connect( buscar_objeto( "BotonSi"), "clicked", G_CALLBACK( producto_eliminar ), nullptr );
+void producto_buscar( GtkSearchEntry* entry, GdkEvent* event ){
+    cout << "producto_buscar" << endl;
+    // Obtiene el contenido de la entrada
+    string busqueda = gtk_entry_get_text( GTK_ENTRY( entry ) );
 
-    // Señales
-    senal_imagen_seleccionar = g_signal_connect( buscar_objeto( "EnlaceProductoCambiarFoto" ), "activate-link", G_CALLBACK( seleccionar_archivo ), nullptr );
-    senal_imagen_guardar = g_signal_connect( buscar_objeto( "BotonGuardarEdicionImagen" ), "clicked", G_CALLBACK( producto_escribir_imagen ), nullptr );
-    senal_imagen_cancelar = g_signal_connect( buscar_objeto( "BotonCancelarEdicionImagen" ), "clicked", G_CALLBACK( imagen_cancelar ), nullptr );
-    senal_imagen_omitir = g_signal_connect( buscar_objeto( "ProductoEdicionCancelar" ), "clicked", G_CALLBACK( producto_descartar_cambios ), nullptr );
-    //senal_imagen_descartar = g_signal_connect( buscar_objeto( "BotonSi" ), "clicked", G_CALLBACK( producto_cancelar_edicion ), nullptr );
-    senal_imagen_continuar = g_signal_connect( buscar_objeto( "ProductoEdicionGuardar" ), "clicked", G_CALLBACK( producto_guardar_cambios ), nullptr );
-    enlace_salir = g_signal_connect( buscar_objeto( "EnlaceRegresar" ), "activate-link", G_CALLBACK( producto_desconectar_senales ), nullptr );
-}
- 
-void producto_desconectar_senales( GtkWidget *widget, gpointer info ){
-    // Cancela las señales
-    g_signal_handler_disconnect( buscar_objeto( "EnlaceProductoCambiarFoto" ), senal_imagen_seleccionar );
-    g_signal_handler_disconnect( buscar_objeto( "BotonGuardarEdicionImagen" ), senal_imagen_guardar );
-    g_signal_handler_disconnect( buscar_objeto( "BotonCancelarEdicionImagen" ), senal_imagen_cancelar );
-    g_signal_handler_disconnect( buscar_objeto( "BotonSi" ), senal_imagen_descartar );
-    g_signal_handler_disconnect( buscar_objeto( "ProductoEdicionGuardar" ), senal_imagen_continuar );
-    g_signal_handler_disconnect( buscar_objeto( "ProductoEdicionCancelar" ), senal_imagen_omitir );
-    g_signal_handler_disconnect( buscar_objeto( "EnlaceRegresar" ), enlace_salir );
-    senal_imagen_seleccionar = 0;
-    senal_imagen_guardar = 0;
-    senal_movimiento = 0;
+    cout << "Busqueda: " << busqueda << endl;
+
+    // Limpia el contenedor
+    limpiar_contenedor( "ContenedorRegistros" );
+
+    // Realiza la busqueda
+    database.open( databaseFile );
+    database.query( "select * from Producto where nombre like '%" + busqueda + "%'" );
+    database.close();
+    
+    if( results.size() > 0 ){
+        for( unordered_map< string, string > *producto : results ){
+            GError *error = nullptr;
+            GtkBuilder *builder_chido = gtk_builder_new();
+            GdkPixbuf *imagen = nullptr;
+            
+            // Clave del registro
+            try{
+                if( gtk_builder_add_from_file( builder, "../recursos/interfaces/ItemRegistro.glade", &error ) != 0 ){
+                    if( (*producto)[ "imagen" ].compare( "null" ) != 0 ){
+                        imagen = imagen_cargar_escalar( "../recursos/imagenes/productos/" + (*producto)[ "imagen" ], 64, 64 );
+                        if( imagen != nullptr ){
+                            gtk_image_set_from_pixbuf( GTK_IMAGE( gtk_builder_get_object( builder, "ImagenRegistro" ) ), imagen );
+                        }
+                    }
+                    else{
+                        gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenRegistro" ) ), "../recursos/imagenes/iconos/Producto64.png" );
+                    }
+                    
+                    gtk_widget_set_name( GTK_WIDGET( gtk_builder_get_object( builder, "ItemRegistro" ) ), (*producto)[ "id_producto" ].c_str() );
+                    gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaClave" ) ), (*producto)[ "id_producto" ].c_str() );
+                    gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaNombre" ) ), (*producto)[ "nombre" ].c_str() );
+                    
+                    gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( "ContenedorRegistros" ) ), GTK_WIDGET( buscar_objeto( "ItemRegistro" ) ), stoi( (*producto)[ "id_producto" ] ) );
+                }
+            }
+            catch( runtime_error &re ){
+                cerr << re.what() << endl;
+            }
+        }
+    }
 }

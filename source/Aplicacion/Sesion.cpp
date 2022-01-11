@@ -142,9 +142,6 @@ void iniciarSesion(){
 			
 			// Redirige hacia la vista de inicio
 			irA( "Inicio", true );
-
-			// Carga la información
-			cargarInformacion();
 			
 			// Conecta las señales
 			if( usuario.esAdministrador() ){
@@ -153,7 +150,9 @@ void iniciarSesion(){
 
 			// Manda a conectar todas las señales de las vistas
         	conectarSenales();
-			
+
+			// Carga la información
+			cargarInformacion();
 		}
 		else{
 			app_mostrar_error( "El usuario " + nombreUsuario + " no está registrado." );

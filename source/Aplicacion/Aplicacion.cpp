@@ -143,6 +143,7 @@ void conectarSenalesBase()
 
     // Ventana que contiene un mensaje
     conectar_senal( botonAceptar, G_CALLBACK( app_aceptar_mensaje ), nullptr );
+    conectar_senal( botonNo, G_CALLBACK( cancelarAccion ), nullptr );
 }
 
 // Conecta las señales de cada una de las vistas
@@ -214,7 +215,6 @@ void conectarSenalesAdministrador(){
 
     // Vista de listado de registros
     //conectar_senal( botonRegistroCancelarEdicion, nullptr );
-    conectar_senal( botonNo, G_CALLBACK( cancelarAccion ), nullptr );
 
     // Vista de ticket interno
     //conectar_senal( eliminarRegistroInterno, nullptr );

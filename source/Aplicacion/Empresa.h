@@ -12,6 +12,7 @@ void empresa_domicilio_agregar( GtkWidget *widget, gpointer info );
 void empresa_escribir_imagen( GtkWidget *widget, gpointer info );
 void empresa_inicio_registrar( GtkWidget *widget, gpointer info );
 void empresa_inicio_imagen( GtkWidget *widget, gpointer info );
+void empresa_inicio_imagen_escribir( GtkWidget *widget, gpointer info );
 void empresa_leer_informacion( void );
 
 void empresa_inicio_imagen_omitir( GtkWidget *widget, gpointer info );

@@ -97,7 +97,7 @@ void actualizarDatosUsuario()
 		
 		// Muestra que el registro fue exitoso
 		app_mostrar_mensaje( "Datos actualizados de forma exitosa." );
-		vistaCuenta( nullptr, nullptr );
+		usuario_cuenta_leer( nullptr, nullptr );
 	}
 	catch( invalid_argument &ia ){
 		app_mostrar_error( ia.what() );
@@ -121,21 +121,18 @@ void iniciarSesion(){
 
 		// Si hay resultados (usuario encontrado)
 		if( results.size() > 0 ){
-			// Obtiene la contraseña y la sal
-			string hash = (* results.at( 0 ))[ "contrasena" ];
-			string nombre = (* results.at( 0 ))[ "nombre" ];
-			string apellidos = (* results.at( 0 ))[ "apellidos" ];
-			bool administrador = stoi( (* results.at( 0 ))[ "administrador" ] );
-			
+			auto resultado = results.at( 0 );
+
 			// Verifica la autenticidad de la contrasena
-			verificarContrasena( contrasena, hash );
+			verificarContrasena( contrasena, (* resultado)[ "contrasena" ] );
 			
 			// Establece los datos restantes
+			usuario.establecerClave( stoi( (* resultado)[ "id_usuario" ] ) );
 			usuario.establecerNombreUsuario( nombreUsuario );
-			usuario.establecerNombre( nombre );
-			usuario.establecerApellidos( apellidos );
-			usuario.establecerHash( hash );
-			usuario.establecerAdministrador( administrador );
+			usuario.establecerNombre( (* resultado)[ "nombre" ] );
+			usuario.establecerApellidos( (* resultado)[ "apellidos" ] );
+			usuario.establecerHash( (* resultado)[ "contrasena" ] );
+			usuario.establecerAdministrador( stoi( (* resultado)[ "administrador" ] ) );
 
 			// Muestra al usuario
 			mostrarUsuario();
@@ -147,6 +144,9 @@ void iniciarSesion(){
 			if( usuario.esAdministrador() ){
 				conectarSenalesAdministrador();
 			}
+
+			//
+			conectar_senal( enlaceCuenta, G_CALLBACK( usuario_cuenta_leer ), nullptr );
 
 			// Manda a conectar todas las señales de las vistas
         	conectarSenales();

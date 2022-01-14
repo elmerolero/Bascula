@@ -1,8 +1,17 @@
 #include "Usuario.h"
-#include <string>
+#include "GestorRegistros.h"
+#include "Aplicacion.h"
 #include <stdexcept>
+#include <iostream>
+#include <sstream>
+#include <string>
 #include <regex>
 using namespace std;
+
+// Usuario
+Usuario usuario;
+
+Signal enlaceCuenta{ "EnlaceCuenta", "activate-link", 0 };
 
 // Constructor
 Usuario::Usuario():
@@ -20,12 +29,25 @@ Usuario::Usuario( unordered_map< string, string > *renglon ):
     }
 
     // Establece los datos del registro
+    establecerClave( stoi( (* renglon)[ "id_usuario" ] ) );
     establecerNombreUsuario( (* renglon)[ "nombre_usuario" ] );
     establecerHash( (* renglon)[ "contrasena" ] );
-    establecerSal( (* renglon)[ "sal" ] );
     establecerNombre( (* renglon)[ "nombre" ] );
     establecerApellidos( (* renglon)[ "apellidos" ] );
     establecerAdministrador( stoi( (* renglon)[ "administrador" ] ) );
+}
+
+// Clave
+void Usuario::establecerClave( unsigned int clave ){
+	if( clave < 1 ){
+		throw invalid_argument( "Ha ocurrido un error estableciendo la clave." );
+	}
+	
+	this -> clave = clave;
+}
+
+unsigned int Usuario::obtenerClave() const{
+	return clave;
 }
 
 // Establece el nombre del usuario
@@ -188,18 +210,6 @@ void Usuario::compararContrasenas( string contrasena, string confirmacion )
 	}
 }
 
-// Establece la sal
-void Usuario::establecerSal( string sal )
-{
-    this -> sal = sal;
-}
-
-// Obtiene la sal
-std::string Usuario::obtenerSal() const
-{
-    return sal;
-}
-
 // Establece los permisos de administrador
 void Usuario::establecerAdministrador( bool permiso )
 {
@@ -225,4 +235,46 @@ string Usuario::validarContrasena( std::string contrasena ){
     }
     
     return contrasena;
+}
+
+
+void usuario_cuenta_leer( GtkWidget *widget, gpointer ptr ){
+    cout << "usuario_cuenta_leer" << endl;
+	// Establece las opciones para cuenta
+    stringstream consulta;
+    consulta << "select * from Usuario where id_usuario = " << usuario.obtenerClave();
+
+    database.open( databaseFile );
+    database.query( consulta.str() );
+    database.close();
+
+    if( results.size() > 0 ){
+        cout << "llegue aqui" << endl;
+        unordered_map< string, string > *cuenta = results.at( 0 );
+
+        // Establece los datos base
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaClave" ) ), (* cuenta)[ "id_usuario" ].c_str() );
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaNombre" ) ), (* cuenta)[ "nombre" ].c_str() );
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaApellidos" ) ), (* cuenta)[ "apellidos" ].c_str() );
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaPseudonimo" ) ), (* cuenta)[ "pseudonimo" ].c_str() );
+
+        // Establece los datos adicionales
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaFechaNacimiento" ) ), "No establecido." );
+        if( (* cuenta)[ "fecha_nacimiento" ].compare( "null" ) != 0 ){
+            gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaFechaNacimiento" ) ), (* cuenta)[ "fecha_nacimiento" ].c_str() );
+        }
+
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaRFC" ) ), "No establecido" );
+        if( (* cuenta)[ "RFC" ].compare( "null" ) != 0 ){
+            gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaRFC" ) ), (* cuenta)[ "RFC" ].c_str() );
+        }
+
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaCorreoElectronico" ) ), "No establecido" );
+        if( (* cuenta)[ "correo" ].compare( "null" ) != 0 ){
+            gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaCorreoElectronico" ) ), (* cuenta)[ "correo" ].c_str() );
+        }
+    }
+
+	// Se dirige a cuenta
+	irA( "Cuenta", false );
 }

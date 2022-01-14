@@ -15,19 +15,6 @@
 #include "Senales.h"
 using namespace std;
 
-void vistaCuenta( GtkWidget *widget, gpointer ptr )
-{
-	// Establece las opciones para cuenta
-	gtk_entry_set_text( GTK_ENTRY( "EntradaCuentaNombre" ), usuario.obtenerNombre().c_str() );
-	gtk_entry_set_text( GTK_ENTRY( "EntradaCuentaApellidos" ), usuario.obtenerApellidos().c_str() );
-	gtk_entry_set_text( GTK_ENTRY( "EntradaCuentaNombreUsuario" ), usuario.obtenerNombreUsuario().c_str() );
-	gtk_entry_set_text( GTK_ENTRY( "EntradaCuentaContrasenaNueva" ), "" );
-	gtk_entry_set_text( GTK_ENTRY( "EntradaCuentaContrasenaConfirmacion" ), "" );
-
-	// Se dirige a cuenta
-	irA( "Cuenta", false );
-}
-
 void vista_registros( GtkWidget *widget, gpointer ptr ){	
 	// Lo convierte para establecer el título
 	ContenedorRegistros *registros = static_cast< ContenedorRegistros * >( ptr );
@@ -165,12 +152,35 @@ void vistaBasculaEdicion()
 
 void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
 {
-	// Numero copias
-	interfaz.establecerTextoEntrada( "OpcionesImpresionFormatos", to_string( numeroFormatos ) );
-	interfaz.establecerTextoEntrada( "OpcionesImpresionCopias", to_string( numeroCopias ) );
+	// Obtiene la información de la empresa
+	database.open( databaseFile );
+	database.query( "select * from EmpresaPropia where id_empresa = 1" );
+	database.close();
+
+	if( results.size() > 0 ){
+		unordered_map< string, string > *resultado = results.at( 0 );
+
+		// Actualiza el nombre
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreEmpresa" ) ), (* resultado)[ "razon_social" ].c_str() );
+
+		// Actualiza el RFC si tiene
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EmpresaPropiaRFC" ) ), "No establecido" );
+		if( (* resultado)[ "RFC" ].compare( "null" ) != 0 ){
+			gtk_label_set_text( GTK_LABEL( buscar_objeto( "EmpresaPropiaRFC" ) ), (* resultado)[ "RFC" ].c_str() );
+		}
+
+		// Obtiene la imagen de la empresa
+		gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenEmpresaPropia" ) ), "../recursos/imagenes/iconos/Empresas.png" );
+		if( (* resultado)[ "imagen" ].compare( "null" ) != 0 ){
+			GdkPixbuf *imagen = imagen_cargar_escalar( "../recursos/imagenes/empresas/" + (*resultado)[ "imagen" ], 128, 128 );
+            if( imagen != nullptr ){
+            	gtk_image_set_from_pixbuf( GTK_IMAGE( gtk_builder_get_object( builder, "ImagenEmpresaPropia" ) ), imagen );
+            }
+		}
+	} 
 
 	// Establece la señal de eliminar bascula
-	interfaz.conectarSenal( botonSi, G_CALLBACK( basculaEliminar ), nullptr );
+	//interfaz.conectarSenal( botonSi, G_CALLBACK( basculaEliminar ), nullptr );
 
 	// Se dirige a la vista
 	irA( "Configuracion", false );

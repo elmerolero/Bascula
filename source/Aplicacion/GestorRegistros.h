@@ -11,9 +11,6 @@
 // Base de datos
 extern Database database;
 
-// Usuario
-extern Usuario usuario;
-
 // El usuario seleccionado a consultar
 extern Usuario *usuarioConsultado;
 

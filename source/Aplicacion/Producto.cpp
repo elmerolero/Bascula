@@ -23,19 +23,19 @@ Signal senal_producto_cancelar_edicion = { "ProductoEdicionCancelar", "clicked",
 Signal senal_producto_eliminar = { "BotonRegistroEliminar", "clicked", 0 };
 Signal senal_producto_seleccionar = { "ContenedorRegistros", "row-activated", 0 };
 
-Signal senal_producto_buscar = { "BuscadorRegistros", "search-changed" };
+Signal senal_producto_buscar = { "BuscadorRegistros", "search-changed", 0 };
 
 void producto_conectar_senales( void ){
-    const char *mensaje = "ALERTA: Si el existen registros de pesaje que hagan\nreferencia a este registro, también serán eliminados.\n¿Estás seguro que deseas hacerlo?";
+    const char *mensaje = "ALERTA: Si el existen registros de pesaje que hagan\nreferencia a este producto también serán eliminados.\n¿Estás seguro que deseas hacerlo?";
 
     // Vista de listado de productos
     conectar_senal( senal_producto_nuevo, G_CALLBACK( irHacia ), (void *)"NuevoRegistro" );                 // Crea nuevo producto
     conectar_senal( senal_producto_guardar_nuevo, G_CALLBACK( producto_nuevo ), nullptr );                  // Guarda el nuevo producto
-    conectar_senal( senal_producto_cancelar_nuevo, G_CALLBACK( regresarVista ), nullptr );        // Cancela la creación del nuevo producot
+    conectar_senal( senal_producto_cancelar_nuevo, G_CALLBACK( regresarVista ), nullptr );                  // Cancela la creación del nuevo producot
     conectar_senal( senal_producto_editar, G_CALLBACK( producto_editar ), nullptr );                        // Edita el producto seleccionado
     conectar_senal( senal_producto_cancelar_edicion, G_CALLBACK( producto_descartar_cambios ), nullptr );   // Cancela la edicion del producto seleccionado
     conectar_senal( senal_producto_guardar_edicion, G_CALLBACK( producto_guardar_edicion ), nullptr );      // Guarda los cambios de la edición del producto seleccionado
-    conectar_senal( senal_producto_eliminar, G_CALLBACK( app_alerta ), (void *)mensaje );            // Lanza una alerta de eliminación del producto seleccionado
+    conectar_senal( senal_producto_eliminar, G_CALLBACK( app_alerta ), (void *)mensaje );                   // Lanza una alerta de eliminación del producto seleccionado
     conectar_senal( senal_producto_seleccionar, G_CALLBACK( producto_seleccionar ), nullptr );              // Selecciona un producto
     conectar_senal( botonSi, G_CALLBACK( producto_eliminar ), nullptr );
     conectar_senal( senal_producto_buscar, G_CALLBACK( producto_buscar ), nullptr );
@@ -265,7 +265,7 @@ void producto_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
 		}
 
 		// Establece la vista de registro
-		irA( "Registro", false );
+		irA( "Producto", false );
 	}
 }
 

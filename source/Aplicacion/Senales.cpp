@@ -50,7 +50,6 @@ Signal enlaceCreditos{ "EnlaceCreditos", "activate-link", 0 };
 Signal enlaceCreditosRegresar{ "EnlaceCreditosRegresar", "activate-link", 0 };
     
 // Barra de usuario
-Signal enlaceCuenta{ "EnlaceCuenta", "activate-link", 0 };
 Signal enlaceCuentaRegresar{ "EnlaceCuentaRegresar", "activate-link", 0 };
 Signal botonActualizarCuenta{ "BotonActualizarCuenta", "clicked", 0 };
 

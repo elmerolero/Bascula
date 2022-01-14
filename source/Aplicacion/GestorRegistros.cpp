@@ -13,9 +13,6 @@ using namespace std;
 // Base de datos
 Database database;
 
-// Usuario
-Usuario usuario;
-
 // El usuario seleccionado a consultar
 Usuario *usuarioConsultado;
 

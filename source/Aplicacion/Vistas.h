@@ -5,7 +5,6 @@
 #include "Registro.h"
 #include "ContenedorRegistros.h"
 
-void vistaCuenta( GtkWidget *widget, gpointer ptr );
 void vistaRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data );
 void vistaRegistroEditar( GtkWidget *widget, gpointer data );
 void vistaRegistroEliminar( GtkWidget *widget, gpointer data );

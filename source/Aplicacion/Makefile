@@ -16,7 +16,7 @@ Widget.o:	Widget.h Widget.cpp
 	$(CC) $(CFLAGS) -c Widget.h Widget.cpp $(LIBS)
 
 Usuario.o:	Usuario.h Usuario.cpp
-	$(CC) -c Usuario.h Usuario.cpp
+	$(CC) $(CFLAGS) -c Usuario.h Usuario.cpp $(LIBS)
 	
 Funciones.o: Funciones.h Funciones.cpp
 	$(CC) $(CFLAGS) -c Funciones.h Funciones.cpp

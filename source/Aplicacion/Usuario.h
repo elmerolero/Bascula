@@ -5,6 +5,10 @@
 #include <regex>
 #include <unordered_map>
 #include <stdexcept>
+#include <gtk/gtk.h>
+#include "Widget.h"
+
+extern Signal enlaceCuenta;
 
 class Usuario
 {
@@ -16,6 +20,10 @@ class Usuario
         Usuario( std::unordered_map< std::string, std::string > *renglon );
 
         /* Modificadores de acceso */
+        // Folio
+		void establecerClave( unsigned int clave );
+		unsigned int obtenerClave() const;
+
         // Nombre de usuario
         void establecerNombreUsuario( std::string nombreUsuario );
         std::string obtenerNombreUsuario() const;
@@ -38,23 +46,24 @@ class Usuario
         // Aspectos relacionados a la contraseña
         static std::string validarContrasena( std::string contrasena );
         static void compararContrasenas( std::string contrasena, std::string confirmacion );
-        
-        // Sal de contrasena
-        void establecerSal( std::string sal );
-        std::string obtenerSal() const;
 
         // Permisos de administrador
         void establecerAdministrador( bool permiso );
         bool esAdministrador() const;
 
     private:
+        unsigned int clave;
         std::string nombreUsuario;
         std::string nombre;
         std::string apellidos;
         std::string hash;
-        std::string sal;
         bool administrador;
 };
+
+// Usuario
+extern Usuario usuario;
+
+void usuario_cuenta_leer( GtkWidget *widget, gpointer info );
 
 #endif
 

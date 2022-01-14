@@ -152,7 +152,6 @@ void conectarSenales()
     // Vista Inicio
     conectar_senal( botonBascula, G_CALLBACK( irHacia ), (void *)"Bascula" );
     conectar_senal( enlaceCreditos, G_CALLBACK( irHacia ), (void *)"Creditos" );
-    conectar_senal( enlaceCuenta, G_CALLBACK( vistaCuenta ), nullptr );
     conectar_senal( botonConfiguracion, G_CALLBACK( vistaConfiguracion ), nullptr );
     
     // Barra de usuario
@@ -208,7 +207,7 @@ void conectarSenalesAdministrador(){
     conectar_senal( botonUsuarios, G_CALLBACK( vistaConsultarUsuarios ), nullptr );
 
     // Vista Registros
-    conectar_senal( botonRegistrosEmpresas, G_CALLBACK( vista_registros ), (void *)(&empresas) );
+    conectar_senal( botonRegistrosEmpresas, G_CALLBACK( empresa_listar_registros ), (void *)(&empresas) );
     conectar_senal( botonRegistrosProductos, G_CALLBACK( producto_listar_registros ), (void *)(&productos) );
     conectar_senal( botonRegistrosPesajesInternos, G_CALLBACK( vistaConsultarPesajesInternos ), nullptr );
     conectar_senal( botonRegistrosBasculaPublica, G_CALLBACK( vistaConsultarPesajesPublicos ), nullptr );

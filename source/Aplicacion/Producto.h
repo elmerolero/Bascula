@@ -5,6 +5,20 @@
 #include "Imagen.h"
 #include <string>
 
+extern Signal senal_producto_imagen_seleccionar;
+
+extern Signal senal_producto_nuevo;
+extern Signal senal_producto_guardar_nuevo;
+extern Signal senal_producto_cancelar_nuevo;
+
+extern Signal senal_producto_editar;
+extern Signal senal_producto_guardar_edicion;
+extern Signal senal_producto_cancelar_edicion;
+extern Signal senal_producto_eliminar;
+extern Signal senal_producto_seleccionar;
+
+extern Signal senal_producto_buscar;
+
 void producto_validar_nombre( std::string nombre );
 void producto_listar_registros( GtkWidget *widget, gpointer info );
 void producto_nuevo( GtkWidget *widget, gpointer info );

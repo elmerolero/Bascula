@@ -233,7 +233,6 @@ gboolean imagen_cancelar(){
 void imagen_escalar( ImagenCairo* imagen, ImagenCairo *imagen_destino, int ancho, int alto ){
     cout << "imagen_escalar" << endl;
     // Libera la imagen anterior
-    cout << imagen << " " << imagen_destino << endl;
     if( imagen -> superficie != imagen_destino -> superficie ){
         imagen_destruir( imagen_destino );
     }

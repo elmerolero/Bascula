@@ -43,7 +43,6 @@ extern Signal botonConfiguracion;
 extern Signal enlaceCreditos;
     
 // Barra de usuario
-extern Signal enlaceCuenta;
 extern Signal botonActualizarCuenta;
 
 // Seleccion servicio

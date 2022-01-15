@@ -129,21 +129,18 @@ void vistaRegistroEditar( GtkWidget *widget, gpointer data )
 	}
 }
 
-void vistaRegistroEliminar( GtkWidget *widget, gpointer ptr )
-{
+void vistaRegistroEliminar( GtkWidget *widget, gpointer ptr ){
 	const char *mensaje = "ALERTA: Si el existen registros de pesaje que hagan\nreferencia a este registro, también serán eliminados.\n¿Estás seguro que deseas hacerlo?";
 	gtk_label_set_text( GTK_LABEL( buscar_objeto( "MensajeAlerta" ) ), mensaje );
-	interfaz.mostrarElemento( "VentanaSiNo" );
+	gtk_widget_show( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
 }
 
-void vistaBasculaEliminar()
-{
-	interfaz.establecerTextoEtiqueta( "MensajeAlerta", "¿Quieres eliminar la báscula seleccionada?" );
-	interfaz.mostrarElemento( "VentanaSiNo" );
+void vistaBasculaEliminar(){
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "MensajeAlerta" ) ), "¿Quieres eliminar la báscula seleccionada?" );
+	gtk_widget_show( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
 }
 
-void vistaBasculaEdicion()
-{
+void vistaBasculaEdicion(){
 	basculaLimpiarFormulario();
 
 	irA( "OpcionesBascula", false );
@@ -180,7 +177,7 @@ void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
 	} 
 
 	// Establece la señal de eliminar bascula
-	//interfaz.conectarSenal( botonSi, G_CALLBACK( basculaEliminar ), nullptr );
+	//conectar_senal( botonSi, G_CALLBACK( basculaEliminar ), nullptr );
 
 	// Se dirige a la vista
 	irA( "Configuracion", false );
@@ -192,8 +189,8 @@ void vistaBasculaPublica( GtkWidget *widget, gpointer ptr )
 	publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
 	
 	// Conecta las señales correspondientes
-    interfaz.conectarSenal( botonBasculaNuevo, G_CALLBACK( vistaCrearRegistroPublico ), nullptr );
-	interfaz.conectarSenal( ticketsPendientesSeleccionados, G_CALLBACK( vistaPublicoEditarRegistro ), nullptr );
+	conectar_senal( botonBasculaNuevo, G_CALLBACK( vistaCrearRegistroPublico ), nullptr );
+	conectar_senal( ticketsPendientesSeleccionados, G_CALLBACK( vistaPublicoEditarRegistro ), nullptr );
 
 	// Establece las vistas
 	irA( "Tickets", false );
@@ -205,8 +202,8 @@ void vistaBasculaInterna( GtkWidget *widget, gpointer ptr )
 	internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
 	
 	// Conecta las señales correspondientes
-    interfaz.conectarSenal( botonBasculaNuevo, G_CALLBACK( vistaCrearRegistro ), nullptr );
-    interfaz.conectarSenal( ticketsPendientesSeleccionados, G_CALLBACK( vistaInternoEditarRegistro ), nullptr);
+    conectar_senal( botonBasculaNuevo, G_CALLBACK( vistaCrearRegistro ), nullptr );
+    conectar_senal( ticketsPendientesSeleccionados, G_CALLBACK( vistaInternoEditarRegistro ), nullptr);
 
     // Establece las vistas
 	irHacia( nullptr, (void *)"Tickets" );
@@ -217,40 +214,41 @@ void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
 	// Folio
 	stringstream folio;
 	folio << setfill( '0' ) << setw( 7 ) << (folioActualPublico + 1);
-	interfaz.establecerTextoEtiqueta( "EntradaFolioPublico", folio.str() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), folio.str() );
 	
 	// Fecha
-	interfaz.establecerTextoEtiqueta( "EntradaFechaPublico", tiempo_leer_fecha_corta() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico", tiempo_leer_fecha_corta() );
 	
 	// Producto
-	interfaz.habilitarEdicionEntrada( "EntradaNombreProductoPublico" );
-	interfaz.establecerTextoEntrada( "EntradaNombreProductoPublico", "" );
+	gtk_entry_set_editable( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ), TRUE );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ), "" );
 	
 	// Nombre del conductor
-	interfaz.habilitarEdicionEntrada( "EntradaNombreConductorPublico" );
-	interfaz.establecerTextoEntrada( "EntradaNombreConductorPublico", "" );
+	gtk_entry_set_editable( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico"  ) ), TRUE );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ), "" );
 	
 	// Numero de placas
-	interfaz.habilitarEdicionEntrada( "EntradaNumeroPlacasPublico" );
-	interfaz.establecerTextoEntrada( "EntradaNumeroPlacasPublico", "" );
+	gtk_entry_set_editable( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico"  ) ), TRUE );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ), "" ) );
 	
 	// Hora entrada y Peso Bruto
-	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", "No establecida" );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", "No establecido" );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ), "No establecida" );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ), "No establecido" );
 	
 	// Hora salida y Peso Tara
-	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", "No establecida" );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", "No establecido" );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ), "No establecida" );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ), "No establecido" );
 	
 	// Tipo de registro
-	interfaz.establecerActivoBotonToggle( "ViajeLocal" );
+	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "ViajeLocal" ) ), TRUE );
 	
 	// Peso neto
-	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", "No establecido" );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), "No establecido" ) );
 	
 	// Establece el completador de producto
-	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoInterno", NULL );
-	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoPublico", productos.obtenerCompletador() ); 
+	//  gtk_entry_set_completion( GTK_ENTRY( objecto ), completador );
+	//establecerCompletadorEntrada( "EntradaNombreProductoInterno", NULL );
+	//establecerCompletadorEntrada( "EntradaNombreProductoPublico", productos.obtenerCompletador() ); 
 	
 	// Establece la vista de nuevo ticket
 	irA( "NuevoTicketPublico", false );
@@ -262,8 +260,7 @@ void vistaPublicoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 		// Busca el ticket
 		TicketPublico *registroPublico = buscarRegistroPublicoPorFolio( obtenerFolioSelector( row ), registrosPublicosPendientes );
 		if( registroPublico == nullptr ){
-			interfaz.establecerTextoEtiqueta( "DialogoMensaje", "Registro no encontrado." );
-			interfaz.mostrarElemento( "VentanaMensaje" );
+			app_mostrar_mensaje( "Registro no encontrado." );
 			return;
 		}
 		
@@ -272,44 +269,44 @@ void vistaPublicoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 		
 		// Folio
 		entrada << setfill( '0' ) << setw( 7 ) << registroPublico -> obtenerFolio();
-		interfaz.establecerTextoEtiqueta( "EntradaFolioPublico", entrada.str() );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), entrada.str().c_str() ) );
 		
 		// Fecha
-		interfaz.establecerTextoEtiqueta( "EntradaFechaPublico", registroPublico -> obtenerFecha() );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico" ) ), registroPublico -> obtenerFecha().c_str() );
 		
 		// Tipo registro
 		if( registroPublico -> obtenerTipoViaje() == VIAJE_LOCAL ){
-			interfaz.establecerActivoBotonToggle( "ViajeLocal" );
+			gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "ViajeLocal" ) ),TRUE );
 		}
 		else{
-			interfaz.establecerActivoBotonToggle( "ViajeForaneo" );
+			gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "ViajeForaneo" ) ),TRUE );
 		}
 		
 		// Nombre del producto (no permite edicion)
-		interfaz.establecerTextoEntrada( "EntradaNombreProductoPublico", registroPublico -> obtenerProducto() -> obtenerNombre() );
-		interfaz.deshabilitarEdicionEntrada( "EntradaNombreProductoPublico" );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ), registroPublico -> obtenerProducto() -> obtenerNombre() ) );
+		gtk_entry_set_editable( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico"  ) ), FALSE );
 		
 		// Nombre del conductor (no permite edicion)
-		interfaz.establecerTextoEntrada( "EntradaNombreConductorPublico", registroPublico -> obtenerNombreConductor() );
-		interfaz.deshabilitarEdicionEntrada( "EntradaNombreConductorPublico" );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ), registroPublico -> obtenerNombreConductor() ) );
+		gtk_entry_set_editable( GTK_ENTRY( buscar_objeto(  "EntradaNombreConductorPublico"  ) ), FALSE );
 		
 		// Numero de placas (no permite edicion)
-		interfaz.establecerTextoEntrada( "EntradaNumeroPlacasPublico", registroPublico -> obtenerNumeroPlacas() );
-		interfaz.deshabilitarEdicionEntrada( "EntradaNumeroPlacasPublico" );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ), registroPublico -> obtenerNumeroPlacas() );
+		gtk_entry_set_editable( GTK_ENTRY( buscar_objeto(  "EntradaNumeroPlacasPublico"  ) ), FALSE );
 		
 		// Hora entrada y peso bruto
-		interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaPublico", ( registroPublico -> estaPesoBrutoEstablecido() ? registroPublico -> obtenerHoraEntrada() : "No establecida" ) );
-		interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoPublico", ( registroPublico -> estaPesoBrutoEstablecido() ? pesoString( registroPublico -> obtenerPesoBruto(), 2 ) : "No establecido" ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ), ( registroPublico -> estaPesoBrutoEstablecido() ? registroPublico -> obtenerHoraEntrada() : "No establecida" ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ), ( registroPublico -> estaPesoBrutoEstablecido() ? pesoString( registroPublico -> obtenerPesoBruto(), 2 ) : "No establecido" ) );
 		
 		// Hora salida y peso tara
-		interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaPublico", ( registroPublico -> estaPesoTaraEstablecido() ? registroPublico -> obtenerHoraSalida() : "No establecida" ) );
-		interfaz.establecerTextoEtiqueta( "EntradaPesoTaraPublico", ( registroPublico -> estaPesoTaraEstablecido() ? pesoString( registroPublico -> obtenerPesoTara(), 2 ) : "No establecido" ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ), ( registroPublico -> estaPesoTaraEstablecido() ? registroPublico -> obtenerHoraSalida() : "No establecida" ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ), ( registroPublico -> estaPesoTaraEstablecido() ? pesoString( registroPublico -> obtenerPesoTara(), 2 ) : "No establecido" ) );
 		
 		// Peso neto
-		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", ( registroPublico -> estaPesoNetoEstablecido() ? pesoString( registroPublico -> obtenerPesoNeto(), 2 ) : "No establecido" ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), ( registroPublico -> estaPesoNetoEstablecido() ? pesoString( registroPublico -> obtenerPesoNeto(), 2 ) : "No establecido" ) );
 		
 		// Establece el texto de finalizar
-		interfaz.establecerBotonEtiqueta( "BotonRegistrarPublico", "Finalizar" );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "BotonRegistrarPublico" ) ), "Finalizar" );
 
 		// Va hacia la vista
 		irA( "NuevoTicketPublico", false );
@@ -324,28 +321,28 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	// Folio
 	stringstream folio;
 	folio << setfill( '0' ) << setw( 7 ) << (folioActual + 1);
-	interfaz.establecerTextoEtiqueta( "EntradaFolioInterno", folio.str() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioInterno" ) ), folio.str().C_str() );
 	
 	// Fecha
-	interfaz.establecerTextoEtiqueta( "EntradaFechaInterno", tiempo_leer_fecha_corta() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFechaInterno" ) ), tiempo_leer_fecha_corta().c_str() );
 	
 	// Limpia el formulario
 	internoLimpiarFormulario();
 
 	// Descuento
-	interfaz.establecerActivoBotonToggle( "NoDescuentoInterno" );
-	interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
-	interfaz.deshabilitarEdicionEntrada( "EntradaDescuentoInterno" );
+	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "NoDescuentoInterno" ) ), TRUE );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ), "" );
+	gtk_entry_set_editable( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ), FALSE );
 
 	// Tipo de registro (registra entrada por defecto)
-	interfaz.establecerActivoBotonToggle( "RegistraEntrada" );
-	
+	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "RegistraEntrada" ) ), TRUE );
+
 	// Establece el completador de empresa
-	interfaz.establecerCompletadorEntrada( "EntradaNombreEmpresaInterno", empresas.obtenerCompletador() );
+	//establecerCompletadorEntrada( "EntradaNombreEmpresaInterno", empresas.obtenerCompletador() );
 	
 	// Establece el completador de producto
-	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoPublico", NULL );
-	interfaz.establecerCompletadorEntrada( "EntradaNombreProductoInterno", productos.obtenerCompletador() );
+	//establecerCompletadorEntrada( "EntradaNombreProductoPublico", NULL );
+	//establecerCompletadorEntrada( "EntradaNombreProductoInterno", productos.obtenerCompletador() );
 	
 	// Establece la vista de nuevo ticket 
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
@@ -357,8 +354,7 @@ void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 	
 	// Si no encuentra el ticket
 	if( ticket == nullptr ){
-		interfaz.establecerTextoEtiqueta( "DialogoMensaje", "Registro no encontrado." );
-		interfaz.mostrarElemento( "VentanaMensaje" );
+		app_mostrar_mensaje( "Registro no encontrado." );
 		return;
 	}
 	
@@ -367,40 +363,40 @@ void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 	
 	// Folio
 	entrada << setfill( '0' ) << setw( 7 ) << ticket -> obtenerFolio();
-	interfaz.establecerTextoEtiqueta( "EntradaFolioInterno", entrada.str() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioInterno" ) ), entrada.str().c_str() );
 	
 	// Fecha
-	interfaz.establecerTextoEtiqueta( "EntradaFechaInterno", ticket -> obtenerFecha() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFechaInterno" ) ), ticket -> obtenerFecha().c_str() );
 	
 	// Tipo registro
 	if( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ){
-		interfaz.establecerActivoBotonToggle( "RegistraEntrada" );
-		interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Proveedor:      " );
+		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "RegistraEntrada" ) ), TRUE );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaEmpresa" ) ), "Proveedor:      " );
 	}
 	else{
-		interfaz.establecerActivoBotonToggle( "RegistraSalida" );
-		interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Cliente:           " );
+		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "RegistraSalida" ) ), TRUE );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaEmpresa" ) ), "Cliente:           " );
 	}
 
 	// Nombre de la empresa
-	interfaz.establecerTextoEntrada( "EntradaNombreEmpresaInterno", ticket -> obtenerEmpresa() -> obtenerNombre() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreEmpresaInterno" ) ), ticket -> obtenerEmpresa() -> obtenerNombre().c_str() );
 	
 	// Nombre del producto
-	interfaz.establecerTextoEntrada( "EntradaNombreProductoInterno", ticket -> obtenerProducto() -> obtenerNombre() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoInterno" ) ), ticket -> obtenerProducto() -> obtenerNombre().c_str() );
 	
 	// Nombre del conductor
-	interfaz.establecerTextoEntrada( "EntradaNombreConductorInterno", ticket -> obtenerNombreConductor() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorInterno" ) ), ticket -> obtenerNombreConductor().c_str() );
 	
 	// Numero de placas
-	interfaz.establecerTextoEntrada( "EntradaNumeroPlacasInterno", ticket -> obtenerNumeroPlacas() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasInterno" ) ), ticket -> obtenerNumeroPlacas().c_str() );
 	
 	// Hora entrada y peso bruto
-	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", ( ticket -> estaPesoBrutoEstablecido() ? ticket -> obtenerHoraEntrada() : "No establecida" ) );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", ( ticket -> estaPesoBrutoEstablecido() ? pesoString( ticket -> obtenerPesoBruto(), 2 ) : "No establecido" ) );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaInterno" ) ), ( ticket -> estaPesoBrutoEstablecido() ? ticket -> obtenerHoraEntrada() : "No establecida" ).c_str() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoInterno" ) ), ( ticket -> estaPesoBrutoEstablecido() ? pesoString( ticket -> obtenerPesoBruto(), 2 ) : "No establecido" ).c_str() );
 	
 	// Hora salida y peso tara
-	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", ( ticket -> estaPesoTaraEstablecido() ? ticket -> obtenerHoraSalida() : "No establecida" ) );
-	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", ( ticket -> estaPesoTaraEstablecido() ? pesoString( ticket -> obtenerPesoTara(), 2 ) : "No establecido" ) );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaInterno" ) ), ( ticket -> estaPesoTaraEstablecido() ? ticket -> obtenerHoraSalida() : "No establecida" ).c_str() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraInterno" ) ), ( ticket -> estaPesoTaraEstablecido() ? pesoString( ticket -> obtenerPesoTara(), 2 ) : "No establecido" ).c_str() );
 	
 	// Descuento
 	if( ticket -> permitirDescuento() ){
@@ -427,25 +423,25 @@ void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 void vistaLeerPesoBruto()
 {
 	basculaAbrirLector();
-	interfaz.conectarSenal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoBruto ), nullptr );
+	conectar_senal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoBruto ), nullptr );
 }
 
 void vistaLeerPesoTara()
 {
 	basculaAbrirLector();
-	interfaz.conectarSenal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoTara ), nullptr );
+	conectar_senal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoTara ), nullptr );
 }
 
 void vistaLeerPesoBrutoPublico()
 {
 	basculaAbrirLector();
-	interfaz.conectarSenal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoBruto ), nullptr );
+	conectar_senal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoBruto ), nullptr );
 }
 
 void vistaLeerPesoTaraPublico()
 {
 	basculaAbrirLector();
-	interfaz.conectarSenal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoTara ), nullptr );
+	conectar_senal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoTara ), nullptr );
 }
 
 void vistaConsultarPesajesInternos()
@@ -455,28 +451,28 @@ void vistaConsultarPesajesInternos()
 	internoActualizarRegistros( registrosInternosConsultados, "ContenedorRegistrosPesaje" );
 
 	// Establece la fecha del ticket que se está consultando
-	interfaz.establecerTextoEtiqueta( "TicketsRegistrados", "Registros del día " + tiempo_leer_fecha_corta() + ":"  );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsRegistrados" ) ), ("Registros del día " + tiempo_leer_fecha_corta() + ":").c_str() );
 
 	// Establece el número de tickets
-	interfaz.establecerTextoEtiqueta( "TicketsContados", to_string( registrosInternosConsultados.size() ) + " registros"  );;
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsContados" ) ), (to_string( registrosInternosConsultados.size() ) + " registros").c_str() );
 
 	// Señal del boton seleccionar día
-	interfaz.conectarSenal( botonRegistrosPesajeSeleccionarDia, G_CALLBACK( irHacia ), ( void *)"ConsultarDia" );
+	conectar_senal( botonRegistrosPesajeSeleccionarDia, G_CALLBACK( irHacia ), ( void *)"ConsultarDia" );
 
 	// Señal del boton informe
-	interfaz.conectarSenal( botonRegistrosPesajeObtenerInforme, G_CALLBACK( internoGenerarInforme ), nullptr );
+	conectar_senal( botonRegistrosPesajeObtenerInforme, G_CALLBACK( internoGenerarInforme ), nullptr );
 
 	// Señal de obtener registros
-	interfaz.conectarSenal( botonObtenerRegistros, G_CALLBACK( irHacia ), (void *)"ObtenerRegistros" );
+	conectar_senal( botonObtenerRegistros, G_CALLBACK( irHacia ), (void *)"ObtenerRegistros" );
 
 	// Señal de selección de ticket
-	interfaz.conectarSenal( ticketsConsultadosSeleccionados, G_CALLBACK( vistaInternoConsultarRegistro ), nullptr );
+	conectar_senal( ticketsConsultadosSeleccionados, G_CALLBACK( vistaInternoConsultarRegistro ), nullptr );
 
 	// Boton de seleccion dia
-	interfaz.conectarSenal( botonConsultarDia, G_CALLBACK( internoSeleccionarDia ), nullptr );
+	conectar_senal( botonConsultarDia, G_CALLBACK( internoSeleccionarDia ), nullptr );
 
 	// Boton de generación de informe
-	interfaz.conectarSenal( botonObtenerRegistrosRango, G_CALLBACK( internoObtenerRegistrosRango ), nullptr );
+	conectar_senal( botonObtenerRegistrosRango, G_CALLBACK( internoObtenerRegistrosRango ), nullptr );
 
 	// Redirige hacia la vista
 	irHacia( nullptr, (void *)"Pesajes" );
@@ -489,28 +485,28 @@ void vistaConsultarPesajesPublicos()
 	publicoActualizarRegistros( registrosPublicosConsultados, "ContenedorRegistrosPesaje" );
 
 	// Establece la fecha del ticket que se está consultando
-	interfaz.establecerTextoEtiqueta( "TicketsRegistrados", "Registros del día " + tiempo_leer_fecha_corta() + ":"  );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsRegistrados" ) ), ("Registros del día " + tiempo_leer_fecha_corta() + ":").c_str() );
 
 	// Establece el número de tickets
-	interfaz.establecerTextoEtiqueta( "TicketsContados", to_string( registrosPublicosConsultados.size() ) + " registros"  );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsContados" ) ), (to_string( registrosPublicosConsultados.size() ) + " registros").c_str() );
 
 	// Señal del boton seleccionar día
-	interfaz.conectarSenal( botonRegistrosPesajeSeleccionarDia, G_CALLBACK( irHacia ), ( void *)"ConsultarDia" );
+	conectar_senal( botonRegistrosPesajeSeleccionarDia, G_CALLBACK( irHacia ), ( void *)"ConsultarDia" );
 
 	// Señal del boton informe
-	interfaz.conectarSenal( botonRegistrosPesajeObtenerInforme, G_CALLBACK( publicoGenerarInforme ), nullptr );
+	conectar_senal( botonRegistrosPesajeObtenerInforme, G_CALLBACK( publicoGenerarInforme ), nullptr );
 
 	// Señal de obtener registros
-	interfaz.conectarSenal( botonObtenerRegistros, G_CALLBACK( irHacia ), (void *)"ObtenerRegistros" );	
+	conectar_senal( botonObtenerRegistros, G_CALLBACK( irHacia ), (void *)"ObtenerRegistros" );	
 
 	// Señal de selección de ticket
-	interfaz.conectarSenal( ticketsConsultadosSeleccionados, G_CALLBACK( vistaPublicoConsultarRegistro ), nullptr );
+	conectar_senal( ticketsConsultadosSeleccionados, G_CALLBACK( vistaPublicoConsultarRegistro ), nullptr );
 
 	// Boton de seleccion dia
-	interfaz.conectarSenal( botonConsultarDia, G_CALLBACK( publicoSeleccionarDia ), nullptr );
+	conectar_senal( botonConsultarDia, G_CALLBACK( publicoSeleccionarDia ), nullptr );
 
 	// Boton de generación de informe
-	interfaz.conectarSenal( botonObtenerRegistrosRango, G_CALLBACK( publicoObtenerRegistrosRango ), nullptr );
+	conectar_senal( botonObtenerRegistrosRango, G_CALLBACK( publicoObtenerRegistrosRango ), nullptr );
 
 	// Redirige hacia la vista
 	irHacia( nullptr, (void *)"Pesajes" );
@@ -526,27 +522,27 @@ void vistaInternoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointe
 	}
 
 	// Establece los datos del ticket en el formulario
-	interfaz.establecerTextoEtiqueta( "FolioInterno", to_string( ticket -> obtenerFolio() ) ); 					// Folio
-	interfaz.establecerTextoEtiqueta( "FechaInterno", ticket -> obtenerFecha() );			   					// Fecha
-	interfaz.establecerTextoEntrada( "NombreEmpresaInterno", ticket -> obtenerEmpresa() -> obtenerNombre() );	// Empresa
-	interfaz.establecerTextoEntrada( "NombreProductoInterno", ticket -> obtenerProducto() -> obtenerNombre() );	// Producto
-	interfaz.establecerTextoEntrada( "NombreConductorInterno", ticket -> obtenerNombreConductor() );			// Nombre del conductor
-	interfaz.establecerTextoEntrada( "NumeroPlacasInterno", ticket -> obtenerNumeroPlacas() );					// Número de placas
-	interfaz.establecerTextoEtiqueta( "HoraEntradaInterno", ticket -> obtenerHoraEntrada() );					// Hora entrada
-	interfaz.establecerTextoEtiqueta( "PesoBrutoInterno", to_string( ticket -> obtenerPesoBruto() ) );			// Peso bruto
-	interfaz.establecerTextoEtiqueta( "HoraSalidaInterno", ticket -> obtenerHoraSalida() );						// Hora salida
-	interfaz.establecerTextoEtiqueta( "PesoTaraInterno", to_string( ticket -> obtenerPesoTara() ) ) ;			// Peso tara
-	interfaz.establecerTextoEntrada( "PermitirDescuentoInterno", ( ticket -> permitirDescuento() ? "Sí" : "No" ) );	// Descuento (permiso)
-	interfaz.establecerTextoEntrada( "DescuentoInterno", ( ticket -> permitirDescuento() ? to_string( ticket -> obtenerDescuento() ) : "" ) );	// Descuento
-	interfaz.establecerTextoEntrada( "TipoRegistroInterno", ( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" ) );	// Tipo de registro
-	interfaz.establecerTextoEtiqueta( "PesoNetoInterno", to_string( ticket -> obtenerPesoNeto() ) );			// Peso neto
-	interfaz.establecerTextoEntrada( "ObservacionesInterno", ticket -> obtenerObservaciones() );				// Observaciones
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "FolioInterno" ) ), to_string( ticket -> obtenerFolio() ).c_str() ); 			 // Folio
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "FechaInterno" ) ), ticket -> obtenerFecha().c_str() );			   			 // Fecha
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreEmpresaInterno" ) ), ticket -> obtenerEmpresa() -> obtenerNombre() );   // Empresa
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreProductoInterno" ) ), ticket -> obtenerProducto() -> obtenerNombre() ); // Producto
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreConductorInterno" ) ), ticket -> obtenerNombreConductor() );  		     // Nombre del conductor
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NumeroPlacasInterno" ) ), ticket -> obtenerNumeroPlacas() );					// Número de placas
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraEntradaInterno" ) ), ticket -> obtenerHoraEntrada()  );  				// Hora entrada
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoBrutoInterno" ) ), to_string( ticket -> obtenerPesoBruto() ) ); 			// Peso bruto
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraSalidaInterno" ) ), ticket -> obtenerHoraSalida() );						// Hora salida
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoTaraInterno" ) ), to_string( ticket -> obtenerPesoTara() ) ); 			// Peso tara
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "PermitirDescuentoInterno" ) ), ( ticket -> permitirDescuento() ? "Sí" : "No" ) ); 						    	// Descuento (permiso)
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DescuentoInterno" ) ), ( ticket -> permitirDescuento() ? to_string( ticket -> obtenerDescuento() ) : "" ) );     // Descuento
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "TipoRegistroInterno" ) ), ( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" ) );	// Tipo de registro
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoNetoInterno" ) ), to_string( ticket -> obtenerPesoNeto() ) ); 			// Peso neto
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "ObservacionesInterno" ) ), ticket -> obtenerObservaciones() );				// Observaciones
 
 	// Señal de boton si
-	interfaz.conectarSenal( botonSi, G_CALLBACK( internoEliminarSeleccionado ), nullptr );
+	conectar_senal( botonSi, G_CALLBACK( internoEliminarSeleccionado ), nullptr );
 
 	// Señal boton de eliminar registro interno seleccionado
-	interfaz.conectarSenal( eliminarRegistroInterno, G_CALLBACK( internoAlertaEliminar ), nullptr );
+	conectar_senal( eliminarRegistroInterno, G_CALLBACK( internoAlertaEliminar ), nullptr );
 
 	// Redirige a la vista
 	irA( "PesajeInterno", false );
@@ -561,26 +557,26 @@ void vistaPublicoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointe
 		return;
 	}
 	
-	interfaz.establecerTextoEtiqueta( "FolioPublico", to_string( registroPublico -> obtenerFolio() ) );	// Folio
-	interfaz.establecerTextoEtiqueta( "FechaPublico", registroPublico -> obtenerFecha() );				// Fecha
-	interfaz.establecerTextoEntrada( "NombreProductoPublico", registroPublico -> obtenerProducto() -> obtenerNombre() ); // Producto
-	interfaz.establecerTextoEntrada( "NombreConductorPublico", registroPublico -> obtenerNombreConductor() );// Nombre del conductor	
-	interfaz.establecerTextoEntrada( "NumeroPlacasPublico", registroPublico -> obtenerNumeroPlacas() );// Número de placas
-	interfaz.establecerTextoEtiqueta( "HoraEntradaPublico", registroPublico -> obtenerHoraEntrada() );// Hora entrada
-	interfaz.establecerTextoEtiqueta( "PesoBrutoPublico", to_string( registroPublico -> obtenerPesoBruto() ) );// Peso bruto
-	interfaz.establecerTextoEtiqueta( "HoraSalidaPublico", registroPublico -> obtenerHoraSalida() );// Hora salida
-	interfaz.establecerTextoEtiqueta( "PesoTaraPublico", to_string( registroPublico -> obtenerPesoTara() ) ) ;// Peso tara
-	interfaz.establecerTextoEntrada( "TipoViajePublico", ( registroPublico -> obtenerTipoViaje() == VIAJE_LOCAL ? "Local" : "Foráneo" ) );// Tipo de registro
-	interfaz.establecerTextoEtiqueta( "PesoNetoPublico", to_string( registroPublico -> obtenerPesoNeto() ) );// Peso neto
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ), to_string( registroPublico -> obtenerFolio() ) );						// Folio
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "FechaPublico" ) ), registroPublico -> obtenerFecha() );									// Fecha
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreProductoPublico" ) ), registroPublico -> obtenerProducto() -> obtenerNombre() );	// Producto
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreConductorPublico" ) ), registroPublico -> obtenerNombreConductor() );				// Nombre del conductor	
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NumeroPlacasPublico" ) ), registroPublico -> obtenerNumeroPlacas() );					// Número de placas
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraEntradaPublico" ) ), registroPublico -> obtenerHoraEntrada() );						// Hora entrada
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoBrutoPublico" ) ),  to_string( registroPublico -> obtenerPesoBruto() ) );			// Peso bruto
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraSalidaPublico" ) ), registroPublico -> obtenerHoraSalida() );						// Hora salida
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoTaraPublico" ) ), to_string( registroPublico -> obtenerPesoTara() ) ) ;				// Peso tara
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "TipoViajePublico" ) ), ( registroPublico -> obtenerTipoViaje() == VIAJE_LOCAL ? "Local" : "Foráneo" ) ); // Tipo de registro
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoNetoPublico" ) ), to_string( registroPublico -> obtenerPesoNeto() );					// Peso neto
 
 	// Señal boton de eliminar registro interno seleccionado
-	interfaz.conectarSenal( eliminarRegistroInterno, G_CALLBACK( internoAlertaEliminar ), nullptr );
+	conectar_senal( eliminarRegistroInterno, G_CALLBACK( internoAlertaEliminar ), nullptr );
 
 	// Señal de boton si
-	interfaz.conectarSenal( botonSi, G_CALLBACK( publicoEliminarSeleccionado ), nullptr );
+	conectar_senal( botonSi, G_CALLBACK( publicoEliminarSeleccionado ), nullptr );
 
 	// Señal boton imprimir interno
-	interfaz.conectarSenal( imprimirRegistroPublico, G_CALLBACK( publicoImprimirSeleccionado ), nullptr );
+	conectar_senal( imprimirRegistroPublico, G_CALLBACK( publicoImprimirSeleccionado ), nullptr );
 
 	// Redirige a la vista
 	irA( "PesajePublico", false );
@@ -611,31 +607,31 @@ void regresarInicio()
 
 void vistaConsultarUsuario()
 {
-	usuarioConsultado = buscarUsuarioPorNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaConsultarUsuario" ), registrosUsuarios );
+	usuarioConsultado = buscarUsuarioPorNombreUsuario( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaConsultarUsuario" ) ), registrosUsuarios ) );
 	if( usuarioConsultado == nullptr ){
 		app_mostrar_mensaje( "El usuario que se desea consultar no fue encontrado." );
 		return;
 	}
 
 	// Nombre
-	interfaz.establecerTextoEntrada( "NombreConsultado", usuarioConsultado -> obtenerNombre() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreConsultado" ) ), usuarioConsultado -> obtenerNombre() );
 
 	// Apellidos
-	interfaz.establecerTextoEntrada( "ApellidosConsultado", usuarioConsultado -> obtenerApellidos() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "ApellidosConsultado" ) ), usuarioConsultado -> obtenerApellidos() );
 
 	// Nombre de usuario
-	interfaz.establecerTextoEntrada( "NombreUsuarioConsultado", usuarioConsultado -> obtenerNombreUsuario() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreUsuarioConsultado" ) ), usuarioConsultado -> obtenerNombreUsuario() );
 
 	// Administrador
 	if( usuarioConsultado -> esAdministrador() ){
-		interfaz.establecerActivoBotonToggle( "UsuarioAdministrador" );
+		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "UsuarioAdministrador") ), TRUE );
 	}
 
 	//Señal Eliminar usuarios	
-	interfaz.conectarSenal( botonEliminarUsuario, G_CALLBACK( app_alerta ), (void *)"¿Estás seguro que deseas eliminar este usuario?" );
+	conectar_senal( botonEliminarUsuario, G_CALLBACK( app_alerta ), (void *)"¿Estás seguro que deseas eliminar este usuario?" );
 
 	// Boton si si decide eliminar
-	interfaz.conectarSenal( botonSi, G_CALLBACK( eliminarUsuario ), nullptr );
+	conectar_senal( botonSi, G_CALLBACK( eliminarUsuario ), nullptr );
 
 	irHacia( nullptr, (void *)"InformacionUsuario" );
 }
@@ -649,18 +645,17 @@ void regresarUsuarios()
 	irHacia( nullptr, (void *)"ConsultarUsuarios" );
 }
 
-void internoLimpiarFormulario()
-{
-	interfaz.establecerTextoEntrada( "EntradaNombreEmpresaInterno", "" );				// Empresa
-	interfaz.establecerTextoEntrada( "EntradaNombreProductoInterno", "" );				// Producto
-	interfaz.establecerTextoEntrada( "EntradaNombreConductorInterno", "" );				// Nombre del conductor
-	interfaz.establecerTextoEntrada( "EntradaNumeroPlacasInterno", "" );				// Numero de placas
-	interfaz.establecerTextoEtiqueta( "EntradaHoraEntradaInterno", "No establecida" );	// Hora entrada
-	interfaz.establecerTextoEtiqueta( "EntradaPesoBrutoInterno", "No establecido" );	// Peso bruto
-	interfaz.establecerTextoEtiqueta( "EntradaHoraSalidaInterno", "No establecida" );	// Hora salida
-	interfaz.establecerTextoEtiqueta( "EntradaPesoTaraInterno", "No establecido" );		// Peso tara
-	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );		// Peso neto
-	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", "" );				// Observaciones
+void internoLimpiarFormulario(){
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreEmpresaInterno" ) ), "" );				// Empresa
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoInterno" ) ), "" );				// Producto
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorInterno" ) ), "" );			// Nombre del conductor
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasInterno" ) ), "" );				// Numero de placas
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaInterno" ) ), "No establecida" );	// Hora entrada
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoInterno" ) ), "No establecido" );	// Peso bruto	
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaInterno" ) ), "No establecida" );	// Hora salida
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraInterno" ) ), "No establecido" );		// Peso tara
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoInterno" ) ), "No establecido" );		// Peso neto
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaObservacionesInterno" ) ), "" );				// Observaciones		
 }
 
 void vistaBascula( GtkListBox *box, GtkListBoxRow *row, gpointer data )
@@ -672,12 +667,12 @@ void vistaBascula( GtkListBox *box, GtkListBoxRow *row, gpointer data )
 	}
 
 	// Establece las opciones que indica la bascula
-	interfaz.establecerTextoEtiqueta( "OpcionesBasculaCodigo", to_string( obtenerFolioSelector( row ) ) );
-	interfaz.establecerTextoEntrada( "OpcionesBasculaNombre", bascula -> obtenerNombre() );
-	interfaz.establecerActivoComboBoxText( "OpcionesBasculaPuerto", bascula -> obtenerPuerto() );
-	interfaz.establecerTextoEntrada( "OpcionesBasculaBitsDatos", to_string( bascula -> obtenerByteSize() ) );
-	interfaz.establecerTextoEntrada( "OpcionesBasculaBitsStop", to_string( bascula -> obtenerStopBits() ) );
-	interfaz.establecerTextoEntrada( "OpcionesBasculaBytesIgnorados", to_string( bascula -> obtenerBytesIgnorados() ) );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "OpcionesBasculaCodigo" ) ), to_string( obtenerFolioSelector( row ) ) );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaNombre" ) ), bascula -> obtenerNombre() );
+	gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaPuerto" ) ), bascula -> obtenerPuerto() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsDatos" ) ), to_string( bascula -> obtenerByteSize() ) );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsStop" ) ), to_string( bascula -> obtenerStopBits() ) );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBytesIgnorados" ) ), to_string( bascula -> obtenerBytesIgnorados() ) );
 
 	// Redirige hacia la vista
 	irA( "OpcionesBascula", false );

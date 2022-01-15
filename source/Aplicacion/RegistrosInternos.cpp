@@ -23,32 +23,32 @@ void internoRegistrarPendiente()
 
 	try{
 		// Busca el ticket como pendiente, si no lo encuentra, crea uno
-		ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioInterno" ) ), registrosInternosPendientes );
+		ticket = buscarRegistroInternoPorFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioInterno" ) ) ) ), registrosInternosPendientes );
 		if( ticket == nullptr ){
 			folioActual++;
 			ticket = new Ticket();
-			esRegistroNuevo = true;
-			ticket -> establecerFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioInterno" ) ) );
+			esRegistroNuevo = true; 
+			ticket -> establecerFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioInterno" ) ) ) ) );
 		}
 
 		// Obtiene la empresa y el producto introducidos
-		string nombreEmpresa = interfaz.obtenerTextoEntrada( "EntradaNombreEmpresaInterno" );
+		string nombreEmpresa = gtk_entry_get_text( GTK_ENTRY( "EntradaNombreEmpresaInterno" ) );
 		Registro *empresa = empresas.buscarRegistroPorNombre( nombreEmpresa );
-		string nombreProducto = interfaz.obtenerTextoEntrada( "EntradaNombreProductoInterno" );
+		string nombreProducto = gtk_entry_get_text( GTK_ENTRY( "EntradaNombreProductoInterno" ) );
 		Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
 
 		// Establece el resto de los datos
-		ticket -> establecerFecha( interfaz.obtenerTextoEtiqueta( "EntradaFechaInterno" ) );
+		ticket -> establecerFecha( gtk_label_get_text( GTK_LABEL( "EntradaFechaInterno" ) ) );
 		ticket -> establecerEmpresa( empresa == nullptr ? empresas.agregarNuevoRegistro( nombreEmpresa ) : empresa );
 		ticket -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
-		ticket -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorInterno" ) );
-		ticket -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasInterno" ) );
-		ticket -> establecerObservaciones( interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" ) );
+		ticket -> establecerNombreConductor( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorInterno" ) ) ) );
+		ticket -> establecerNumeroPlacas( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasInterno" ) ) ) );
+		ticket -> establecerObservaciones( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaObservacionesInterno" ) ) ) );
 		ticket -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
 		ticket -> establecerPendiente( true );
 
 		// Establece el tipo de registro
-		if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
+		if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "RegistraEntrada" ) ) ) ){
 			ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
 		}
 		else{
@@ -57,8 +57,8 @@ void internoRegistrarPendiente()
 
 		// Establece el peso bruto
 		try{
-			ticket -> establecerPesoBruto( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoInterno" ) );
-			ticket -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaInterno" ) );
+			ticket -> establecerPesoBruto( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoInterno" ) ) ) );
+			ticket -> establecerHoraEntrada( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaInterno" ) ) ) );
 			ticket -> establecerPesoBrutoEstablecido( true );
 		}
 		catch( invalid_argument &ia ){
@@ -68,9 +68,9 @@ void internoRegistrarPendiente()
 		}
 
 		// Establece el peso tara
-		try{ 
-			ticket -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraInterno" ) );
-			ticket -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaInterno" ) );
+		try{
+			ticket -> establecerPesoTara( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraInterno" ) ) ) );
+			ticket -> establecerHoraSalida( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaInterno" ) ) ) );
 			ticket -> establecerPesoTaraEstablecido( true );
 		}
 		catch( invalid_argument &ia ){
@@ -80,10 +80,10 @@ void internoRegistrarPendiente()
 		}
 
 		// Indica si está habilitado el descuento
-		if( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) ){
+		if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "SiDescuentoInterno" ) ) ) ){
 			try{
 				ticket -> permitirDescuento( true );
-				ticket -> establecerDescuento( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
+				ticket -> establecerDescuento( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ) ) );
 				ticket -> establecerDescuentoEstablecido( true );
 
 				// Actualiza el peso neto
@@ -109,7 +109,7 @@ void internoRegistrarPendiente()
 					// ¿Está establecido el descuento?
 					if( ticket -> estaDescuentoEstablecido() ){
 						//Registra el peso neto
-						ticket -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" ) );
+						ticket -> establecerPesoNeto( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaPesoNetoInterno" ) ) ) );
 						ticket -> establecerPesoNetoEstablecido( true );
 					}
 					else{
@@ -120,7 +120,7 @@ void internoRegistrarPendiente()
 				}
 				else{
 					//Registra el peso neto
-					ticket -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" ) );
+					ticket -> establecerPesoNeto( gtk_label_get_text( GTK_LABEL( "EntradaPesoNetoInterno" ) ) );
 					ticket -> establecerPesoNetoEstablecido( true );
 				}
 			}
@@ -172,33 +172,33 @@ void internoFinalizarPendiente()
 	bool esRegistroNuevo = false;
 
 	// Busca el ticket como pendiente, si no lo encuentra, crea uno
-	Ticket * ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioInterno" ) ), registrosInternosPendientes );
+	Ticket * ticket = buscarRegistroInternoPorFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioInterno" ) ) ) ), registrosInternosPendientes );
 
 	try{
 		if( ticket == nullptr ){
 			folioActual++;
 			ticket = new Ticket();
 			esRegistroNuevo = true;
-			ticket -> establecerFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioInterno" ) ) );
+			ticket -> establecerFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioInterno" ) ) ) ) );
 		}
 
 		// Obtiene la empresa y el producto introducidos
-		string nombreEmpresa = interfaz.obtenerTextoEntrada( "EntradaNombreEmpresaInterno" );
+		string nombreEmpresa = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreEmpresaInterno" ) ) );
 		Registro *empresa = empresas.buscarRegistroPorNombre( nombreEmpresa );
-		string nombreProducto = interfaz.obtenerTextoEntrada( "EntradaNombreProductoInterno" );
+		string nombreProducto = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoInterno" ) ) );
 		Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
 
 		// Establece el resto de los datos
-		ticket -> establecerFecha( interfaz.obtenerTextoEtiqueta( "EntradaFechaInterno" ) );
+		ticket -> establecerFecha( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFechaInterno" ) ) ) );
 		ticket -> establecerEmpresa( empresa == nullptr ? empresas.agregarNuevoRegistro( nombreEmpresa ) : empresa );
 		ticket -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
-		ticket -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorInterno" ) );
-		ticket -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasInterno" ) );
-		ticket -> establecerObservaciones( interfaz.obtenerTextoEntrada( "EntradaObservacionesInterno" ) );
+		ticket -> establecerNombreConductor( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorInterno" ) ) ) );
+		ticket -> establecerNumeroPlacas( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasInterno" ) ) ) );
+		ticket -> establecerObservaciones( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaObservacionesInterno" ) ) ) );
 		ticket -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
 
 		// Establece el tipo de registro
-		if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
+		if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "RegistraEntrada" ) ) ) ){
 			ticket -> establecerTipoRegistro( TIPO_REGISTRO_ENTRADA );
 		}
 		else{
@@ -206,19 +206,20 @@ void internoFinalizarPendiente()
 		}
 
 		// Establece el peso bruto
-		ticket -> establecerPesoBruto( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoInterno" ) );
-		ticket -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaInterno" ) );
+		ticket -> establecerPesoBruto( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoInterno" ) ) ) );
+		ticket -> establecerHoraEntrada( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaInterno" ) ) ) );
 		ticket -> establecerPesoBrutoEstablecido( true );
 
 		// Registra el peso tara
-		ticket -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraInterno" ) );
-		ticket -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaInterno" ) );
+		ticket -> establecerPesoTara( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraInterno" ) ) ) );
+		ticket -> establecerHoraSalida( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaInterno") ) ) );
 		ticket -> establecerPesoTaraEstablecido( true );
 
 		// Indica si está habilitado el descuento
-		if( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) ){
+		if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "SiDescuentoInterno" ) ) ) ){
 			ticket -> permitirDescuento( true );
-			string descuento = interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" );
+			
+			string descuento = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ) );
 			if( descuento.empty() ){
 				// Indica un error
 				app_mostrar_error( "Es necesario establecer un descuento." );
@@ -237,7 +238,7 @@ void internoFinalizarPendiente()
 			}
 
 			// Establece el descuento
-			ticket -> establecerDescuento( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
+			ticket -> establecerDescuento( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ) ) );
 			ticket -> establecerDescuentoEstablecido( true );
 
 			// Intenta actualizar el peso neto
@@ -257,13 +258,13 @@ void internoFinalizarPendiente()
 				// ¿Está establecido el descuento?
 				if( ticket -> estaDescuentoEstablecido() ){
 					//Registra el peso neto
-					ticket -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" ) );
+					ticket -> establecerPesoNeto( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoInterno" ) ) ) );
 					ticket -> establecerPesoNetoEstablecido( true );
 				}
 			}
 			else{
 				//Registra el peso neto
-				ticket -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoInterno" ) );
+				ticket -> establecerPesoNeto( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoInterno"  ) ) ) );
 				ticket -> establecerPesoNetoEstablecido( true );
 			}
 		}
@@ -334,23 +335,23 @@ void internoActualizarPesoNeto()
 {
 	try{
 		// Establece peso bruto y tara
-		double pesoBruto = stod( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoInterno" ) );
-		double pesoTara = stod( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraInterno" ) );
+		double pesoBruto = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoInterno" ) ) ) );
+		double pesoTara = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraInterno" ) ) ) );
 		double descuento;
 
 		// Intenta obtener el descuento si este está habilitado
-		if( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) ){
-			descuento = stod( interfaz.obtenerTextoEntrada( "EntradaDescuentoInterno" ) );
+		if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "SiDescuentoInterno" ) ) ) ){
+			descuento = stod( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ) ) );
 		}
 		else{
 			descuento = 0.f;
 		}
 
 		// Establece el peso neto
-		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", pesoString( internoCalcularPesoNeto( pesoBruto, pesoTara, descuento ), 2 ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoInterno" ) ), pesoString( internoCalcularPesoNeto( pesoBruto, pesoTara, descuento ), 2 ).c_str() );
 	}
 	catch( invalid_argument &ia ){
-		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoInterno" ) ), "No establecido" );
 	}
 }
 
@@ -363,11 +364,11 @@ double internoCalcularPesoNeto( double pesoBruto, double pesoTara, double descue
 void internoSeleccionarTipo()
 {
 	// Si el ticket está establecido
-	if( interfaz.obtenerEstadoBotonToggle( "RegistraEntrada" ) ){
-		interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Proveedor:      " );
+	if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "RegistraEntrada" ) ) ) ){
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaEmpresa" ) ), "Proveedor:      " );
 	}
 	else{
-		interfaz.establecerTextoEtiqueta( "EtiquetaEmpresa", "Cliente:           " );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaEmpresa" ) ), "Cliente:           " );
 	}
 }
 
@@ -375,12 +376,12 @@ void internoSeleccionarTipo()
 void internoHabilitarDescuento()
 {
 	// Si ticket está establecido 
-	if( interfaz.obtenerEstadoBotonToggle( "SiDescuentoInterno" ) ){
-		interfaz.habilitarEdicionEntrada( "EntradaDescuentoInterno" );
+	if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "SiDescuentoInterno" ) ) ) ){
+		gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaDescuentoInterno" ) ), TRUE );
 	}
 	else{
-		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
-		interfaz.deshabilitarEdicionEntrada( "EntradaDescuentoInterno" );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ), "" );
+		gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaDescuentoInterno" ) ), FALSE );
 	}
 
 	internoActualizarPesoNeto();
@@ -389,32 +390,34 @@ void internoHabilitarDescuento()
 void internoActualizarRegistros( list< Ticket * > &tickets, std::string idContenedor )
 {
 	// Limpia el contenedor
-	interfaz.removerElementosHijos( idContenedor );
+	limpiar_contenedor( idContenedor );
 	
 	// Itera a través de la lista de tickets pendientes y crea los tickets necesarios
 	for( list< Ticket * >::iterator ticket = tickets.begin(); ticket != tickets.end(); ticket++ ){
         // Crea un elemento que será añadido a la interfaz
-        Widget *elemento = new Widget();
+        GError *error = NULL;
+        GtkBuilder *builder = gtk_builder_new();
         
         stringstream clave;
         clave << setfill( '0' ) << setw( 7 ) << (*ticket) -> obtenerFolio();
         
         try{
-			elemento -> cargarWidget( "../recursos/interfaces/ElementoTicket.glade" );
-			elemento -> establecerNombreWidget( "Ticket", to_string( (* ticket) -> obtenerFolio() ).c_str() );
-			elemento -> establecerTextoEtiqueta( "ItemEntradaFolioInterno", clave.str() );
-			elemento -> establecerTextoEtiqueta( "ItemEntradaFechaInterno", (*ticket) -> obtenerFecha() );
-			elemento -> establecerTextoEtiqueta( "ItemEntradaEmpresaInterno", (*ticket) -> obtenerEmpresa() -> obtenerNombre() );
-			elemento -> establecerTextoEtiqueta( "ItemEntradaProductoInterno", (*ticket) -> obtenerProducto() -> obtenerNombre() );
-			elemento -> establecerTextoEtiqueta( "ItemEntradaPlacaInterno", (*ticket) -> obtenerNumeroPlacas() );
+			if( gtk_builder_add_from_file( builder , "../recursos/interfaces/ElementoTicket.glade", &error ) != 0 ){
+				gtk_widget_set_name( GTK_WIDGET( buscar_objeto( "Ticket" ) ), to_string( (* ticket) -> obtenerFolio() ).c_str() );
+				gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemEntradaFolioInterno" ) ), clave.str().c_str() );
+				gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemEntradaFechaInterno" ) ), (*ticket) -> obtenerFecha().c_str() );
+				gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemEntradaEmpresaInterno" ) ), (*ticket) -> obtenerEmpresa() -> obtenerNombre().c_str() );
+				gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemEntradaProductoInterno" ) ), (*ticket) -> obtenerProducto() -> obtenerNombre().c_str() );
+				gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemEntradaPlacaInterno" ) ), (*ticket) -> obtenerNumeroPlacas().c_str() );
+			}
 			
-			interfaz.insertarElementoListBox( elemento, "Ticket", idContenedor, (*ticket) -> obtenerFolio() );
+			gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( idContenedor ) ), GTK_WIDGET( buscar_objeto( "Ticket" ) ), (* ticket) -> obtenerFolio() );
 		}
 		catch( runtime_error &re ){
 			cerr << re.what() << endl;
 		}
 		
-		delete elemento;
+		//delete elemento;
     }
 }
 
@@ -467,15 +470,14 @@ void internoCancelar()
 	irHacia( nullptr, (void *)"Tickets" );
 
 	// Oculta la barra de mensajes
-	interfaz.ocultarElemento( "MensajeTicketsPendientes" );
+	gtk_widget_hide( GTK_WIDGET( "MensajeTicketsPendientes" ) );
 }
 
 // Manda a imprimir el registro interno seleccionado
 void internoImprimirSeleccionado()
 {
 	// Obtiene el ticket que se desea consultar
-	Ticket *ticket = buscarRegistroInternoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "FolioInterno" ) ), registrosInternosConsultados );
-
+	Ticket *ticket = buscarRegistroInternoPorFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "FolioInterno" ) ) ) ), registrosInternosConsultados );
 	if( ticket != nullptr ){
 		ticket -> imprimir( empresa_razon_social, numeroFormatos, numeroCopias );
 
@@ -486,9 +488,9 @@ void internoImprimirSeleccionado()
 // Alerta de eliminacion
 void internoAlertaEliminar()
 {
-	interfaz.establecerTextoEtiqueta( "MensajeAlerta", "¿Está seguro que desea eliminar este registro?\n"
-													   "Una vez eliminado no se puede recuperar." );
-	interfaz.mostrarElemento( "VentanaSiNo" );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "MensajeAlerta" ) ), "¿Está seguro que desea eliminar este registro?\n"
+																		"Una vez eliminado no se puede recuperar." );
+	gtk_widget_show( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );						   
 }
 
 // Eliminar el registro seleccionado
@@ -517,7 +519,7 @@ void internoEliminarSeleccionado()
 	app_mostrar_mensaje( "Registro eliminado" );
 
 	// Cierra la ventana
-	interfaz.ocultarElemento( "VentanaSiNo" );
+	gtk_widget_hide( GTK_WIDGET( "VentanaSiNo" ) );
 
 	// Redirige hacia la vista de consulta de registros
 	internoActualizarRegistros( registrosInternosConsultados, "ContenedorRegistrosPesaje" );
@@ -531,16 +533,16 @@ void internoSeleccionarDia()
 	unsigned int dia, mes, anio;
 
 	// Obtiene la fecha
-	interfaz.obtenerFechaCalendario( "EntradaDiaConsultar", &dia, &mes, &anio );
+	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "EntradaDiaConsultar" ) ), &dia, &mes, &anio );
 
 	// Obtiene los tickets de la fecha seleccionada
 	internoObtenerPorFecha( registrosInternosConsultados, tiempo_construir_fecha( dia, mes + 1, anio ) );
 
 	// Establece la fecha del ticket que se está consultando
-	interfaz.establecerTextoEtiqueta( "TicketsRegistrados", "Registros del día " + tiempo_construir_fecha( dia, mes, anio ) + ":"  );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsRegistrados" ) ), ("Registros del día " + tiempo_construir_fecha( dia, mes, anio ) + ":").c_str() );
 
 	// Establece el número de tickets
-	interfaz.establecerTextoEtiqueta( "TicketsContados", to_string( registrosInternosConsultados.size() ) + " registros"  );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsContados" ) ), (to_string( registrosInternosConsultados.size() ) + " registros").c_str() );
 
 	// Actualiza la lista de tickets
 	internoActualizarRegistros( registrosInternosConsultados, "ContenedorRegistrosPesaje" );
@@ -559,8 +561,8 @@ void internoObtenerRegistrosRango()
 	unsigned int diaFin, mesFin, anioFin;
 
 	// Obtiene las fechas
-	interfaz.obtenerFechaCalendario( "FechaInformeInicio", &diaInicio, &mesInicio, &anioInicio );
-	interfaz.obtenerFechaCalendario( "FechaInformeFin", &diaFin, &mesFin, &anioFin );
+	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "FechaInformeInicio" ) ), &diaInicio, &mesInicio, &anioInicio );
+	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "FechaInformeInicio" ) ), &diaFin, &mesFin, &anioFin );
 
 	// Consulta de la base de datos
     string consulta = "select folio, fecha, tipo_registro, nombre_empresa, nombre_producto, numero_placas, nombre_conductor, hora_entrada, "

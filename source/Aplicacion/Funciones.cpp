@@ -69,7 +69,7 @@ void actualizarRegistro( GtkWidget *widget, gpointer data )
 		ContenedorRegistros *contenedor = static_cast< ContenedorRegistros * >( data );
 
 		// Obtenemos el nuevo nombre que se desea establecer
-		string nuevoNombre = interfaz.obtenerTextoEtiqueta( "EtiquetaClaveEditarRegistro" );
+		string nuevoNombre = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EtiquetaClaveEditarRegistro" ) ) );
 
 		// Obtiene el registro que se desea actualizar a través de su clave
 		Registro *registro = contenedor -> buscarRegistroPorClave( stoi( nuevoNombre ) );
@@ -85,7 +85,7 @@ void actualizarRegistro( GtkWidget *widget, gpointer data )
     	}
 
 		// Establece el nuevo nombre del registro
-		registro -> establecerNombre( interfaz.obtenerTextoEntrada( "EntradaNombreEditarRegistro" ) );
+		registro -> establecerNombre( gtk_entry_get_text( GTK_ENTRY( "EntradaNombreEditarRegistro" ) ) );
 
 		// Actualiza el nombre en la base de datos
 		contenedor -> actualizarRegistro( registro );
@@ -166,7 +166,7 @@ void convertirMayusculas( GtkEditable *editable, const gchar *text, gint length,
 // Registra el nombre de la empresa
 void registrarEmpresa()
 {
-	string nombreEmpresa = interfaz.obtenerTextoEntrada( "EntradaNombreEmpresaPropia" );
+	string nombreEmpresa = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreEmpresaPropia" ) ) );
 
 	try{
 		//registrarNombreEmpresa( nombreEmpresa );

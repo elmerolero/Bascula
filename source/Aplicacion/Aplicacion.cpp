@@ -18,9 +18,6 @@
 #include <random>
 using namespace std;
 
-// Interfaz principal 
-Widget interfaz;
-
 // Aplicacion activa
 bool aplicacionActiva;
 
@@ -40,8 +37,6 @@ void iniciar( GtkApplication *aplicacion, gpointer informacion ){
             // Lanza una excepcion
             throw runtime_error( "<- Aplicacion::iniciar() Error al cargar el archivo." ); 
         }
-
-        interfaz.establecerBuildable( builder );
 
         // Carga la ventana principal y conecta la función para cerrar la ventana y finalizar el programa
         GObject *objeto = gtk_builder_get_object( builder, "VentanaPrincipal" );
@@ -255,7 +250,7 @@ void app_aceptar_mensaje( GtkWidget *widget, gpointer ptr ){
 void irHacia( GtkWidget *widget, gpointer vista )
 {
     // Oculta cualquier mensaje de error creado
-    interfaz.ocultarElemento( "MensajeError" );
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeError") ) );
 
     // Redirige hacia la vista dada
 	mostrarVista( (char *)vista );
@@ -280,23 +275,22 @@ void reiniciarPilaVistas( void )
 {
     // Oculta cada una de las vistas registradas en la pila
     for( string vista : pilaVistas ){
-        interfaz.ocultarElemento( vista );
+        gtk_widget_hide( GTK_WIDGET( buscar_objeto( vista ) ) );
     }
 
     // Limpia la pila de vistas
     pilaVistas.clear();
 
     // Oculta el enlace para regresar a la vista anterior
-    interfaz.ocultarElemento( "EnlaceRegresar" );
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "EnlaceRegresar" ) ) );
 }
 
 // Regresa hacia la vista anterior
-void regresarVista( void )
-{
+void regresarVista( void ){
     // ¿Hay elementos en la pila de vistas?
     if( pilaVistas.size() > 1 ){
         // Oculta el elemento actual
-        interfaz.ocultarElemento( pilaVistas.back() );
+        gtk_widget_hide( GTK_WIDGET( buscar_objeto( pilaVistas.back() ) ) );
 
         // Lo retira de la pila
         pilaVistas.pop_back();
@@ -312,7 +306,7 @@ void regresarVista( void )
 void mostrarVista( string idVista )
 {
     if( !pilaVistas.empty() ){
-        interfaz.ocultarElemento( pilaVistas.back() );
+        gtk_widget_hide( GTK_WIDGET( buscar_objeto( pilaVistas.back() ) ) );
     }
 
     pilaVistas.push_back( idVista );
@@ -321,10 +315,10 @@ void mostrarVista( string idVista )
     establecer_texto_etiqueta( "Titulo", obtener_nombre_elemento( idVista ) );
     
     if( pilaVistas.size() <= 1 ){
-        ocultar_elemento( "EnlaceRegresar" );
+        gtk_widget_hide( GTK_WIDGET( buscar_objeto( "EnlaceRegresar" ) ) );
     }
     else{
-        mostrar_elemento( "EnlaceRegresar" );
+        gtk_widget_show( GTK_WIDGET( buscar_objeto( "EnlaceRegresar" ) ) );
     }
 }
 

@@ -10,9 +10,6 @@
 extern time_t t;
 extern struct tm tiempo;
 
-// Interfaz
-extern Widget interfaz;
-
 // Meses para mostrar la fecha en formato humano
 const std::array< std::string, 12 > meses{ "enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre" };
 

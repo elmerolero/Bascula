@@ -1,4 +1,8 @@
 {
+    "includePath" : [
+        "D:\\msys\\mingw64\\include"
+    ],
+    
     "files.associations": {
         "atomic": "cpp",
         "cctype": "cpp",

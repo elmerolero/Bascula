@@ -36,7 +36,6 @@ extern Signal entradaRecuperacionCodigoSeguridad;
 extern Signal botonAceptar;
 
 // Vista Inicio
-extern Signal botonBascula;
 extern Signal botonConfiguracion;
 
 // Enlace hacia los créditos
@@ -47,7 +46,7 @@ extern Signal botonActualizarCuenta;
 
 // Seleccion servicio
 extern Signal botonBasculaPublica;
-extern Signal botonBasculaInterna;
+extern Signal botonBasculaAdministrativo;
     
 // Uso bascula de uso interno
 extern Signal entradaSeguimiento;

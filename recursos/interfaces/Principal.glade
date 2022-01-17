@@ -2,22 +2,11 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
-  <object class="GtkImage" id="ImagenBascula">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="margin-top">5</property>
-    <property name="pixbuf">..\imagenes\iconos\Bascula.png</property>
-  </object>
   <object class="GtkImage" id="ImagenBasculaNueva">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="tooltip-text" translatable="yes">Nuevo</property>
     <property name="pixbuf">..\imagenes\iconos\NuevaBascula.png</property>
-  </object>
-  <object class="GtkImage" id="ImagenBasculaPublica">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="pixbuf">..\imagenes\iconos\Pesajes.png</property>
   </object>
   <object class="GtkImage" id="ImagenCierre">
     <property name="visible">True</property>
@@ -28,6 +17,36 @@
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="pixbuf">..\imagenes\iconos\EliminarBascula.png</property>
+  </object>
+  <object class="GtkImage" id="ImagenEmpresaDomicilioEditar">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">..\imagenes\iconos\UbicacionEditar.png</property>
+  </object>
+  <object class="GtkImage" id="ImagenEmpresaDomicilioEditar1">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">..\imagenes\iconos\UbicacionEditar.png</property>
+  </object>
+  <object class="GtkImage" id="ImagenEmpresaDomicilioEliminar">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">..\imagenes\iconos\UbicacionEliminar.png</property>
+  </object>
+  <object class="GtkImage" id="ImagenEmpresaDomicilioEliminar1">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">..\imagenes\iconos\UbicacionEliminar.png</property>
+  </object>
+  <object class="GtkImage" id="ImagenEmpresaDomicilioNuevo">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">..\imagenes\iconos\UbicacionNuevo.png</property>
+  </object>
+  <object class="GtkImage" id="ImagenEmpresaDomicilioNuevo1">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">..\imagenes\iconos\UbicacionNuevo.png</property>
   </object>
   <object class="GtkImage" id="ImagenEmpresaInicio">
     <property name="visible">True</property>
@@ -60,6 +79,11 @@
     <property name="tooltip-text" translatable="yes">Nuevo</property>
     <property name="pixbuf">..\imagenes\iconos\Nuevo.png</property>
   </object>
+  <object class="GtkImage" id="ImagenOpcionBascula1">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixbuf">..\imagenes\iconos\empresa64.png</property>
+  </object>
   <object class="GtkImage" id="ImagenProductos">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
@@ -85,7 +109,6 @@
   <object class="GtkImage" id="ImagenRegistros">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
-    <property name="margin-top">5</property>
     <property name="pixbuf">..\imagenes\iconos\Registro.png</property>
   </object>
   <object class="GtkImage" id="ImagenRegistrosRegistrados">
@@ -97,16 +120,6 @@
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="pixbuf">..\imagenes\iconos\RegistroPeso.png</property>
-  </object>
-  <object class="GtkImage" id="ImagenUsoInterno">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="pixbuf">..\imagenes\iconos\Abierto.png</property>
-  </object>
-  <object class="GtkImage" id="ImagenUsuarios">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="pixbuf">..\imagenes\iconos\Usuario.png</property>
   </object>
   <object class="GtkImage" id="ImagenUsuarios1">
     <property name="visible">True</property>
@@ -904,7 +917,7 @@ introdúcelo aquí para reestablecer tu contraseña.</property>
                                 <property name="can-focus">False</property>
                                 <property name="halign">start</property>
                                 <property name="margin-top">10</property>
-                                <property name="label" translatable="yes">Nueva constraseña</property>
+                                <property name="label" translatable="yes">Nueva contraseña</property>
                                 <attributes>
                                   <attribute name="font-desc" value="Sans Bold 10"/>
                                 </attributes>
@@ -992,8 +1005,6 @@ introdúcelo aquí para reestablecer tu contraseña.</property>
                           <object class="GtkGrid" id="Inicio">
                             <property name="name">Inicio</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-left">5</property>
-                            <property name="margin-right">5</property>
                             <property name="margin-start">5</property>
                             <property name="margin-end">5</property>
                             <property name="margin-top">5</property>
@@ -1014,6 +1025,20 @@ introdúcelo aquí para reestablecer tu contraseña.</property>
                               </packing>
                             </child>
                             <child>
+                              <object class="GtkLabel" id="Saludo">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin-top">5</property>
+                                <property name="margin-bottom">5</property>
+                                <property name="label" translatable="yes">¡Buenos días! ¿Qué desea hacer hoy?</property>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
@@ -1023,19 +1048,101 @@ introdúcelo aquí para reestablecer tu contraseña.</property>
                                 <property name="vexpand">True</property>
                                 <property name="spacing">30</property>
                                 <child>
-                                  <object class="GtkButton" id="BotonBascula">
-                                    <property name="label" translatable="yes">Báscula</property>
+                                  <object class="GtkButton" id="BotonBasculaPublica">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">True</property>
-                                    <property name="image">ImagenBascula</property>
                                     <property name="image-position">top</property>
                                     <property name="always-show-image">True</property>
+                                    <child>
+                                      <object class="GtkBox">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkImage" id="ImagenBascula">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-top">2</property>
+                                            <property name="pixbuf">..\imagenes\iconos\Bascula.png</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="label" translatable="yes">Báscula
+Pública</property>
+                                            <property name="justify">center</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                    </child>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="BotonBasculaAdministrativo">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="tooltip-text" translatable="yes">Realice un registro más detallado de lo que se desea pesar y genere información de utilidad.</property>
+                                    <property name="image-position">top</property>
+                                    <property name="always-show-image">True</property>
+                                    <child>
+                                      <object class="GtkBox">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkImage" id="ImagenBasculaPublica">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="pixbuf">..\imagenes\iconos\Pesajes.png</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLabel">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="label" translatable="yes">Bascula
+(Administrativo)</property>
+                                            <property name="justify">center</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -1045,22 +1152,6 @@ introdúcelo aquí para reestablecer tu contraseña.</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">True</property>
                                     <property name="image">ImagenRegistros</property>
-                                    <property name="image-position">top</property>
-                                    <property name="always-show-image">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkButton" id="BotonUsuarios">
-                                    <property name="label" translatable="yes">Usuarios</property>
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">True</property>
-                                    <property name="image">ImagenUsuarios</property>
                                     <property name="image-position">top</property>
                                     <property name="always-show-image">True</property>
                                   </object>
@@ -1092,20 +1183,6 @@ introdúcelo aquí para reestablecer tu contraseña.</property>
                                 <property name="top-attach">1</property>
                               </packing>
                             </child>
-                            <child>
-                              <object class="GtkLabel" id="Saludo">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="margin-top">5</property>
-                                <property name="margin-bottom">5</property>
-                                <property name="label" translatable="yes">¡Buenos días! ¿Qué desea hacer hoy?</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">0</property>
-                              </packing>
-                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -1114,95 +1191,13 @@ introdúcelo aquí para reestablecer tu contraseña.</property>
                           </packing>
                         </child>
                         <child>
-                          <!-- n-columns=1 n-rows=2 -->
-                          <object class="GtkGrid" id="Bascula">
-                            <property name="name">Seleccionar tipo de uso</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-left">5</property>
-                            <property name="margin-right">5</property>
-                            <property name="margin-start">5</property>
-                            <property name="margin-end">5</property>
-                            <property name="vexpand">True</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="label" translatable="yes">Seleccione el tipo de uso:</property>
-                                <attributes>
-                                  <attribute name="font-desc" value="Sans 13"/>
-                                </attributes>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkBox">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="halign">center</property>
-                                <property name="valign">center</property>
-                                <property name="hexpand">True</property>
-                                <property name="vexpand">True</property>
-                                <property name="spacing">30</property>
-                                <child>
-                                  <object class="GtkButton" id="BotonBasculaPublica">
-                                    <property name="label" translatable="yes">Báscula
-publica</property>
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">True</property>
-                                    <property name="tooltip-text" translatable="yes">Utilice este en caso de dar servicio de báscula pública.</property>
-                                    <property name="image">ImagenBasculaPublica</property>
-                                    <property name="image-position">top</property>
-                                    <property name="always-show-image">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkButton" id="BotonBasculaInterna">
-                                    <property name="label" translatable="yes">Uso
-Interno</property>
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">True</property>
-                                    <property name="tooltip-text" translatable="yes">Lleve un registro más detallado de lo que se desea pesar, ideal para fines administrativos.</property>
-                                    <property name="image">ImagenUsoInterno</property>
-                                    <property name="image-position">top</property>
-                                    <property name="always-show-image">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">False</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">1</property>
-                              </packing>
-                            </child>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">5</property>
-                          </packing>
+                          <placeholder/>
                         </child>
                         <child>
                           <!-- n-columns=1 n-rows=3 -->
                           <object class="GtkGrid" id="Tickets">
                             <property name="name">Pesajes pendientes</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="margin-top">10</property>
@@ -1284,8 +1279,6 @@ Interno</property>
                           <object class="GtkGrid" id="NuevoTicketInterno">
                             <property name="name">Nuevo pesaje de control interno</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="hexpand">True</property>
@@ -2012,8 +2005,6 @@ Interno</property>
                           <object class="GtkGrid" id="NuevoTicketPublico">
                             <property name="name">Nuevo pesaje público</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="vexpand">False</property>
@@ -2329,6 +2320,7 @@ Interno</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
                                         <property name="label" translatable="yes">Peso tara:</property>
+                                        <property name="selectable">True</property>
                                         <attributes>
                                           <attribute name="font-desc" value="Sans 12"/>
                                         </attributes>
@@ -2345,6 +2337,7 @@ Interno</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
                                         <property name="label" translatable="yes">Peso bruto:</property>
+                                        <property name="selectable">True</property>
                                         <attributes>
                                           <attribute name="font-desc" value="Sans 12"/>
                                         </attributes>
@@ -2377,6 +2370,7 @@ Interno</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
                                         <property name="label" translatable="yes">No establecida</property>
+                                        <property name="selectable">True</property>
                                         <property name="width-chars">14</property>
                                       </object>
                                       <packing>
@@ -2391,6 +2385,7 @@ Interno</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
                                         <property name="label" translatable="yes">No establecida</property>
+                                        <property name="selectable">True</property>
                                         <property name="width-chars">14</property>
                                       </object>
                                       <packing>
@@ -2405,6 +2400,7 @@ Interno</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
                                         <property name="label" translatable="yes">No establecido</property>
+                                        <property name="selectable">True</property>
                                         <property name="width-chars">14</property>
                                       </object>
                                       <packing>
@@ -2419,6 +2415,7 @@ Interno</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
                                         <property name="label" translatable="yes">No establecido</property>
+                                        <property name="selectable">True</property>
                                         <property name="width-chars">14</property>
                                       </object>
                                       <packing>
@@ -2580,8 +2577,6 @@ Interno</property>
                           <object class="GtkGrid" id="ConsultarRegistros">
                             <property name="name">Registros</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="margin-top">10</property>
@@ -2703,12 +2698,14 @@ Interno</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkSearchEntry">
+                                  <object class="GtkSearchEntry" id="BuscadorRegistros">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="width-chars">25</property>
                                     <property name="primary-icon-name">edit-find-symbolic</property>
                                     <property name="primary-icon-activatable">False</property>
                                     <property name="primary-icon-sensitive">False</property>
+                                    <property name="placeholder-text" translatable="yes">Nombre del registro</property>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
@@ -2730,7 +2727,7 @@ Interno</property>
                           </packing>
                         </child>
                         <child>
-                          <object class="GtkBox" id="Registro">
+                          <object class="GtkBox" id="Producto">
                             <property name="name">Información</property>
                             <property name="can-focus">False</property>
                             <property name="margin-end">20</property>
@@ -3094,8 +3091,6 @@ Interno</property>
                           <object class="GtkGrid" id="ProductoEditar">
                             <property name="name">Editar</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="margin-top">10</property>
@@ -3326,8 +3321,6 @@ Interno</property>
                           <object class="GtkGrid" id="Pesajes">
                             <property name="name">Pesajes</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="margin-top">10</property>
@@ -3510,8 +3503,6 @@ Interno</property>
                             <property name="name">Nuevo</property>
                             <property name="can-focus">False</property>
                             <property name="valign">start</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="margin-top">10</property>
@@ -4139,8 +4130,6 @@ Interno</property>
                           <object class="GtkBox" id="PesajePublico">
                             <property name="name">Nuevo</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="margin-top">10</property>
@@ -4642,8 +4631,6 @@ Interno</property>
                           <object class="GtkGrid" id="ConsultarDia">
                             <property name="name">Consultar día</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="margin-bottom">10</property>
@@ -4729,8 +4716,6 @@ Interno</property>
                             <property name="can-focus">False</property>
                             <property name="halign">center</property>
                             <property name="valign">center</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="margin-top">10</property>
@@ -4879,8 +4864,6 @@ Interno</property>
                           <object class="GtkGrid" id="ConsultarUsuarios">
                             <property name="name">Usuarios</property>
                             <property name="can-focus">False</property>
-                            <property name="margin-left">10</property>
-                            <property name="margin-right">10</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
                             <property name="margin-top">10</property>
@@ -5302,133 +5285,27 @@ y poder establecer su nombre en los registros.</property>
                           </packing>
                         </child>
                         <child>
-                          <!-- n-columns=1 n-rows=4 -->
+                          <!-- n-columns=1 n-rows=7 -->
                           <object class="GtkGrid" id="Cuenta">
                             <property name="name">Cuenta</property>
                             <property name="can-focus">False</property>
+                            <property name="margin-left">10</property>
+                            <property name="margin-right">10</property>
+                            <property name="margin-start">10</property>
+                            <property name="margin-end">10</property>
                             <property name="margin-top">10</property>
                             <property name="margin-bottom">10</property>
                             <property name="column-spacing">5</property>
                             <child>
-                              <!-- n-columns=3 n-rows=4 -->
-                              <object class="GtkGrid">
+                              <object class="GtkLabel">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="valign">center</property>
-                                <property name="hexpand">True</property>
-                                <property name="row-spacing">5</property>
-                                <property name="column-spacing">5</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="label" translatable="yes">Usuario:</property>
-                                    <attributes>
-                                      <attribute name="font-desc" value="Sans 13"/>
-                                    </attributes>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">1</property>
-                                    <property name="top-attach">3</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkEntry" id="EntradaCuentaNombreUsuario">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="valign">center</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">2</property>
-                                    <property name="top-attach">3</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkEntry" id="EntradaCuentaApellidos">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="valign">center</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">2</property>
-                                    <property name="top-attach">2</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkEntry" id="EntradaCuentaNombre">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="valign">center</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">2</property>
-                                    <property name="top-attach">1</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="label" translatable="yes">Apellidos:</property>
-                                    <attributes>
-                                      <attribute name="font-desc" value="Sans 13"/>
-                                    </attributes>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">1</property>
-                                    <property name="top-attach">2</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="label" translatable="yes">Nombre:</property>
-                                    <attributes>
-                                      <attribute name="font-desc" value="Sans 13"/>
-                                    </attributes>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">1</property>
-                                    <property name="top-attach">1</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkImage">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="valign">center</property>
-                                    <property name="pixbuf">..\imagenes\iconos\Usuario.png</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">1</property>
-                                    <property name="height">3</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Datos del usuario</property>
-                                    <attributes>
-                                      <attribute name="font-desc" value="Sans 14"/>
-                                      <attribute name="foreground" value="#1ac95ad2bae0"/>
-                                    </attributes>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">0</property>
-                                    <property name="width">3</property>
-                                  </packing>
-                                </child>
+                                <property name="halign">start</property>
+                                <property name="margin-top">10</property>
+                                <property name="label" translatable="yes">Datos del usuario</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 10"/>
+                                </attributes>
                               </object>
                               <packing>
                                 <property name="left-attach">0</property>
@@ -5436,17 +5313,53 @@ y poder establecer su nombre en los registros.</property>
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkLabel">
+                              <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="halign">start</property>
-                                <property name="valign">end</property>
-                                <property name="vexpand">True</property>
-                                <property name="label" translatable="yes">Cambiar contrasena</property>
-                                <attributes>
-                                  <attribute name="font-desc" value="Sans 14"/>
-                                  <attribute name="foreground" value="#1ac95ad2bae0"/>
-                                </attributes>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="spacing">5</property>
+                                    <child>
+                                      <object class="GtkLabel" id="TituloCampo52">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="label" translatable="yes">Clave:</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans 12"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="CuentaClave">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">end</property>
+                                        <property name="label" translatable="yes">0</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
                               </object>
                               <packing>
                                 <property name="left-attach">0</property>
@@ -5456,78 +5369,139 @@ y poder establecer su nombre en los registros.</property>
                             <child>
                               <!-- n-columns=2 n-rows=2 -->
                               <object class="GtkGrid">
+                                <property name="name">Registro</property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
+                                <property name="halign">center</property>
                                 <property name="valign">center</property>
-                                <property name="vexpand">True</property>
+                                <property name="hexpand">True</property>
                                 <property name="row-spacing">5</property>
-                                <property name="column-spacing">5</property>
+                                <property name="column-spacing">15</property>
                                 <child>
-                                  <object class="GtkEntry" id="EntradaCuentaContrasenaNueva">
-                                    <property name="name">EntradaContrasena</property>
+                                  <object class="GtkImage">
                                     <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="tooltip-text" translatable="yes">Introduzca una nueva contraseña si desea cambiarla.</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="valign">center</property>
+                                    <property name="pixbuf">..\imagenes\iconos\Usuario.png</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="CuentaFechaRegistro">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">center</property>
+                                    <property name="margin-top">10</property>
+                                    <property name="margin-bottom">3</property>
                                     <property name="hexpand">True</property>
-                                    <property name="max-length">20</property>
-                                    <property name="visibility">False</property>
-                                    <property name="width-chars">30</property>
-                                    <property name="max-width-chars">30</property>
-                                    <property name="shadow-type">none</property>
-                                    <property name="progress-pulse-step">0</property>
-                                    <property name="input-purpose">password</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">1</property>
-                                    <property name="top-attach">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkEntry" id="EntradaCuentaContrasenaConfirmacion">
-                                    <property name="name">EntradaConfirmarContrasena</property>
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="tooltip-text" translatable="yes">Confirme su contraseña, asegúrese de que coinicida con la que introdujo en el campo anterior.</property>
-                                    <property name="max-length">20</property>
-                                    <property name="visibility">False</property>
-                                    <property name="width-chars">30</property>
-                                    <property name="max-width-chars">30</property>
-                                    <property name="progress-pulse-step">0</property>
-                                    <property name="input-purpose">password</property>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">1</property>
-                                    <property name="top-attach">1</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="label" translatable="yes">Nueva contraseña:</property>
-                                    <attributes>
-                                      <attribute name="font-desc" value="Sans 13"/>
-                                    </attributes>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="label" translatable="yes">Confirmar contraseña:</property>
-                                    <attributes>
-                                      <attribute name="font-desc" value="Sans 13"/>
-                                    </attributes>
+                                    <property name="label" translatable="yes">Registrado el día de mes de año</property>
                                   </object>
                                   <packing>
                                     <property name="left-attach">0</property>
                                     <property name="top-attach">1</property>
+                                    <property name="width">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <!-- n-columns=1 n-rows=6 -->
+                                  <object class="GtkGrid">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="column-spacing">20</property>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="label" translatable="yes">Nombre:</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans 12"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="CuentaNombre">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Nombre de la Persona</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="label" translatable="yes">Apellidos:</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans 12"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="CuentaApellidos">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Apellidos de la Personas</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">3</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="label" translatable="yes">Pseudónimo:</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans 12"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">4</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="CuentaPseudonimo">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Pseudonimo </property>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">5</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">1</property>
+                                    <property name="top-attach">0</property>
                                   </packing>
                                 </child>
                               </object>
@@ -5542,6 +5516,8 @@ y poder establecer su nombre en los registros.</property>
                                 <property name="can-focus">False</property>
                                 <property name="halign">center</property>
                                 <property name="valign">center</property>
+                                <property name="margin-top">15</property>
+                                <property name="margin-bottom">15</property>
                                 <property name="spacing">10</property>
                                 <child>
                                   <object class="GtkButton" id="BotonCerrarSesionCuenta">
@@ -5574,6 +5550,340 @@ y poder establecer su nombre en los registros.</property>
                               </object>
                               <packing>
                                 <property name="left-attach">0</property>
+                                <property name="top-attach">6</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin-top">16</property>
+                                    <property name="margin-bottom">10</property>
+                                    <property name="label" translatable="yes">Bitácora del usuario</property>
+                                    <attributes>
+                                      <attribute name="font-desc" value="Sans Bold 10"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkScrolledWindow">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="shadow-type">in</property>
+                                    <child>
+                                      <object class="GtkViewport">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <child>
+                                          <object class="GtkListBox" id="BitacoraUsuario">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                      </object>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">5</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <!-- n-columns=2 n-rows=8 -->
+                              <object class="GtkGrid">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="hexpand">True</property>
+                                <property name="column-spacing">10</property>
+                                <child>
+                                  <object class="GtkLinkButton">
+                                    <property name="label" translatable="yes">Editar</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="halign">end</property>
+                                    <property name="relief">none</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">1</property>
+                                    <property name="top-attach">3</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLinkButton">
+                                    <property name="label" translatable="yes">Editar</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="halign">end</property>
+                                    <property name="relief">none</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">1</property>
+                                    <property name="top-attach">5</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin-top">10</property>
+                                    <property name="label" translatable="yes">Fecha de nacimiento:</property>
+                                    <attributes>
+                                      <attribute name="font-desc" value="Sans 12"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin-top">10</property>
+                                    <property name="label" translatable="yes">RFC:</property>
+                                    <attributes>
+                                      <attribute name="font-desc" value="Sans 12"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">1</property>
+                                    <property name="top-attach">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="CuentaCorreoElectronico">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin-bottom">3</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">No establecido</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">7</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin-top">10</property>
+                                    <property name="label" translatable="yes">Correo electrónico</property>
+                                    <attributes>
+                                      <attribute name="font-desc" value="Sans 12"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">6</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="CuentaTelefono">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">Ninguno</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">5</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin-top">10</property>
+                                    <property name="label" translatable="yes">Teléfono:</property>
+                                    <attributes>
+                                      <attribute name="font-desc" value="Sans 12"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">4</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="margin-top">10</property>
+                                    <property name="label" translatable="yes">Domicilio:</property>
+                                    <attributes>
+                                      <attribute name="font-desc" value="Sans 12"/>
+                                    </attributes>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="CuentaDomicilio">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">Ninguno</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">3</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLinkButton">
+                                    <property name="label" translatable="yes">Editar</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="halign">end</property>
+                                    <property name="relief">none</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">1</property>
+                                    <property name="top-attach">7</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <child>
+                                      <object class="GtkLabel" id="CuentaFechaNacimiento">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">No establecido</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLinkButton">
+                                        <property name="label" translatable="yes">Editar</property>
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="receives-default">True</property>
+                                        <property name="halign">end</property>
+                                        <property name="relief">none</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">start</property>
+                                    <child>
+                                      <object class="GtkLabel" id="CuentaRFC">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">No establecido</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLinkButton">
+                                        <property name="label" translatable="yes">Editar</property>
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="receives-default">True</property>
+                                        <property name="halign">end</property>
+                                        <property name="relief">none</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">1</property>
+                                    <property name="top-attach">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                                <child>
+                                  <placeholder/>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">4</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin-top">10</property>
+                                <property name="label" translatable="yes">Información adicional</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 10"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
                                 <property name="top-attach">3</property>
                               </packing>
                             </child>
@@ -5585,145 +5895,110 @@ y poder establecer su nombre en los registros.</property>
                           </packing>
                         </child>
                         <child>
-                          <!-- n-columns=1 n-rows=6 -->
-                          <object class="GtkGrid" id="Configuracion">
+                          <object class="GtkBox" id="Configuracion">
                             <property name="name">Configuración</property>
                             <property name="can-focus">False</property>
+                            <property name="orientation">vertical</property>
                             <child>
-                              <!-- n-columns=1 n-rows=2 -->
-                              <object class="GtkGrid" id="Empresa">
+                              <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="margin-bottom">10</property>
-                                <property name="row-spacing">10</property>
                                 <child>
-                                  <object class="GtkLabel">
+                                  <object class="GtkBox" id="EmpresaPropia">
+                                    <property name="name">Información</property>
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="halign">start</property>
+                                    <property name="margin-left">10</property>
+                                    <property name="margin-right">10</property>
+                                    <property name="margin-start">10</property>
+                                    <property name="margin-end">10</property>
                                     <property name="margin-top">10</property>
-                                    <property name="label" translatable="yes">Empresa</property>
-                                    <attributes>
-                                      <attribute name="font-desc" value="Sans Bold 10"/>
-                                    </attributes>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
+                                    <property name="margin-bottom">10</property>
                                     <property name="hexpand">True</property>
-                                    <property name="spacing">10</property>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <!-- n-columns=2 n-rows=1 -->
+                                      <object class="GtkGrid">
+                                        <property name="name">Registro</property>
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">center</property>
+                                        <property name="valign">center</property>
+                                        <property name="vexpand">True</property>
+                                        <property name="row-spacing">5</property>
+                                        <property name="column-spacing">15</property>
+                                        <child>
+                                          <object class="GtkBox">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="valign">center</property>
+                                            <property name="orientation">vertical</property>
+                                            <child>
+                                              <object class="GtkLabel">
+                                                <property name="visible">True</property>
+                                                <property name="can-focus">False</property>
+                                                <property name="halign">start</property>
+                                                <property name="margin-top">10</property>
+                                                <property name="label" translatable="yes">RFC:</property>
+                                                <attributes>
+                                                  <attribute name="font-desc" value="Sans 12"/>
+                                                </attributes>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">0</property>
+                                              </packing>
+                                            </child>
+                                            <child>
+                                              <object class="GtkLabel" id="EmpresaPropiaRFC">
+                                                <property name="visible">True</property>
+                                                <property name="can-focus">False</property>
+                                                <property name="halign">start</property>
+                                                <property name="hexpand">True</property>
+                                                <property name="label" translatable="yes">XXXXXXXXXXXXX</property>
+                                              </object>
+                                              <packing>
+                                                <property name="expand">False</property>
+                                                <property name="fill">True</property>
+                                                <property name="position">1</property>
+                                              </packing>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="left-attach">1</property>
+                                            <property name="top-attach">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkImage" id="ImagenEmpresaPropia">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="pixbuf">..\imagenes\iconos\Empresas.png</property>
+                                          </object>
+                                          <packing>
+                                            <property name="left-attach">0</property>
+                                            <property name="top-attach">0</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
                                     <child>
                                       <object class="GtkLabel">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Nombre de la empresa:</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkEntry" id="OpcionesNombreEmpresa">
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="tooltip-text" translatable="yes">Nombre que aparecerá en los formatos y en algunas partes de la interfaz del programa.</property>
-                                        <property name="halign">end</property>
-                                        <property name="max-length">50</property>
-                                        <property name="width-chars">50</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">1</property>
-                                  </packing>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">0</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSeparator">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">1</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <!-- n-columns=1 n-rows=3 -->
-                              <object class="GtkGrid" id="Basculas">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="margin-bottom">10</property>
-                                <property name="hexpand">True</property>
-                                <property name="row-spacing">10</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="margin-top">10</property>
-                                    <property name="label" translatable="yes">Básculas</property>
-                                    <attributes>
-                                      <attribute name="font-desc" value="Sans Bold 10"/>
-                                    </attributes>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkBox" id="ConsultarRegistrosTareas1">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="spacing">10</property>
-                                    <child>
-                                      <object class="GtkButton" id="BotonBasculaAgregar">
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="receives-default">True</property>
-                                        <property name="tooltip-text" translatable="yes">Agregar una báscula</property>
-                                        <property name="halign">start</property>
-                                        <property name="image">ImagenBasculaNueva</property>
-                                        <property name="image-position">top</property>
-                                        <property name="always-show-image">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkButton" id="BotonBasculaEditar">
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="receives-default">True</property>
-                                        <property name="tooltip-text" translatable="yes">Editar parámetros</property>
-                                        <property name="image">ImagenRegistroEditar2</property>
-                                        <property name="image-position">top</property>
-                                        <property name="always-show-image">True</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="margin-bottom">10</property>
+                                        <property name="label" translatable="yes">Domicilios registrados</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans Bold 10"/>
+                                        </attributes>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
@@ -5732,14 +6007,58 @@ y poder establecer su nombre en los registros.</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkButton" id="BotonBasculaEliminar">
+                                      <object class="GtkBox">
                                         <property name="visible">True</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="receives-default">True</property>
-                                        <property name="tooltip-text" translatable="yes">Eliminar</property>
-                                        <property name="image">ImagenEliminarBascula</property>
-                                        <property name="image-position">top</property>
-                                        <property name="always-show-image">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="spacing">10</property>
+                                        <child>
+                                          <object class="GtkButton" id="DomicilioEmpresaPropiaAgregar">
+                                            <property name="label" translatable="yes">Agregar</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <property name="image">ImagenEmpresaDomicilioNuevo1</property>
+                                            <property name="image-position">top</property>
+                                            <property name="always-show-image">True</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="DomicilioEmpresaPropiaEditar">
+                                            <property name="label" translatable="yes">Editar</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <property name="image">ImagenEmpresaDomicilioEditar1</property>
+                                            <property name="image-position">top</property>
+                                            <property name="always-show-image">True</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="DomicilioEmpresaPropiaEliminar">
+                                            <property name="label" translatable="yes">Eliminar</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <property name="image">ImagenEmpresaDomicilioEliminar1</property>
+                                            <property name="image-position">top</property>
+                                            <property name="always-show-image">True</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
@@ -5747,10 +6066,51 @@ y poder establecer su nombre en los registros.</property>
                                         <property name="position">2</property>
                                       </packing>
                                     </child>
+                                    <child>
+                                      <object class="GtkScrolledWindow">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="vexpand">True</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkViewport">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                            <child>
+                                              <object class="GtkListBox" id="ContenedorEmpresaPropiaDomicilios">
+                                                <property name="visible">True</property>
+                                                <property name="can-focus">False</property>
+                                                <property name="activate-on-single-click">False</property>
+                                              </object>
+                                            </child>
+                                          </object>
+                                        </child>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">3</property>
+                                      </packing>
+                                    </child>
                                   </object>
                                   <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">1</property>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkSeparator">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
                                   </packing>
                                 </child>
                                 <child>
@@ -5758,90 +6118,13 @@ y poder establecer su nombre en los registros.</property>
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="hexpand">True</property>
+                                    <property name="vexpand">True</property>
                                     <property name="orientation">vertical</property>
                                     <child>
-                                      <object class="GtkLabel" id="MensajeBasculas">
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">False</property>
-                                        <property name="margin-top">15</property>
-                                        <property name="margin-bottom">15</property>
-                                        <property name="label" translatable="yes">No hay básculas registradas.</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkListBox" id="ContenedorBasculas">
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">False</property>
-                                        <property name="activate-on-single-click">False</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">2</property>
-                                  </packing>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">2</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkSeparator">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">3</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <!-- n-columns=1 n-rows=3 -->
-                              <object class="GtkGrid" id="Impresion">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <property name="margin-bottom">10</property>
-                                <property name="row-spacing">10</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="margin-top">10</property>
-                                    <property name="label" translatable="yes">Impresión</property>
-                                    <attributes>
-                                      <attribute name="font-desc" value="Sans Bold 10"/>
-                                    </attributes>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="hexpand">True</property>
-                                    <child>
                                       <object class="GtkLabel">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Número de formatos:</property>
+                                        <property name="label" translatable="yes">Seleccione una opcion</property>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
@@ -5850,49 +6133,169 @@ y poder establecer su nombre en los registros.</property>
                                       </packing>
                                     </child>
                                     <child>
-                                      <object class="GtkEntry" id="OpcionesImpresionFormatos">
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="halign">end</property>
-                                        <property name="width-chars">14</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
-                                  </object>
-                                  <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">1</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="hexpand">True</property>
-                                    <child>
-                                      <object class="GtkLabel">
+                                      <object class="GtkBox">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Número de copias:</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkEntry" id="OpcionesImpresionCopias">
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="halign">end</property>
-                                        <property name="width-chars">14</property>
+                                        <property name="halign">center</property>
+                                        <property name="valign">center</property>
+                                        <property name="vexpand">True</property>
+                                        <property name="spacing">21</property>
+                                        <child>
+                                          <object class="GtkButton" id="OpcionBasculas1">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <property name="halign">center</property>
+                                            <property name="valign">center</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                            <property name="image-position">top</property>
+                                            <property name="always-show-image">True</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="visible">True</property>
+                                                <property name="can-focus">False</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="spacing">5</property>
+                                                <child>
+                                                  <object class="GtkImage" id="ImagenOpcionBascula2">
+                                                    <property name="visible">True</property>
+                                                    <property name="can-focus">False</property>
+                                                    <property name="pixbuf">..\imagenes\iconos\empresa64.png</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can-focus">False</property>
+                                                    <property name="label" translatable="yes">Editar
+Empresa</property>
+                                                    <property name="justify">center</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">1</property>
+                                                  </packing>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="OpcionBasculas">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <property name="halign">center</property>
+                                            <property name="valign">center</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                            <property name="image-position">top</property>
+                                            <property name="always-show-image">True</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="visible">True</property>
+                                                <property name="can-focus">False</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="spacing">5</property>
+                                                <child>
+                                                  <object class="GtkImage" id="ImagenOpcionBascula3">
+                                                    <property name="visible">True</property>
+                                                    <property name="can-focus">False</property>
+                                                    <property name="pixbuf">..\imagenes\iconos\BasculaRegistro.png</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can-focus">False</property>
+                                                    <property name="label" translatable="yes">Consultar
+Basculas</property>
+                                                    <property name="justify">center</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">1</property>
+                                                  </packing>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkButton" id="OpcionUsuarios">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <property name="halign">center</property>
+                                            <property name="valign">center</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                            <property name="image-position">top</property>
+                                            <property name="always-show-image">True</property>
+                                            <child>
+                                              <object class="GtkBox">
+                                                <property name="visible">True</property>
+                                                <property name="can-focus">False</property>
+                                                <property name="orientation">vertical</property>
+                                                <property name="spacing">5</property>
+                                                <child>
+                                                  <object class="GtkImage" id="ImagenOpcionUsuarios">
+                                                    <property name="visible">True</property>
+                                                    <property name="can-focus">False</property>
+                                                    <property name="pixbuf">..\imagenes\iconos\Usuario64.png</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">0</property>
+                                                  </packing>
+                                                </child>
+                                                <child>
+                                                  <object class="GtkLabel">
+                                                    <property name="visible">True</property>
+                                                    <property name="can-focus">False</property>
+                                                    <property name="label" translatable="yes">Consultar
+Usuarios</property>
+                                                    <property name="justify">center</property>
+                                                  </object>
+                                                  <packing>
+                                                    <property name="expand">False</property>
+                                                    <property name="fill">True</property>
+                                                    <property name="position">1</property>
+                                                  </packing>
+                                                </child>
+                                              </object>
+                                            </child>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">2</property>
+                                          </packing>
+                                        </child>
                                       </object>
                                       <packing>
                                         <property name="expand">False</property>
@@ -5902,29 +6305,16 @@ y poder establecer su nombre en los registros.</property>
                                     </child>
                                   </object>
                                   <packing>
-                                    <property name="left-attach">0</property>
-                                    <property name="top-attach">2</property>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
                               <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">4</property>
-                              </packing>
-                            </child>
-                            <child>
-                              <object class="GtkButton" id="BotonGuardarConfiguracion">
-                                <property name="label" translatable="yes">Guardar</property>
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="receives-default">True</property>
-                                <property name="halign">center</property>
-                                <property name="valign">center</property>
-                                <property name="vexpand">True</property>
-                              </object>
-                              <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">5</property>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
                               </packing>
                             </child>
                           </object>
@@ -6630,48 +7020,193 @@ y condiciones indicados en la página web mencionada a continuación.
                           </packing>
                         </child>
                         <child>
-                          <placeholder/>
-                        </child>
-                        <child>
-                          <!-- n-columns=1 n-rows=2 -->
-                          <object class="GtkGrid" id="AgregarImagenEmpresaPropia">
-                            <property name="name">¿Desea agregar una imagen representativa?</property>
+                          <object class="GtkBox" id="Empresa">
+                            <property name="name">Información</property>
                             <property name="can-focus">False</property>
                             <property name="margin-start">10</property>
                             <property name="margin-end">10</property>
+                            <property name="margin-top">10</property>
                             <property name="margin-bottom">10</property>
+                            <property name="orientation">vertical</property>
                             <child>
                               <object class="GtkLabel">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="halign">center</property>
-                                <property name="valign">start</property>
-                                <property name="margin-bottom">10</property>
-                                <property name="hexpand">True</property>
-                                <property name="label" translatable="yes">Puede añadir una imagen que permita identificar a  su empresa. Además podrá 
-agregarla en los documentos generados  por la aplicación.</property>
-                                <property name="justify">center</property>
+                                <property name="halign">start</property>
+                                <property name="margin-top">10</property>
+                                <property name="label" translatable="yes">Información de la empresa</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 10"/>
+                                </attributes>
                               </object>
                               <packing>
-                                <property name="left-attach">0</property>
-                                <property name="top-attach">0</property>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <!-- n-columns=2 n-rows=1 -->
+                              <object class="GtkGrid">
+                                <property name="name">Registro</property>
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">center</property>
+                                <property name="valign">center</property>
+                                <property name="row-spacing">5</property>
+                                <property name="column-spacing">15</property>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="label" translatable="yes">Clave:</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans 12"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="EmpresaClave">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">XXXXXX</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="label" translatable="yes">Razón social:</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans 12"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="EmpresaRazonSocial">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Nombre del registro</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">3</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="label" translatable="yes">RFC:</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans 12"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">4</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="EmpresaRFC">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">XXXXXXXXXXXXX</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">5</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">1</property>
+                                    <property name="top-attach">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkImage" id="ImagenEmpresa">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="pixbuf">..\imagenes\iconos\Empresas.png</property>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">0</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin-top">10</property>
+                                <property name="margin-bottom">10</property>
+                                <property name="label" translatable="yes">Domicilios registrados</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 10"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">2</property>
                               </packing>
                             </child>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="halign">center</property>
-                                <property name="vexpand">True</property>
-                                <property name="orientation">vertical</property>
+                                <property name="spacing">10</property>
                                 <child>
-                                  <object class="GtkLinkButton" id="InicioAgregarFotoEmpresa">
+                                  <object class="GtkButton" id="DomicilioEmpresaAgregar">
                                     <property name="label" translatable="yes">Agregar</property>
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">True</property>
-                                    <property name="image">ImagenEmpresaInicio</property>
-                                    <property name="relief">none</property>
+                                    <property name="image">ImagenEmpresaDomicilioNuevo</property>
                                     <property name="image-position">top</property>
                                     <property name="always-show-image">True</property>
                                   </object>
@@ -6682,44 +7217,297 @@ agregarla en los documentos generados  por la aplicación.</property>
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkBox">
+                                  <object class="GtkButton" id="DomicilioEmpresaEditar">
+                                    <property name="label" translatable="yes">Editar</property>
                                     <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="halign">center</property>
-                                    <property name="margin-top">15</property>
-                                    <property name="margin-bottom">10</property>
-                                    <property name="spacing">15</property>
-                                    <child>
-                                      <object class="GtkButton" id="InicioOmitirFotoEmpresa">
-                                        <property name="label" translatable="yes">Omitir</property>
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="receives-default">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">0</property>
-                                      </packing>
-                                    </child>
-                                    <child>
-                                      <object class="GtkButton" id="InicioAgregrFotoEmpresa">
-                                        <property name="label" translatable="yes">Seguir</property>
-                                        <property name="visible">True</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="receives-default">True</property>
-                                      </object>
-                                      <packing>
-                                        <property name="expand">False</property>
-                                        <property name="fill">True</property>
-                                        <property name="position">1</property>
-                                      </packing>
-                                    </child>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="image">ImagenEmpresaDomicilioEditar</property>
+                                    <property name="image-position">top</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="DomicilioEmpresaEliminar">
+                                    <property name="label" translatable="yes">Eliminar</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="image">ImagenEmpresaDomicilioEliminar</property>
+                                    <property name="image-position">top</property>
+                                    <property name="always-show-image">True</property>
                                   </object>
                                   <packing>
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">2</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">3</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkScrolledWindow">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="margin-top">10</property>
+                                <property name="hexpand">True</property>
+                                <property name="vexpand">True</property>
+                                <property name="shadow-type">in</property>
+                                <child>
+                                  <object class="GtkViewport">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="vexpand">True</property>
+                                    <child>
+                                      <object class="GtkListBox" id="ContenedorEmpresaDomicilios">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="activate-on-single-click">False</property>
+                                      </object>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">4</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">26</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <!-- n-columns=1 n-rows=2 -->
+                          <object class="GtkGrid" id="EmpresaEditar">
+                            <property name="name">Editar</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-start">10</property>
+                            <property name="margin-end">10</property>
+                            <property name="margin-top">10</property>
+                            <property name="margin-bottom">10</property>
+                            <property name="hexpand">True</property>
+                            <property name="vexpand">True</property>
+                            <property name="row-spacing">5</property>
+                            <property name="column-spacing">15</property>
+                            <child>
+                              <!-- n-columns=2 n-rows=1 -->
+                              <object class="GtkGrid" id="FormularioEdicionRegistro1">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">center</property>
+                                <property name="valign">center</property>
+                                <property name="hexpand">True</property>
+                                <property name="vexpand">True</property>
+                                <property name="row-spacing">5</property>
+                                <property name="column-spacing">15</property>
+                                <child>
+                                  <!-- n-columns=1 n-rows=6 -->
+                                  <object class="GtkGrid">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="label" translatable="yes">Clave:</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans 12"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel" id="EmpresaClaveEditar">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">XXXXXX</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">1</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="label" translatable="yes">Razón Social:</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans 12"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">2</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkEntry" id="EmpresaRazonSocialEditar">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="halign">center</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="max-length">35</property>
+                                        <property name="width-chars">26</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">3</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="halign">start</property>
+                                        <property name="margin-top">10</property>
+                                        <property name="label" translatable="yes">RFC:</property>
+                                        <attributes>
+                                          <attribute name="font-desc" value="Sans 12"/>
+                                        </attributes>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">4</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkEntry" id="EmpresaRFCEditar">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="halign">center</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="max-length">13</property>
+                                        <property name="width-chars">26</property>
+                                      </object>
+                                      <packing>
+                                        <property name="left-attach">0</property>
+                                        <property name="top-attach">5</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">1</property>
+                                    <property name="top-attach">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkViewport">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="valign">center</property>
+                                    <property name="margin-left">10</property>
+                                    <property name="margin-right">10</property>
+                                    <property name="margin-start">10</property>
+                                    <property name="margin-end">10</property>
+                                    <property name="margin-top">10</property>
+                                    <property name="margin-bottom">10</property>
+                                    <property name="vexpand">True</property>
+                                    <child>
+                                      <object class="GtkBox">
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">False</property>
+                                        <property name="valign">center</property>
+                                        <property name="vexpand">True</property>
+                                        <property name="orientation">vertical</property>
+                                        <child>
+                                          <object class="GtkImage" id="ImagenEmpresaEditar">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="pixbuf">..\imagenes\iconos\Empresas.png</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">0</property>
+                                          </packing>
+                                        </child>
+                                        <child>
+                                          <object class="GtkLinkButton" id="EnlaceEmpresaCambiarFoto">
+                                            <property name="label" translatable="yes">Agregar</property>
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">True</property>
+                                            <property name="receives-default">True</property>
+                                            <property name="relief">none</property>
+                                          </object>
+                                          <packing>
+                                            <property name="expand">False</property>
+                                            <property name="fill">True</property>
+                                            <property name="position">1</property>
+                                          </packing>
+                                        </child>
+                                      </object>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="left-attach">0</property>
+                                    <property name="top-attach">0</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="ControlesEdicionRegistro1">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">center</property>
+                                <property name="valign">center</property>
+                                <property name="hexpand">True</property>
+                                <property name="vexpand">True</property>
+                                <property name="spacing">15</property>
+                                <child>
+                                  <object class="GtkButton" id="EmpresaEdicionCancelar">
+                                    <property name="label" translatable="yes">Cancelar</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="EmpresaEdicionGuardar">
+                                    <property name="label" translatable="yes"> Guardar </property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
                                   </packing>
                                 </child>
                               </object>
@@ -7111,7 +7899,7 @@ agregarla en los documentos generados  por la aplicación.</property>
                                 </child>
                                 <child>
                                   <object class="GtkButton" id="DomicilioAgregar">
-                                    <property name="label" translatable="yes">Agregar</property>
+                                    <property name="label" translatable="yes">Guardar</property>
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">True</property>
@@ -7134,6 +7922,239 @@ agregarla en los documentos generados  por la aplicación.</property>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">28</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <!-- n-columns=1 n-rows=2 -->
+                          <object class="GtkGrid" id="AgregarImagenEmpresaPropia">
+                            <property name="name">¿Desea agregar una imagen representativa?</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-left">10</property>
+                            <property name="margin-right">10</property>
+                            <property name="margin-start">10</property>
+                            <property name="margin-end">10</property>
+                            <property name="margin-bottom">10</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">center</property>
+                                <property name="valign">start</property>
+                                <property name="margin-bottom">10</property>
+                                <property name="hexpand">True</property>
+                                <property name="label" translatable="yes">Puede añadir una imagen que permita identificar a  su empresa. Además podrá 
+agregarla en los documentos generados  por la aplicación.</property>
+                                <property name="justify">center</property>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">center</property>
+                                <property name="vexpand">True</property>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkLinkButton" id="InicioSeleccionarFotoEmpresa">
+                                    <property name="label" translatable="yes">Agregar</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="image">ImagenEmpresaInicio</property>
+                                    <property name="relief">none</property>
+                                    <property name="image-position">top</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkBox">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="halign">center</property>
+                                    <property name="margin-top">15</property>
+                                    <property name="margin-bottom">10</property>
+                                    <property name="spacing">15</property>
+                                    <child>
+                                      <object class="GtkButton" id="InicioOmitirFotoEmpresa">
+                                        <property name="label" translatable="yes">Omitir</property>
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="receives-default">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">0</property>
+                                      </packing>
+                                    </child>
+                                    <child>
+                                      <object class="GtkButton" id="InicioAgregarFotoEmpresa">
+                                        <property name="label" translatable="yes">Seguir</property>
+                                        <property name="visible">True</property>
+                                        <property name="can-focus">True</property>
+                                        <property name="receives-default">True</property>
+                                      </object>
+                                      <packing>
+                                        <property name="expand">False</property>
+                                        <property name="fill">True</property>
+                                        <property name="position">1</property>
+                                      </packing>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">1</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">29</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <!-- n-columns=1 n-rows=3 -->
+                          <object class="GtkGrid" id="Basculas">
+                            <property name="can-focus">False</property>
+                            <property name="margin-bottom">10</property>
+                            <property name="hexpand">True</property>
+                            <property name="row-spacing">10</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="halign">start</property>
+                                <property name="margin-top">10</property>
+                                <property name="label" translatable="yes">Básculas</property>
+                                <attributes>
+                                  <attribute name="font-desc" value="Sans Bold 10"/>
+                                </attributes>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">0</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox" id="ConsultarRegistrosTareas1">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="spacing">10</property>
+                                <child>
+                                  <object class="GtkButton" id="BotonBasculaAgregar">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="tooltip-text" translatable="yes">Agregar una báscula</property>
+                                    <property name="halign">start</property>
+                                    <property name="image">ImagenBasculaNueva</property>
+                                    <property name="image-position">top</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="BotonBasculaEditar">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="tooltip-text" translatable="yes">Editar parámetros</property>
+                                    <property name="image">ImagenRegistroEditar2</property>
+                                    <property name="image-position">top</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="BotonBasculaEliminar">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="tooltip-text" translatable="yes">Eliminar</property>
+                                    <property name="image">ImagenEliminarBascula</property>
+                                    <property name="image-position">top</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">1</property>
+                              </packing>
+                            </child>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="hexpand">True</property>
+                                <property name="orientation">vertical</property>
+                                <child>
+                                  <object class="GtkLabel" id="MensajeBasculas">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="margin-top">15</property>
+                                    <property name="margin-bottom">15</property>
+                                    <property name="label" translatable="yes">No hay básculas registradas.</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkListBox" id="ContenedorBasculas">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="activate-on-single-click">False</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="left-attach">0</property>
+                                <property name="top-attach">2</property>
+                              </packing>
+                            </child>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">30</property>
                           </packing>
                         </child>
                       </object>

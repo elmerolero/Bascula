@@ -5,6 +5,7 @@
 #include "GestorRegistros.h"
 #include "Aplicacion.h"
 #include "Funciones.h"
+#include <gtk/gtk.h>
 #include <list>
 
 // Lista de las básculas creadas

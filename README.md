@@ -8,11 +8,13 @@ Mejoras implementadas o por implementar:
  * Consistencia de la interfaz de usuario. Ahora los títulos, mensajes y formularios son consistentes y conservan una posición y formas similares. IMPLEMENTADA SATISFACTORIAMENTE.
 
 Tareas por resolver:
- * Crear un launcher y actualizador automáticos.
+ * Crear un launcher y actualizador automáticos. (lejano plazo)
  * Implementar el manejo de sesiones para el usuario.
  * Terminar de implementar los selectores.
  * Testing de funciones
  * Permitir editar el nombre de la empresa
+ * Validar los campos de domicilio adecuadamente.
+ * Validar el control básico de las señales (definir exactamente cuando manda a habilitar señales específicas);
 
 Problemas por resolver:
  * El programa se cierra al leer el peso.

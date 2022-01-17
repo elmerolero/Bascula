@@ -11,7 +11,10 @@ void empresa_listar_registros( GtkWidget *widget, gpointer info );
 void empresa_actualizar_registros( void );
 
 std::string empresa_validar_razon_social( std::string razon_social );
-void empresa_domicilio_agregar( GtkWidget *widget, gpointer info );
+void empresa_propia_domicilio_guardar_nuevo( GtkWidget *widget, gpointer info );
+void empresa_propia_domicilio_guardar_edicion( GtkWidget *widget, gpointer info );
+void empresa_propia_domicilio_editar( GtkWidget *widget, gpointer info );
+void empresa_propia_domicilio_cancelar_edicion( GtkWidget *widget, gpointer infor );
 void empresa_escribir_imagen( GtkWidget *widget, gpointer info );
 void empresa_inicio_registrar( GtkWidget *widget, gpointer info );
 void empresa_inicio_imagen( GtkWidget *widget, gpointer info );
@@ -21,6 +24,8 @@ void empresa_leer_informacion( void );
 
 void empresa_inicio_imagen_omitir( GtkWidget *widget, gpointer info );
 void empresa_inicio_imagen_omitir_confirmacion( GtkWidget *widget, gpointer info );
+void empresa_inicio_domicilio_agregar( GtkWidget *widget, gpointer info );
+void empresa_inicio_domicilio_cancelar( GtkWidget *widget, gpointer info );
 
 void empresa_nuevo( GtkWidget *widget, gpointer info );
 void empresa_editar( GtkWidget *widget, gpointer info );
@@ -32,12 +37,7 @@ void empresa_guardar_edicion( GtkWidget *widget, gpointer info );
 void empresa_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data );
 
 void empresa_inicio_senales_conectar();
-void empresa_senales_desconectar();
+void empresa_inicio_senales_desconectar();
 void empresa_senales_conectar( void );
-
-void domicilio_validar_formulario( void );
-std::string domicilio_validar_lugar( std::string objeto, bool obligatorio );
-std::string domicilio_validar_numero( std::string numero, bool obligatorio );
-std::string domicilio_validar_descripcion( std::string descripcion );
 
 #endif

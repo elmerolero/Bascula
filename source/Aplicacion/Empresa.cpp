@@ -5,6 +5,7 @@
 #include "Funciones.h"
 #include "Senales.h"
 #include "Producto.h"
+#include "Domicilio.h"
 #include <iostream>
 #include <sstream>
 #include <iomanip>
@@ -232,6 +233,9 @@ void empresa_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
 			gtk_image_set_from_pixbuf( GTK_IMAGE(  buscar_objeto( "ImagenEmpresa" ) ), imagen );
 		}
 
+        // Obtiene los datos de la empresa
+        domicilio_empresa_registros_actualizar( "DomiciliosEmpresas", "ContenedorEmpresaDomicilios", folio );
+
 		// Establece la vista de registro
 		irA( "Empresa", false );
 	}
@@ -317,7 +321,7 @@ void empresa_guardar_edicion( GtkWidget *widget, gpointer info ){
     consulta << "update Empresas set razon_social = '" << nombre << "', "
              << "RFC = '" << descripcion << "' " 
              << "where id_empresa = " << clave;
-            
+
     database.open( databaseFile );
     database.query( consulta.str() );
     database.close();
@@ -427,8 +431,8 @@ void empresa_inicio_senales_conectar(){
     conectar_senal( senal_empresa_inicio_imagen_guardar, G_CALLBACK( empresa_inicio_imagen ), nullptr );
     conectar_senal( senal_empresa_inicio_imagen_cancelar, G_CALLBACK( empresa_inicio_imagen_omitir ), nullptr );
     conectar_senal( botonSi, G_CALLBACK( empresa_inicio_imagen_omitir_confirmacion ), nullptr );
-    conectar_senal( senal_empresa_domicilio_guardar, G_CALLBACK( empresa_domicilio_agregar ), nullptr );
-    conectar_senal( senal_empresa_domicilio_cancelar, G_CALLBACK( empresa_domicilio_cancelar ), nullptr );
+    conectar_senal( senal_empresa_domicilio_guardar, G_CALLBACK( empresa_propia_domicilio_guardar_nuevo ), nullptr );
+    conectar_senal( senal_empresa_domicilio_cancelar, G_CALLBACK( empresa_inicio_domicilio_cancelar ), nullptr );
 
     // Selección y edición de imagen
     conectar_senal( senal_empresa_inicio_imagen_seleccionar, G_CALLBACK( seleccionar_archivo ), nullptr );
@@ -613,7 +617,7 @@ void empresa_imagen_escribir( GtkWidget *widget, gpointer info ){
     gtk_image_set_from_surface( GTK_IMAGE( buscar_objeto( "ImagenEmpresaEditar" ) ), imagen_temporal );
 }
 
-void empresa_senales_desconectar(){
+void empresa_inicio_senales_desconectar(){
     /*g_signal_handler_disconnect( buscar_objeto( "InicioAgregarFotoEmpresa" ), senal_empresa_imagen_seleccionar );
     g_signal_handler_disconnect( buscar_objeto( "BotonGuardarEdicionImagen" ), senal_emimagen_guardar );
     g_signal_handler_disconnect( buscar_objeto( "BotonCancelarEdicionImagen" ), senal_imagen_cancelar );
@@ -627,79 +631,7 @@ void empresa_senales_desconectar(){
     senal_movimiento = 0;*/
 }
 
-string domicilio_validar_lugar( std::string objeto, bool obligatorio ){
-    // Formato que permite el nombre de un lugar
-    regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ\\s]*" );
-
-    // Obtiene la información del campo solicitado
-    string informacion = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( objeto ) ) );
-    string nombre_campo = gtk_widget_get_name( GTK_WIDGET( buscar_objeto( objeto ) ) );
-
-    // Verifica si es obligario y no esta vacío
-    if( obligatorio && informacion.empty() ){
-        throw invalid_argument( "Es necesario registrar " + nombre_campo + "." );
-    }
-
-    // Se asegura que esté dentro del tamaño establecido
-    if( informacion.size() > 100 ){
-        throw invalid_argument( "El tamaño del " + nombre_campo + " excede el número de caracteres permitidos." );
-    }
-
-    // Verifica que solo tiene caracteres permitidos
-    if( !regex_match( informacion, formato ) ){
-        throw invalid_argument( "Se está registrando un " + nombre_campo + " inválido." );
-    }
-
-    return informacion;
-}
-
-string domicilio_validar_numero( std::string numero, bool obligatorio ){
-    // Formato que permite el nombre de un lugar
-    regex formato( "[0-9a-zA-ZÑñáéíóúÁÉÍÓÚ\\s-]*" );
-
-    // Obtiene la información del campo solicitado
-    string informacion = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( numero ) ) );
-    string nombre_campo = gtk_widget_get_name( GTK_WIDGET( buscar_objeto( numero ) ) );
-
-    // Verifica si es obligario y no esta vacío
-    if( obligatorio && informacion.empty() ){
-        throw invalid_argument( "Es necesario registrar " + nombre_campo + "." );
-    }
-
-    // Se asegura que esté dentro del tamaño establecido
-    if( informacion.size() > 10 ){
-        throw invalid_argument( "El tamaño del " + nombre_campo + " excede el número de caracteres permitidos." );
-    }
-
-    // Verifica que solo tiene caracteres permitidos
-    if( !regex_match( informacion, formato ) ){
-        throw invalid_argument( "Se está registrando un " + nombre_campo + " inválido." );
-    }
-
-    return informacion;
-}
-
-std::string domicilio_validar_descripcion( std::string descripcion ){
-    // Formato que permite el nombre de un lugar
-    regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ\\s]*" );
-
-    // Obtiene la información del campo solicitado
-    string informacion = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( descripcion ) ) );
-
-    // Se asegura que esté dentro del tamaño establecido
-    if( informacion.size() > 300 ){
-        throw invalid_argument( "El tamaño de la descripción excede el número de caracteres permitidos." );
-    }
-
-    // Verifica que solo tiene caracteres permitidos
-    if( !regex_match( informacion, formato ) ){
-        throw invalid_argument( "Se está registrando una descripción no inválida." );
-    }
-
-    return informacion;
-}
-
-void empresa_domicilio_agregar( GtkWidget *widget, gpointer info ){
+void empresa_propia_domicilio_guardar_nuevo( GtkWidget *widget, gpointer info ){
     try{
         // Consulta 
         stringstream consulta;
@@ -724,28 +656,144 @@ void empresa_domicilio_agregar( GtkWidget *widget, gpointer info ){
         database.query( consulta.str() );
         database.close();
 
-        app_mostrar_mensaje( "Datos de la empresa registrados exitosamente." );
-        irA( "Inicio", true ); 
+        // Actualiza la vista de domicilioss
+        domicilio_empresa_registros_actualizar( "DomicilioEmpresaPropia", "ContenedorEmpresaPropiaDomicilios", 1 );
 
-        empresa_senales_desconectar();
+        // Regresa
+        app_mostrar_error( "Domicilio agregado correctamente." );
+        regresarVista();
     }
     catch( invalid_argument &ia ){
         // Obtiene el mensaje de error
         string what = ia.what();
 
         // Verifica que sea error stoi
+        app_mostrar_error( what );
         if( what.compare( "stoi" ) == 0 ){
             app_mostrar_error( "Código Postal no válido." );
-        }
-        else{
-            app_mostrar_error( what );
         }
     }
 }
 
-void empresa_domicilio_cancelar( GtkWidget *widget, gpointer info ){
-    //
-    empresa_senales_desconectar();
+void empresa_propia_domicilio_editar( GtkWidget *widget, gpointer info ){
+    // Obtiene el item seleccionado
+    GtkListBoxRow *itemSeleccionado = gtk_list_box_get_selected_row( GTK_LIST_BOX( buscar_objeto( "ContenedorEmpresaPropiaDomicilios" ) ) );
+    if( itemSeleccionado == NULL ){
+        app_mostrar_error( "No ha seleccionado ningún registro." );
+        return;
+    }
+
+    // Genera la consulta
+    stringstream consulta;
+    consulta << "select * from DomicilioEmpresaPropia where id_domicilio = " 
+             << gtk_widget_get_name( GTK_WIDGET ( gtk_bin_get_child( GTK_BIN( itemSeleccionado ) ) ) );
+
+    // Busca la información del domicilio seleccionado
+    database.open( databaseFile );
+    database.query( consulta.str() );
+    database.close();
+    if( results.size() > 0 ){
+        // Obtiene el mapa
+        unordered_map< string, string > *domicilio = results.at( 0 );
+    
+        // Establece los campos correspondientes
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DomicilioCalle" ) ), ( (* domicilio)[ "calle" ].compare( "null" ) != 0 ? (* domicilio)[ "calle" ] : "" ).c_str() );
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DomicilioNumero" ) ), ( (* domicilio)[ "calle" ].compare( "null" ) != 0 ? (* domicilio)[ "numero" ] : "" ).c_str() );
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DomicilioNumeroInterior" ) ), ( (* domicilio)[ "calle" ].compare( "null" ) != 0 ? (* domicilio)[ "numero_interior" ] : "" ).c_str() );
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DomicilioColonia" ) ), ( (* domicilio)[ "calle" ].compare( "null" ) != 0 ? (* domicilio)[ "colonia" ] : "" ).c_str() );
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DomicilioCodigoPostal" ) ), ( (* domicilio)[ "calle" ].compare( "null" ) != 0 ? (* domicilio)[ "codigo_postal" ] : "" ).c_str() );
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DomicilioMunicipio" ) ), ( (* domicilio)[ "calle" ].compare( "null" ) != 0 ? (* domicilio)[ "municipio" ] : "" ).c_str() );
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DomicilioEstado" ) ), ( (* domicilio)[ "calle" ].compare( "null" ) != 0 ? (* domicilio)[ "estado" ] : "" ).c_str() );
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DomicilioPais" ) ), ( (* domicilio)[ "calle" ].compare( "null" ) != 0 ? (* domicilio)[ "pais" ] : "" ).c_str() );
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DomicilioDescripcion" ) ), ( (* domicilio)[ "calle" ].compare( "null" ) != 0 ? (* domicilio)[ "descripcion" ] : "" ).c_str() );
+    }
+
+    // Establece la señal para guardar la edicion
+    conectar_senal( enlaceRegresar, G_CALLBACK( empresa_propia_domicilio_cancelar_edicion ), nullptr );
+    conectar_senal( senal_domicilio_cancelar_nuevo, G_CALLBACK( empresa_propia_domicilio_cancelar_edicion ), nullptr );
+    conectar_senal( senal_domicilio_guardar_nuevo, G_CALLBACK( empresa_propia_domicilio_guardar_edicion ), nullptr );
+
+    // Redirige hacia domicilio
+    irA( "AgregarDomicilio", false );
+}
+
+void empresa_propia_domicilio_guardar_edicion( GtkWidget *widget, gpointer info ){
+    try{
+        GtkListBoxRow *itemSeleccionado = gtk_list_box_get_selected_row( GTK_LIST_BOX( buscar_objeto( "ContenedorEmpresaPropiaDomicilios" ) ) );
+        if( itemSeleccionado == NULL ){
+            app_mostrar_error( "Ha ocurrido un error." );
+            return;
+        }
+
+        // Consulta 
+        stringstream consulta;
+
+        // Establece la consulta a la base de datos
+        consulta << "update DomicilioEmpresaPropia set "
+                 << "calle = '" << domicilio_validar_lugar( "DomicilioCalle", true ) << "', "
+                 << "numero = '" << domicilio_validar_numero( "DomicilioNumero", true ) << "', "
+                 << "numero_interior = '" << domicilio_validar_numero( "DomicilioNumeroInterior", false ) << "', "
+                 << "colonia = '" << domicilio_validar_lugar( "DomicilioColonia", true ) << "', "
+                 << "codigo_postal = " << stoi( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "DomicilioCodigoPostal" ) ) ) ) << ", "
+                 << "municipio = '" << domicilio_validar_lugar( "DomicilioMunicipio", true ) << "', "
+                 << "estado = '" << domicilio_validar_lugar( "DomicilioEstado" , true ) << "', "
+                 << "pais = '" << domicilio_validar_lugar( "DomicilioPais", true ) << "', "
+                 << "descripcion = '" << domicilio_validar_descripcion( "DomicilioDescripcion" )
+                 << "' where id_domicilio = " << gtk_widget_get_name( GTK_WIDGET ( gtk_bin_get_child( GTK_BIN( itemSeleccionado ) ) ) );
+        
+        cout << consulta.str() << endl;
+
+        // Realiza la consulta
+        database.open( databaseFile );
+        database.query( consulta.str() );
+        database.close();
+
+        // Actualiza la vista de domicilioss
+        domicilio_empresa_registros_actualizar( "DomicilioEmpresaPropia", "ContenedorEmpresaPropiaDomicilios", 1 );
+
+        // Regresa
+        empresa_propia_domicilio_cancelar_edicion( nullptr, nullptr );
+        app_mostrar_error( "Domicilio editado correctamente." );
+    }
+    catch( invalid_argument &ia ){
+        // Obtiene el mensaje de error
+        string what = ia.what();
+
+        // Verifica que sea error stoi
+        app_mostrar_error( what );
+        if( what.compare( "stoi" ) == 0 ){
+            app_mostrar_error( "Código Postal no válido." );
+        }
+    }
+}
+
+void empresa_propia_domicilio_cancelar_edicion( GtkWidget *widget, gpointer info ){
+    // Reestablece la señal correspondiente
+    conectar_senal( enlaceRegresar, G_CALLBACK( regresarVista ), nullptr );
+    conectar_senal( senal_domicilio_guardar_nuevo, G_CALLBACK( empresa_propia_domicilio_guardar_nuevo ), nullptr );
+
+    // Limpia el formulario
+    domicilio_limpiar_formulario();
+
+    // Regresa
+    regresarVista();
+}
+
+void empresa_inicio_domicilio_agregar( GtkWidget *widget, gpointer info ){
+    // Llama a agregar domicilio
+    empresa_propia_domicilio_guardar_nuevo( nullptr, nullptr );
+
+    // Desconecta las señales
+    empresa_inicio_senales_desconectar();
+
+    // Muestra el mensaje
+    app_mostrar_mensaje( "Datos de la empresa registrados exitosamente." );
+    irA( "Inicio", true ); 
+}
+
+void empresa_inicio_domicilio_cancelar( GtkWidget *widget, gpointer info ){
+    // Desconecta las señales
+    empresa_inicio_senales_desconectar();
 
     app_mostrar_mensaje( "Puede agregar o actualizar los datos de\nla empresa mas adelante en configuración." );
     irA( "Inicio", true );

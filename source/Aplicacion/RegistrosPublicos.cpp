@@ -23,29 +23,30 @@ void publicoRegistrarPendiente()
 
 	try{
 		// Revisa si el ticket con el folio indicado existe como pendiente, si no, se crea uno nuevo
-		registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioPublico" ) ), registrosPublicosPendientes );
+		registroPublico = buscarRegistroPublicoPorFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ) ) ), registrosPublicosPendientes );
 		if( registroPublico == nullptr ){
 			++folioActualPublico;
 			esRegistroNuevo = true;
 			registroPublico = new TicketPublico();
-			registroPublico -> establecerFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioPublico" ) ) );
+			registroPublico -> establecerFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ) ) ) );
 		}
 
 		// Obtiene el producto introducido
-   		string nombreProducto = interfaz.obtenerTextoEntrada( "EntradaNombreProductoPublico" );
+   		string nombreProducto = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ) );
     	Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
 
     	// Establece los datos obligatorios
-		registroPublico -> establecerFecha( interfaz.obtenerTextoEtiqueta( "EntradaFechaPublico" ) );
+		registroPublico -> establecerFecha( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico" ) ) ) );
 		registroPublico -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
-		registroPublico -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorPublico" ) );
-		registroPublico -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasPublico" ) );
+		registroPublico -> establecerNombreConductor( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ) ) );
+		registroPublico -> establecerNumeroPlacas( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ) ) );
 		registroPublico -> establecerEntradaManual( 0 );// lectorBascula.lecturaManualActivada() );
 		registroPublico -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
 		registroPublico -> establecerPendiente( true );
 
 		// Registra el tipo de registro
-		if( interfaz.obtenerEstadoBotonToggle( "ViajeLocal" ) ){
+		
+		if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "ViajeLocal" ) ) ) ){
 	    	registroPublico -> establecerTipoViaje( VIAJE_LOCAL );
 		}
 		else{
@@ -54,8 +55,8 @@ void publicoRegistrarPendiente()
 
 		// Registra el peso bruto
 		try{
-			registroPublico -> establecerPesoBruto( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoPublico" ) );
-			registroPublico -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaPublico" ) );
+			registroPublico -> establecerPesoBruto( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ) ) );
+			registroPublico -> establecerHoraEntrada( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ) ) );
 			registroPublico -> establecerPesoBrutoEstablecido( true );
 		}
 		catch( invalid_argument &ia ){
@@ -66,8 +67,8 @@ void publicoRegistrarPendiente()
 
 		// Registra el peso tara
 		try{
-			registroPublico -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraPublico" ) );
-			registroPublico -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaPublico" ) );
+			registroPublico -> establecerPesoTara( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ) ) );
+			registroPublico -> establecerHoraSalida( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ) ) );
 			registroPublico -> establecerPesoTaraEstablecido( true );
 		}
 		catch( invalid_argument &ia ){
@@ -80,7 +81,7 @@ void publicoRegistrarPendiente()
 		try{
 			// ¿Están establecidos el peso bruto y el peso tara?
 			if( registroPublico -> estaPesoBrutoEstablecido() && registroPublico -> estaPesoTaraEstablecido() ){
-				registroPublico -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoPublico" ) );
+				registroPublico -> establecerPesoNeto( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ) ) );
 				registroPublico -> establecerPesoNetoEstablecido( true );
 			}
 			else{
@@ -132,28 +133,28 @@ void publicoFinalizarPendiente()
 
 	try{
 		// Revisa si el ticket con el folio indicado existe como pendiente, si no, se crea uno nuevo
-		registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioPublico" ) ), registrosPublicosPendientes );
+		registroPublico = buscarRegistroPublicoPorFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ) ) ), registrosPublicosPendientes );
 		if( registroPublico == nullptr ){
 			++folioActualPublico;
 			esRegistroNuevo = true;
 			registroPublico = new TicketPublico();
-			registroPublico -> establecerFolio( stoi( interfaz.obtenerTextoEtiqueta( "EntradaFolioPublico" ) ) );
+			registroPublico -> establecerFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ) ) ) );
 		}
 
 		// Obtiene el producto introducido
-   		string nombreProducto = interfaz.obtenerTextoEntrada( "EntradaNombreProductoPublico" );
+   		string nombreProducto = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ) );
     	Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
 
     	// Establece los datos obligatorios
-		registroPublico -> establecerFecha( interfaz.obtenerTextoEtiqueta( "EntradaFechaPublico" ) );
+		registroPublico -> establecerFecha( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico" ) ) ) );
 		registroPublico -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
-		registroPublico -> establecerNombreConductor( interfaz.obtenerTextoEntrada( "EntradaNombreConductorPublico" ) );
-		registroPublico -> establecerNumeroPlacas( interfaz.obtenerTextoEntrada( "EntradaNumeroPlacasPublico" ) );
+		registroPublico -> establecerNombreConductor( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductoPublico" ) ) ) );
+		registroPublico -> establecerNumeroPlacas( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ) ) );
 		registroPublico -> establecerEntradaManual( 0 );//lectorBascula.lecturaManualActivada() );
 		registroPublico -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
 
 		// Registra el tipo de registro
-		if( interfaz.obtenerEstadoBotonToggle( "ViajeLocal" ) ){
+		if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "ViajeLocal" ) ) ) ){
 	    	registroPublico -> establecerTipoViaje( VIAJE_LOCAL );
 		}
 		else{
@@ -161,19 +162,19 @@ void publicoFinalizarPendiente()
 		}
 
 		// Registra el peso bruto
-		registroPublico -> establecerPesoBruto( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoPublico" ) );
-		registroPublico -> establecerHoraEntrada( interfaz.obtenerTextoEtiqueta( "EntradaHoraEntradaPublico" ) );
+		registroPublico -> establecerPesoBruto( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ) ) );
+		registroPublico -> establecerHoraEntrada( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ) ) );
 		registroPublico -> establecerPesoBrutoEstablecido( true );
 
 		// Registra el peso tara
-		registroPublico -> establecerPesoTara( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraPublico" ) );
-		registroPublico -> establecerHoraSalida( interfaz.obtenerTextoEtiqueta( "EntradaHoraSalidaPublico" ) );
+		registroPublico -> establecerPesoTara( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ) ) );
+		registroPublico -> establecerHoraSalida( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ) ) );
 		registroPublico -> establecerPesoTaraEstablecido( true );
 
 		// Registra el peso neto
 		// ¿Están establecidos el peso bruto y el peso tara?
 		if( registroPublico -> estaPesoBrutoEstablecido() && registroPublico -> estaPesoTaraEstablecido() ){
-			registroPublico -> establecerPesoNeto( interfaz.obtenerTextoEtiqueta( "EntradaPesoNetoPublico" ) );
+			registroPublico -> establecerPesoNeto( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ) ) );
 			registroPublico -> establecerPesoNetoEstablecido( true );
 		}
 		else{
@@ -247,7 +248,7 @@ void publicoActualizarPesoNeto()
 
 	// Intenta obtener el peso bruto leído
 	try{
-		pesoBruto = stod( interfaz.obtenerTextoEtiqueta( "EntradaPesoBrutoPublico" ) );
+		pesoBruto = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ) ) );
 	}
 	catch( invalid_argument &ia ){
 		completo = false;
@@ -255,7 +256,7 @@ void publicoActualizarPesoNeto()
 
 	// Intenta obtener el peso tara
 	try{
-		pesoTara = stod( interfaz.obtenerTextoEtiqueta( "EntradaPesoTaraPublico" ) );
+		pesoTara = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ) ) );
 	}
 	catch( invalid_argument &ia ){
 		completo = false;
@@ -263,13 +264,13 @@ void publicoActualizarPesoNeto()
 
 	// Intenta calculara el peso neto
 	if( completo ){
-		interfaz.ocultarElemento( "MensajeError" );
-		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoPublico", pesoString( publicoCalcularPesoNeto( pesoBruto, pesoTara ), 2 ) );
+		gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeError" ) ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), pesoString( publicoCalcularPesoNeto( pesoBruto, pesoTara ), 2 ).c_str() );
 	}
 	else{
-		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado		
-		interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", "No establecido" );
-		interfaz.establecerBotonEtiqueta( "BotonRegistrarInterno", "Pendiente" );
+		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoInterno" ) ), "No establecido" );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "BotonRegistrarInterno" ) ), "Pendiente" );
 	}
 }
 
@@ -288,16 +289,16 @@ void publicoSeleccionarDia()
 	unsigned int dia, mes, anio;
 
 	// Obtiene la fecha
-	interfaz.obtenerFechaCalendario( "EntradaDiaConsultar", &dia, &mes, &anio );
+	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "EntradaDiaConsultar" ) ), &dia, &mes, &anio );
 
 	// Obtiene los tickets de la fecha seleccionada
 	publicoObtenerPorFecha( registrosPublicosConsultados, tiempo_construir_fecha( dia, mes + 1, anio ) );
 
 	// Establece la fecha del ticket que se está consultando
-	interfaz.establecerTextoEtiqueta( "TicketsRegistrados", "Registros del día " + tiempo_construir_fecha( dia, mes, anio ) + ":"  );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsRegistrados" ) ), ( "Registros del día " + tiempo_construir_fecha( dia, mes, anio ) + ":" ).c_str() );
 
 	// Establece el número de tickets
-	interfaz.establecerTextoEtiqueta( "TicketsContados", to_string( registrosPublicosConsultados.size() ) + " registros"  );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsContados" ) ), ( to_string( registrosPublicosConsultados.size() ) + " registros" ).c_str() );
 
 	// Actualiza la lista de tickets
 	publicoActualizarRegistros( registrosPublicosConsultados, "ContenedorRegistrosPesaje" );
@@ -316,8 +317,8 @@ void publicoObtenerRegistrosRango()
 	unsigned int diaFin, mesFin, anioFin;
 
 	// Obtiene las fechas
-	interfaz.obtenerFechaCalendario( "FechaInformeInicio", &diaInicio, &mesInicio, &anioInicio );
-	interfaz.obtenerFechaCalendario( "FechaInformeFin", &diaFin, &mesFin, &anioFin );
+	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "FechaInformeInicio" ) ), &diaInicio, &mesInicio, &anioInicio  );
+	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "FechaInformeFin" ) ), &diaFin, &mesFin, &anioFin );
 
 	// Consulta a realizar
     string consulta = "select folio, fecha, tipo_viaje, nombre_producto, numero_placas, nombre_conductor, hora_entrada, "
@@ -379,30 +380,32 @@ void publicoObtenerPorFecha( list< TicketPublico * > &registros, std::string fec
 void publicoActualizarRegistros( list< TicketPublico * > &ticketsPublicos, std::string idContenedor )
 {
     // Limpia el contenedor
-    interfaz.removerElementosHijos( idContenedor );
+	limpiar_contenedor( idContenedor );
 
     // Itera a través de la lista de tickets pendientes y crea los tickets necesarios
     for( list< TicketPublico * >::iterator ticket = ticketsPublicos.begin(); ticket != ticketsPublicos.end(); ticket++ ){
 		// Crea un elemento que será añadido a la interfaz
-		Widget *elemento = new Widget();
+		GtkBuilder *builder = gtk_builder_new();
+		GError *error = NULL;
 
 		stringstream clave;
 		clave << setfill( '0' ) << setw( 7 ) << (*ticket) -> obtenerFolio();
 
 		try{
-		    elemento -> cargarWidget( "../recursos/interfaces/ElementoTicketPublico.glade" );
-			elemento -> establecerNombreWidget( "Ticket", to_string( (*ticket) -> obtenerFolio() ) );
-		    elemento -> establecerTextoEtiqueta( "ItemEntradaFolioInterno", clave.str() );
-		    elemento -> establecerTextoEtiqueta( "ItemEntradaFechaInterno", (*ticket) -> obtenerFecha() );
-		    elemento -> establecerTextoEtiqueta( "ItemEntradaProductoInterno", (*ticket) -> obtenerProducto() -> obtenerNombre() );
-		    elemento -> establecerTextoEtiqueta( "ItemEntradaPlacaInterno", (*ticket) -> obtenerNumeroPlacas() );
-		    interfaz.insertarElementoListBox( elemento, "Ticket", idContenedor, (*ticket) -> obtenerFolio() );
+			if( gtk_builder_add_from_file( builder, "../recursos/interfaces/ElementoTicketPublico.glade", &error ) != 0 ){
+				gtk_widget_set_name( GTK_WIDGET( gtk_builder_get_object( builder, "Ticket" ) ), to_string( (*ticket) -> obtenerFolio() ).c_str() );
+				gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaFolioInterno" ) ), clave.str().c_str() );
+				gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaFechaInterno" ) ), (*ticket) -> obtenerFecha().c_str() );
+				gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaProductoInterno" ) ), (*ticket) -> obtenerProducto() -> obtenerNombre().c_str() );
+				gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaPlacaInterno" ) ), (*ticket) -> obtenerNumeroPlacas().c_str() );
+
+				gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( idContenedor ) ), GTK_WIDGET( buscar_objeto( "Ticket" ) ), (*ticket) -> obtenerFolio() );
+			}
 	    }
 	    catch( runtime_error &re ){
 		    cerr << re.what() << endl;
 	    }
-		
-		delete elemento;
+
     }
 }
 
@@ -432,7 +435,7 @@ void publicoEliminarSeleccionado()
 	app_mostrar_mensaje( "Registro eliminado" );
 
 	// Cierra la ventana
-	interfaz.ocultarElemento( "VentanaSiNo" );
+	gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
 
 	// Redirige hacia la vista de consulta de registros
 	publicoActualizarRegistros( registrosPublicosConsultados, "ContenedorRegistrosPesaje" );
@@ -443,7 +446,7 @@ void publicoEliminarSeleccionado()
 void publicoImprimirSeleccionado()
 {
 	// Busca el ticket publico y lo imprime
-	TicketPublico *registroPublico = buscarRegistroPublicoPorFolio( stoi( interfaz.obtenerTextoEtiqueta( "FolioPublico" ) ), registrosPublicosConsultados );
+	TicketPublico *registroPublico = buscarRegistroPublicoPorFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ) ) ), registrosPublicosConsultados );
 	if( registroPublico != nullptr ){
 		registroPublico -> imprimir( empresa_razon_social );
 

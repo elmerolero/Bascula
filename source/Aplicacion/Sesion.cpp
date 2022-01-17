@@ -18,11 +18,12 @@ void registrarUsuario(){
 	cout << "usuario_registrar" << endl;
 	try{
 		// Obtiene los datos del formulario
-		string nombre = Usuario::validarNombre( interfaz.obtenerTextoEntrada( "EntradaRegistroNombre" ) );
-		string apellidos = Usuario::validarApellidos( interfaz.obtenerTextoEntrada( "EntradaRegistroApellidos" ) );
-		string nombreUsuario = Usuario::validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaRegistroNombreUsuario" ) );
-		string contrasena = Usuario::validarContrasena( interfaz.obtenerTextoEntrada( "EntradaRegistroContrasena" ) );
-		string confirmacion = Usuario::validarContrasena( interfaz.obtenerTextoEntrada( "EntradaRegistroConfirmarContrasena" ) );
+		
+		string nombre = Usuario::validarNombre( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroNombre" ) ) ) );
+		string apellidos = Usuario::validarApellidos( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroApellidos" ) ) ) );
+		string nombreUsuario = Usuario::validarNombreUsuario( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroNombreUsuario" ) ) ) );
+		string contrasena = Usuario::validarContrasena( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroContrasena" ) ) ) );
+		string confirmacion = Usuario::validarContrasena( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroConfirmarContraseña" ) ) ) );
 		
 		// Se asegura de que el usuario que se desea registrar no existe
 		nombreUsuarioOcupado( nombreUsuario );
@@ -93,7 +94,7 @@ void actualizarDatosUsuario()
 		database.close();
 		
 		// Actuliza los datos de la interfaz
-		interfaz.establecerTextoEtiqueta( "NombreUsuario", usuario.obtenerNombre() + "\n" + usuario.obtenerApellidos() );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreUsuario" ) ), ( usuario.obtenerNombre() + "\n" + usuario.obtenerApellidos() ).c_str() );
 		
 		// Muestra que el registro fue exitoso
 		app_mostrar_mensaje( "Datos actualizados de forma exitosa." );
@@ -111,8 +112,8 @@ void iniciarSesion(){
 		
 	try{
 		// Establece el nombre de usuario
-		string nombreUsuario = Usuario::validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaUsuario" ) );
-		string contrasena = Usuario::validarContrasena( interfaz.obtenerTextoEntrada( "EntradaContrasena" ) );
+		string nombreUsuario = Usuario::validarNombreUsuario( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaUsuario" ) ) ) );
+		string contrasena = Usuario::validarContrasena( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaContrasena" ) ) ) );
 		
 		// Busca en la base de datos el usuario solicitado
 		string consulta = "select * from Usuario where pseudonimo = '" + nombreUsuario + "'";
@@ -163,10 +164,9 @@ void iniciarSesion(){
 	}
 }
 
-void mostrarUsuario()
-{
-	interfaz.establecerTextoEtiqueta( "NombreUsuario", usuario.obtenerNombre() + "\n" + usuario.obtenerApellidos() );
-	interfaz.mostrarElemento( "Usuario" );
+void mostrarUsuario(){
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreUsuario" ) ), ( usuario.obtenerNombre() + "\n" + usuario.obtenerApellidos() ).c_str() );
+	gtk_widget_show( GTK_WIDGET( buscar_objeto( "Usuario" ) ) );
 }
 
 void nombreUsuarioOcupado( std::string nombreUsuario )
@@ -187,7 +187,7 @@ void nombreUsuarioOcupado( std::string nombreUsuario )
 void autorizarCambios()
 {
 	// Solicita la contraseña para autorizar cambios
-	interfaz.mostrarElemento( "VentanaEntradaContrasena" );
+	gtk_widget_show( GTK_WIDGET( buscar_objeto( "VentanaEntradaContrasena" ) ) );
 }
 
 string crearSal()
@@ -247,8 +247,8 @@ void cambiarContrasenaUsuario()
 
 		// Obtiene los campos introducidos
 		string usuario = Usuario::validarNombreUsuario( nombreUsuario );
-		string contrasena = Usuario::validarContrasena( interfaz.obtenerTextoEntrada( "EntradaReemplazarContrasena" ) );
-		string confirmacion = Usuario::validarContrasena( interfaz.obtenerTextoEntrada( "EntradaReemplazarConfirmacion" ) );
+		string contrasena = Usuario::validarContrasena( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaReemplazarContrasena" ) ) ) );
+		string confirmacion = Usuario::validarContrasena( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaReemplazarConfirmacion" ) ) ) );
 
 		// Cambia la contraseña del usuario especificado
 		cambiarContrasena( usuario, contrasena, confirmacion );

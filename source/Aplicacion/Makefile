@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3` -mwindows
 LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
-OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Empresa.o Registro.o Database.o ContenedorRegistros.o Vistas.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o Senales.o Bascula.o GestorBasculas.o Imagen.o Producto.o aplicacion.res
+OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Empresa.o Registro.o Database.o ContenedorRegistros.o Vistas.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o Senales.o Bascula.o GestorBasculas.o Imagen.o Producto.o Domicilio.o aplicacion.res
 
 ../../build/aplicacion:  main.cpp $(OBJS)
 	$(CC) main.cpp $(CFLAGS) -g -o ../../build/aplicacion $(OBJS) $(LIBS)
@@ -68,6 +68,9 @@ Producto.o: Producto.h Producto.cpp
 
 Empresa.o: Empresa.h Empresa.cpp
 	$(CC) $(CFLAGS) -c Empresa.h Empresa.cpp $(LIBS)
+
+Domicilio.o: Domicilio.h Domicilio.cpp
+	$(CC) $(CFLAGS) -c Domicilio.h Domicilio.cpp $(LIBS)
 
 aplicacion.res: aplicacion.rc
 	windres aplicacion.rc -O coff -o aplicacion.res

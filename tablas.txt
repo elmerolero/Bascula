@@ -13,14 +13,20 @@ create table TelefonoEmpresaPropia( id_telefono integer not null primary key aut
 create index telefonos_empresas_propias on TelefonoEmpresaPropia( id_empresa );
 
 -- Información empresas
-create table Empresa( id_empresa integer not null primary key autoincrement, razon_social text( 100 ) not null, RFC text( 13 ), imagen text( 68 ) );
-create table DomicilioEmpresa( id_domicilio integer not null primary key autoincrement, id_empresa integer not null, calle text( 100 ), numero text( 10 ), numero_interior text( 10 ), colonia text( 100 ), codigo_postal integer, municipio text( 100 ), estado text( 100 ), pais text( 100 ), descripcion text( 300 ) );
-create index domicilios_empresas on domicilio_empresa( id_empresa );
-create table telefono_empresa( id_telefono integer not null primary key autoincrement, id_empresa integer not null, id_domicilio integer, codigo_pais text( 4 ), codigo_area text( 12 ), telefono text( 10 ), extension text( 5 ) );
-create index telefonos_empresas on telefono_empresa( id_empresa );
+create table Empresas( id_empresa integer not null primary key autoincrement, razon_social text( 100 ) not null, RFC text( 13 ), imagen text( 68 ) );
+create table DomiciliosEmpresas( id_domicilio integer not null primary key autoincrement, id_empresa integer not null, calle text( 100 ), numero text( 10 ), numero_interior text( 10 ), colonia text( 100 ), codigo_postal integer, municipio text( 100 ), estado text( 100 ), pais text( 100 ), descripcion text( 300 ) );
+create index domicilios_empresas on DomiciliosEmpresas( id_empresa );
+create table TelefonosEmpresas( id_telefono integer not null primary key autoincrement, id_empresa integer not null, id_domicilio integer not null, codigo_pais text( 4 ), codigo_area text( 12 ), telefono text( 10 ), extension text( 5 ) );
+create index telefonos_empresas on TelefonosEmpresas( id_domicilio );
 
 -- Codigos de recuperacion
 CREATE TABLE codigos_recuperacion( codigo text( 64 ) not null, id_usuario integer not null );
 
 -- Productos
 CREATE TABLE Producto( id_producto integer not null primary key autoincrement, nombre text( 35 ) not null, descripcion text( 200 ), imagen text( 68 ) );
+
+--Pesajes internos
+CREATE TABLE PesajesInternos( folio integer not null primary key autoincrement, fecha text( 10 ) not null, tipo_registro integer not null, clave_empresa integer not null, clave_producto integer not null, numero_placas text( 7 ) not null, nombre_conductor text( 35 ) not null, hora_entrada text( 8 ), hora_salida text( 8 ), peso_bruto decimal, bruto_establecido integer, peso_tara decimal, tara_establecido integer, descuento decimal, descuento_establecido integer, descuento_permitido integer, peso_neto decimal, neto_establecido integer, observaciones text( 500 ), manual_activado integer, pendiente integer, nombre_basculista text( 70 ) not null, foreign key( clave_empresa ) references empresas(clave_empresa), foreign key( clave_producto ) references productos( clave_producto ) );
+
+-- Basculas
+CREATE TABLE Basculas( id_bascula integer integer not null primary key, nombre text( 50 ) not null, puerto text( 256 ) not null, baudrate integer not null, bytesize integer not null, parity integer not null, stopbits integer not null, ignoredbytes integer not null, inversed_text integer not null );

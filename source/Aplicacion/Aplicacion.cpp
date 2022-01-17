@@ -145,7 +145,6 @@ void conectarSenalesBase()
 void conectarSenales()
 {
     // Vista Inicio
-    conectar_senal( botonBascula, G_CALLBACK( irHacia ), (void *)"Bascula" );
     conectar_senal( enlaceCreditos, G_CALLBACK( irHacia ), (void *)"Creditos" );
     conectar_senal( botonConfiguracion, G_CALLBACK( vistaConfiguracion ), nullptr );
     
@@ -154,7 +153,7 @@ void conectarSenales()
 
     // Vista seleccion servicio
     conectar_senal( botonBasculaPublica, G_CALLBACK( vistaBasculaPublica ), nullptr );
-    conectar_senal( botonBasculaInterna, G_CALLBACK( vistaBasculaInterna ), nullptr );
+    conectar_senal( botonBasculaAdministrativo, G_CALLBACK( vistaBasculaInterna ), nullptr );
     
     // Nuevo para ticket interno
     conectar_senal( botonLeerPesoBrutoInterno, G_CALLBACK( vistaLeerPesoBruto ), nullptr );

@@ -42,7 +42,6 @@ Signal botonAceptar{ "BotonAceptar", "clicked", 0 };
 
 /* SEÑALES PARA EL MODO BASCULISTA */
 // Vista Inicio
-Signal botonBascula{ "BotonBascula", "clicked", 0 };
 Signal botonConfiguracion{ "BotonConfiguracion", "clicked", 0 };
 
 // Enlace hacia los créditos
@@ -56,7 +55,7 @@ Signal botonActualizarCuenta{ "BotonActualizarCuenta", "clicked", 0 };
 // Seleccion servicio
 Signal enlaceTipoBasculaRegresar{ "EnlaceTipoBasculaRegresar", "activate-link", 0 };
 Signal botonBasculaPublica{ "BotonBasculaPublica", "clicked", 0 };
-Signal botonBasculaInterna{ "BotonBasculaInterna", "clicked", 0 };
+Signal botonBasculaAdministrativo{ "BotonBasculaAdministrativo", "clicked", 0 };
     
 // Uso bascula de uso interno
 Signal botonBasculaNuevo{ "BotonBasculaNuevo", "clicked", 0 };

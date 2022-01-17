@@ -1,5 +1,6 @@
 #include "GestorRegistros.h"
 #include "Aplicacion.h"
+#include "Imagen.h"
 #include "Sesion.h"
 #include "Vistas.h"
 #include "sha256.h"
@@ -472,14 +473,14 @@ void cargarOpcionesImpresion()
 void actualizarOpcionesImpresion()
 {
     try{
-        numeroFormatos = stoi( interfaz.obtenerTextoEntrada( "OpcionesImpresionFormatos" ) );
+        numeroFormatos = stoi( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "OpcionesImpresionFormatos" ) ) ) );
     }
     catch( invalid_argument &ia ){
         throw invalid_argument( "Numero de formatos no válido." );
     }
 
     try{
-        numeroCopias = stoi( interfaz.obtenerTextoEntrada( "OpcionesImpresionCopias" ) );
+        numeroCopias = stoi( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "OpcionesImpresionCopia" ) ) ) );
     }
     catch( invalid_argument &ia ){
         throw invalid_argument( "Numero de copias no válido." );
@@ -625,15 +626,9 @@ void actualizarEstadoAdministrador()
     // Conecta con la base de datos
     database.open( databaseFile );
 
-    unsigned int opcion = 0;
-    if( interfaz.obtenerEstadoBotonToggle( "UsuarioAdministrador" ) == TRUE ){
-        opcion = 1;
-    }
-    else{
-        opcion = 0;
-    }
+    unsigned int opcion = gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "UsuarioAdministrador" ) ) );
 
-    string consulta = "update usuarios set administrador = " + to_string( opcion ) + " where nombre_usuario = '" + usuarioConsultado -> obtenerNombreUsuario() + "';";
+    string consulta = "update Usuario set administrador = " + to_string( opcion ) + " where nombre = '" + usuarioConsultado -> obtenerNombreUsuario() + "';";
     database.query( consulta );
 
     // Cierra la conexión
@@ -670,7 +665,7 @@ void eliminarUsuario()
             consulta = "delete from usuarios where nombre_usuario = '" + usuarioConsultado -> obtenerNombreUsuario() + "'";
             database.query( consulta );
 
-            interfaz.ocultarElemento( "MensajeAlerta" );
+            gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeAlerta" ) ) );
 
             // ¿El usuario que se eliminó es el usuario actual?
             if( usuarioConsultado -> obtenerNombreUsuario().compare( usuario.obtenerNombreUsuario() ) == 0 ){
@@ -698,25 +693,31 @@ void eliminarUsuario()
 void actualizarRegistrosUsuarios( list< Usuario * > &usuarios, std::string idContenedor )
 {
     // Limpia el contenedor
-    interfaz.removerElementosHijos( idContenedor );
+    limpiar_contenedor( idContenedor );
 
     // Itera a través de la lista de tickets pendientes y crea los tickets necesarios
     unsigned int contador = 0;
-    for( list< Usuario * >::iterator usuario = usuarios.begin(); usuario != usuarios.end(); usuario++, contador++ ){
+    database.open( databaseFile );
+    database.query( "select * from Usuario" );
+    database.close();
+    if( results.size() > 0 ){
         // Crea un elemento que será añadido a la interfaz
-        Widget *elemento = new Widget();
+        GtkBuilder *builder = gtk_builder_new();
+        GError *error = NULL;
 
-        try{
-            elemento -> cargarWidget( "../recursos/interfaces/ElementoUsuario.glade" );
-            elemento -> establecerTextoEtiqueta( "ItemEntradaNombre", (*usuario) -> obtenerNombre() + " " + (*usuario) -> obtenerApellidos() );
-            elemento -> establecerTextoEtiqueta( "ItemEntradaUsuario", (*usuario) -> obtenerNombreUsuario() );
-            interfaz.insertarElementoAGrid( elemento, "ItemUsuario", idContenedor, 0, contador, 1, 1 );
+        if( gtk_builder_add_from_file( builder, "../recursos/interfaces/ElementoUsuario.glade", &error ) ){
+            for( unordered_map< string, string > *usuario : results ){
+                gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemEntradaNombre" ) ), ( (* usuario)[ "nombre" ] + " " + (* usuario)[ "apellidos" ] ).c_str() );
+                if( (* usuario)[ "imagen" ].compare( "null" ) != 0 ){
+                    GdkPixbuf *imagen = imagen_cargar_escalar( "../recursos/imagenes/usuarios/" + (*usuario)[ "imagen" ], 64, 64 );
+                    if( imagen != nullptr ){
+                        gtk_image_set_from_pixbuf( GTK_IMAGE( gtk_builder_get_object( builder, "ElementoUsuarioImagen" ) ), imagen );
+                    }
+                }
+
+                gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( idContenedor ) ), GTK_WIDGET( buscar_objeto( "ItemUsuario" ) ), stoi( (*usuario)[ "id_usuario" ] ) );
+            }
         }
-        catch( runtime_error &re ){
-            cerr << re.what() << endl;
-        }
-        
-        delete elemento;
     }
 }
 
@@ -727,7 +728,7 @@ void generarCodigoRecuperacion()
     uniform_int_distribution< unsigned int > intAleatorio( 65, 90 );
 
     // Nombre de usuario
-    string usuario = Usuario::validarNombreUsuario( interfaz.obtenerTextoEntrada( "NombreUsuarioConsultado" ) );
+    string usuario = Usuario::validarNombreUsuario( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "NombreUsuarioConsultado" ) ) ) );
 
     // Código
     stringstream codigo;
@@ -755,8 +756,8 @@ void generarCodigoRecuperacion()
 void validarCodigoRecuperacion()
 {
     try{
-        string entradaUsuario = Usuario::validarNombreUsuario( interfaz.obtenerTextoEntrada( "EntradaRecuperacionUsuario" ) );
-        string codigoSeguridad = interfaz.obtenerTextoEntrada( "EntradaRecuperacionCodigoSeguridad" );
+        string entradaUsuario = Usuario::validarNombreUsuario( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRecuperacionUsuario" ) ) ) );
+        string codigoSeguridad = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRecuperacionCodigoSeguridad" ) ) );
 
         // Obtiene el código en base el nombre de usuario
         database.open( databaseFile );

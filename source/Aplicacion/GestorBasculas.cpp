@@ -18,23 +18,23 @@ thread *lectura;
 void basculaAbrirLector()
 {
     // Muestra la ventana
-    interfaz.mostrarElemento( "VentanaLectorPeso" );
-    interfaz.establecerTextoEtiqueta( "EstadoLectura", "Esperando selección" );
+    gtk_widget_show( GTK_WIDGET( buscar_objeto( "VentanaLectorPeso" ) ) );
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "EstadoLectura" ) ), "Esperando selección" );
 
     // Establece el peso en 0 Kg
-    interfaz.establecerTextoEtiqueta( "EtiquetaPeso", "0 Kg" );
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaPeso" ) ), "0 Kg" );
 
      // Conecta las señales convenientes
-    interfaz.conectarSenal( comboBoxBasculasRegistradas, G_CALLBACK( basculaLecturaIniciar ), nullptr );
+    conectar_senal( comboBoxBasculasRegistradas, G_CALLBACK( basculaLecturaIniciar ), nullptr );
 }
 
 gboolean basculaCerrarLector()
 {
     // Oculta la ventana
-	interfaz.ocultarElemento( "VentanaLectorPeso" );
+	gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaLectorPeso" ) ) );
 
     // Desconecta la señal de seleccion de bascula
-    interfaz.desconectarSenal( comboBoxBasculasRegistradas );
+    desconectar_senal( comboBoxBasculasRegistradas );
     
     // Desactiva la báscula seleccionada
     if( bascula != nullptr ){
@@ -46,7 +46,7 @@ gboolean basculaCerrarLector()
 
 void basculaLecturaIniciar()
 {
-    bascula = basculaBuscarPorCodigo( gtk_combo_box_get_active( GTK_COMBO_BOX( interfaz.obtenerObjeto( "BasculasRegistradas" ) ) ) );
+    bascula = basculaBuscarPorCodigo( gtk_combo_box_get_active( GTK_COMBO_BOX( buscar_objeto( "BasculasRegistradas" ) ) ) );
     if( bascula != nullptr ){
         lectura = new thread( basculaLecturaActualizar );
     }
@@ -55,13 +55,13 @@ void basculaLecturaIniciar()
 void basculaLecturaActualizar()
 {   
     // Establece el estado del lector
-    interfaz.establecerTextoEtiqueta( "EstadoLectura", "Conectando a " + bascula -> obtenerPuerto() );
-
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "EstadoLectura" ) ), ( "Conectando a " + bascula -> obtenerPuerto() ).c_str() );
+    
     // Conecta con la báscula
     bascula -> conectar();
     
     // Indica que está leyendo
-    interfaz.establecerTextoEtiqueta( "EstadoLectura", "Leyendo" );
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "EstadoLectura" ) ), "Leyendo" );
     
     // Comienza a actualizar los datos de la báscula
     while( bascula -> estaActivo() ){
@@ -72,7 +72,7 @@ void basculaLecturaActualizar()
         double peso = bascula -> leer();
 
 		// Establece el peso en la etiqueta
-		interfaz.establecerTextoEtiqueta( "EtiquetaPeso", pesoString( peso, 2, true ) );
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaPeso" ) ), pesoString( peso, 2, true ).c_str() );
     }
     
     // Desconecta de la bascula
@@ -120,11 +120,11 @@ void basculaObtenerRegistros(){
 void basculaObtenerPuertosDisponibles()
 {
 	// Limpia las opciones que había anteriormente
-	interfaz.limpiarComboBoxText( "OpcionesBasculaPuerto" );
+    limpiar_contenedor( "OpcionesBasculaPuerto" );
 	
 	// Agrega las opciones seleccionar y las establece como por defecto
-	interfaz.agregarOpcionComboBoxText( "OpcionesBasculaPuerto", "Seleccionar", "Seleccionar" );
-	interfaz.establecerActivoComboBoxText( "OpcionesBasculaPuerto", "Seleccionar" );
+    gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( buscar_objeto( "OpcionesBasculaPuerto" ) ), "Seleccionar", "Seleccionar" );
+	gtk_combo_box_set_active_id( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaPuerto" ) ), "Seleccionar" );
 
 	// Agrega los puertos seriales disponibles
 	char directorioPuerto[ 5000 ];
@@ -135,7 +135,7 @@ void basculaObtenerPuertosDisponibles()
 		string nombrePuerto = "COM" + to_string( contador );
 		DWORD intento = QueryDosDevice( nombrePuerto.c_str(), directorioPuerto, 5000 );
 		if( intento != 0 ){
-			interfaz.agregarOpcionComboBoxText( "OpcionesBasculaPuerto", ( contador > 9 ? "\\\\.\\" + nombrePuerto : nombrePuerto ).c_str(), ( contador > 9 ? "\\\\.\\" + nombrePuerto : nombrePuerto ).c_str() );
+            gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( buscar_objeto( "OpcionesBasculaPuerto" ) ), ( contador > 9 ? "\\\\.\\" + nombrePuerto : nombrePuerto ).c_str(), ( contador > 9 ? "\\\\.\\" + nombrePuerto : nombrePuerto ).c_str() );
 			contadorDispositivos++;
 		}
 	}
@@ -152,7 +152,7 @@ void basculaGuardar()
         bool nuevaBascula = false;
 
         // Crea la nueva báscula a agregar
-        Bascula *bascula = basculaBuscarPorCodigo( stoi( interfaz.obtenerTextoEtiqueta( "OpcionesBasculaCodigo" ) ) );
+        Bascula *bascula = basculaBuscarPorCodigo( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "OpcionesBasculaCodigo" ) ) ) ) );
         if( bascula == nullptr ){
             // Es un nuevo registro
             bascula = new Bascula();
@@ -163,13 +163,13 @@ void basculaGuardar()
         }
 
         // Establece los datos de configuración establecidos
-        bascula -> establecerNombre( interfaz.obtenerTextoEntrada( "OpcionesBasculaNombre" ) );
-        bascula -> establecerPuerto( interfaz.obtenerOpcionComboBoxText( "OpcionesBasculaPuerto" ) );
-        bascula -> establecerBaudRate( interfaz.obtenerOpcionComboBoxText( "OpcionesBasculaBaudrate" ) );
-        bascula -> establecerByteSize( interfaz.obtenerTextoEntrada( "OpcionesBasculaBitsDatos" ) );
-        bascula -> establecerStopBits( interfaz.obtenerTextoEntrada( "OpcionesBasculaBitsStop" ) );
-        bascula -> establecerParity( interfaz.obtenerOpcionComboBoxText( "OpcionesBasculaParidad" ) );
-        bascula -> establecerBytesIgnorados( interfaz.obtenerTextoEntrada( "OpcionesBasculaBytesIgnorados" ) );
+        bascula -> establecerNombre( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaNombre" ) ) ) );
+        bascula -> establecerPuerto( gtk_combo_box_text_get_active_text( GTK_COMBO_BOX_TEXT( buscar_objeto( "OpcionesBasculaPuerto" ) ) ) );
+        bascula -> establecerBaudRate( gtk_combo_box_text_get_active_text( GTK_COMBO_BOX_TEXT( buscar_objeto( "OpcionesBasculaBaudrate" ) ) ) );
+        bascula -> establecerByteSize( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculasBitsDatos" ) ) ) );
+        bascula -> establecerStopBits( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsStop" ) ) ) );
+        bascula -> establecerParity( gtk_combo_box_text_get_active_text( GTK_COMBO_BOX_TEXT( buscar_objeto( "OpcionesBasculaParidad" ) ) ) );
+        bascula -> establecerBytesIgnorados( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBytesIgnorados" ) ) ) );
 
         // ¿Es nueva bascula?
         if( nuevaBascula ){
@@ -247,7 +247,7 @@ void basculaEliminar()
 {
     try{
         // Busca la bascula a eliminar
-        Bascula *bascula = basculaBuscarPorCodigo( stoi( interfaz.obtenerWidgetSeleccionadoListBox( "ContenedorBasculas" ) ) );
+        Bascula *bascula = basculaBuscarPorCodigo( stoi( gtk_widget_get_name( gtk_bin_get_child( GTK_BIN( gtk_list_box_get_selected_row( GTK_LIST_BOX( buscar_objeto( "ContenedorBasculas" ) ) ) ) ) ) ) );
         if( bascula == nullptr ){
             throw runtime_error( "Ocurrió un error al recuperar un ticket seleccionado." );
         }
@@ -280,39 +280,37 @@ void basculaActualizarRegistros()
 {
     try{
         // Limpia los contenedores
-        interfaz.removerElementosHijos( "ContenedorBasculas" );
-        interfaz.limpiarComboBoxText( "BasculasRegistradas" );
-        interfaz.agregarOpcionComboBoxText( "BasculasRegistradas", "Seleccionar", NULL );
-        interfaz.establecerOpcionComboBox( "BasculasRegistradas", 0 );
+        limpiar_contenedor( "ContenedorBasculas" );
+        gtk_combo_box_text_remove_all( GTK_COMBO_BOX_TEXT( buscar_objeto( "BasculasRegistradas" ) ) );
+        gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( buscar_objeto( "BasculasRegistradas" ) ), NULL, "Seleccionar" );
+        gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "BasculasRegistradas" ) ), 0 );
 
         // Para cada una de las básculas registradas
         for( Bascula *bascula : basculasRegistradas ){
             // Crea un elemento que será añadido a la interfaz
-            Widget *elemento = new Widget();
+            GtkBuilder *builder = gtk_builder_new();
+            GError *error = NULL;
 
-            // Carga el elemento y lo ancla hacia las opciones
-            elemento -> cargarWidget( "../recursos/interfaces/ElementoBascula.glade" );
-            elemento -> establecerNombreWidget( "ItemBascula", to_string( bascula -> obtenerCodigo() ) );
-            elemento -> establecerTextoEtiqueta( "ItemBasculaNombre", bascula -> obtenerNombre() );
-            elemento -> establecerTextoEtiqueta( "ItemBasculaPuerto", bascula-> obtenerPuerto() );
-            elemento -> establecerTextoEtiqueta( "ItemBasculaVelocidad", to_string( bascula -> obtenerBaudRate() ) + " bps"  );
+            if( gtk_builder_add_from_file( builder, "../recursos/interfaces/ElementoBascula.glade", &error ) != 0 ){
+                gtk_widget_set_name( GTK_WIDGET( buscar_objeto( "ItemBascula" ) ), to_string( bascula -> obtenerCodigo() ).c_str() );
+                gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemBasculaNombre" ) ), bascula -> obtenerNombre().c_str() );
+                gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemBasculaPuerto" ) ), bascula -> obtenerPuerto().c_str() );
+                gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemBasculaVelocidad" ) ), ( to_string( bascula -> obtenerBaudRate() ) + " bps" ).c_str() );
+            }
 
             // Lo agrega al contenedor y la lista de basculas registradas
-            interfaz.insertarElementoListBox( elemento, "ItemBascula", "ContenedorBasculas", bascula -> obtenerCodigo() );
-            interfaz.agregarOpcionComboBoxText( "BasculasRegistradas", bascula -> obtenerNombre(), NULL );
-
-            // Elimina el widget creado
-            delete elemento;
+            gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( "ContenedorBasculas" ) ), GTK_WIDGET( gtk_builder_get_object( builder, "ItemBascula" ) ), bascula -> obtenerCodigo() );
+            gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( buscar_objeto( "BasculasRegistradas" ) ), NULL, bascula -> obtenerNombre().c_str() );
         }
 
         // Si no hay basculas registradas muestra un mensaje de vacío
         if( basculasRegistradas.size() < 1 ){
-            interfaz.mostrarElemento( "MensajeBasculas" );
-            interfaz.ocultarElemento( "ContenedorBasculas" );
+            gtk_widget_show( GTK_WIDGET( buscar_objeto( "MensajeBasculas" ) ) );
+            gtk_widget_hide( GTK_WIDGET( buscar_objeto( "ContenedorBasculas" ) ) );
         }
         else{
-            interfaz.mostrarElemento( "ContenedorBasculas" );
-            interfaz.ocultarElemento( "MensajeBasculas" );
+            gtk_widget_show( GTK_WIDGET( buscar_objeto( "ContenedorBasculas" ) ) );
+            gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeBasculas" ) ) );
         }
     }
     catch( runtime_error &re ){
@@ -320,16 +318,16 @@ void basculaActualizarRegistros()
     }
 }
 
-void basculaLimpiarFormulario( void )
-{
-    interfaz.establecerTextoEtiqueta( "OpcionesBasculaCodigo", to_string( codigoBasculaActual + 1 ) );
-    interfaz.establecerTextoEntrada( "OpcionesBasculaNombre", "" );
-    interfaz.establecerOpcionComboBox( "OpcionesBasculaPuerto", 0 );
-    interfaz.establecerOpcionComboBox( "OpcionesBasculaBaudrate", 6 );
-    interfaz.establecerTextoEntrada( "OpcionesBasculaBitsDatos", "8" );
-    interfaz.establecerTextoEntrada( "OpcionesBasculaBitsStop", "0" );
-    interfaz.establecerOpcionComboBox( "OpcionesBasculaParidad", 0 );
-    interfaz.establecerTextoEntrada( "OpcionesBasculaBytesIgnorados", "0" );
+void basculaLimpiarFormulario( void ){
+    cout << "buscula_limpiar_formulario" << endl;
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "OpcionesBasculaCodigo" ) ), to_string( codigoBasculaActual + 1 ).c_str() );
+    gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaNombre" ) ), "" );
+    gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaPuerto" ) ), 0 );
+    gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaBaudrate" ) ), 6 );
+    gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsDatos" ) ), "8" );
+    gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsStop" ) ), "0" );
+    gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaParidad" ) ), 0 );
+    gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBytesIgnorados" ) ), "0" );
 }
 
 void basculaRegistrarPeso( string etiquetaPeso, string etiquetaHora )
@@ -344,18 +342,12 @@ void basculaRegistrarPeso( string etiquetaPeso, string etiquetaHora )
         }
         
         // Establece la opción por defecto
-        interfaz.establecerOpcionComboBox( "BasculasRegistradas", 0 );
+        gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "BasculasRegistradas" ) ), 0 );
 
         // Lee las etiquetas de peso
-        if( bascula != nullptr ){
-            string peso = pesoString( bascula -> leer(), 2, true );
-            interfaz.establecerTextoEtiqueta( etiquetaPeso, peso );
-            interfaz.establecerTextoEtiqueta( etiquetaHora, tiempo_leer_hora( 1 ) );
-        }
-        else{
-            interfaz.establecerTextoEtiqueta( etiquetaPeso, "0.00 kg" );
-            interfaz.establecerTextoEtiqueta( etiquetaHora, tiempo_leer_hora( 1 ) );
-        }
+        string peso = ( bascula != nullptr ? pesoString( bascula -> leer(), 2, true ) : "0.00 Kg" );
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( etiquetaPeso ) ), peso.c_str() );
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( etiquetaHora ) ), tiempo_leer_hora( 1 ).c_str() );
     }
     catch( exception e ){
         cout << e.what() << endl;

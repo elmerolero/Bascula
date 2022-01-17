@@ -12,127 +12,18 @@
 #include "GestorRegistros.h"
 #include "RegistrosInternos.h"
 #include "RegistrosPublicos.h"
+#include "Domicilio.h"
 #include "Senales.h"
 using namespace std;
 
-void vista_registros( GtkWidget *widget, gpointer ptr ){	
-	// Lo convierte para establecer el título
-	ContenedorRegistros *registros = static_cast< ContenedorRegistros * >( ptr );
-	string nombre = registros -> obtenerNombreSingular();
-	nombre[ 0 ] = toupper( nombre[ 0 ] );
+Signal senal_opcion_basculas = { "OpcionBasculas", "clicked", 0 };
 
-	// Establece la vista para consultar registros
-	irA( "ConsultarRegistros", false );
-
-	// Establece el nombre de los registros que se estan consultando
-    gtk_label_set_text( GTK_LABEL( buscar_objeto( "Titulo" ) ), nombre.c_str() );
+void bascula_configuracion( GtkWidget *widget, gpointer ){
+	// Actualiza los registros de básculas
 	
-	// Establece la imagen de registro
-	string ruta = "../recursos/imagenes/iconos/";
-	gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenRegistro" ) ), (ruta + nombre + ".png").c_str() );
-	gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenEdicionRegistro" ) ), "../recursos/imagenes/iconos/Producto.png" );
-	
-	// Actualiza la lista de registros de empresas
-	registros -> actualizarListaRegistros();
-	
-	// Vistas  
-	conectar_senal( botonRegistroVistaConsultar, G_CALLBACK( crearRegistro ), ptr );
-	conectar_senal( botonRegistroVistaNuevo, G_CALLBACK( irHacia ), (void *)"NuevoRegistro" );
-	conectar_senal( botonRegistroVistaEditar, G_CALLBACK( vistaRegistroEditar ), (void *)ptr );
-	conectar_senal( botonRegistroVistaEliminar, G_CALLBACK( vistaRegistroEliminar ), nullptr );
 
-	// Acciones
-	//conectar_senal( botonRegistroGuardarNuevo, ptr );
-	conectar_senal( botonRegistroGuardarEdicion, G_CALLBACK( actualizarRegistro ), ptr );
-    conectar_senal( botonSi, G_CALLBACK( eliminarRegistro ), ptr );
-}
-
-void vistaRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
-	// Obtiene el id del folio
-	unsigned int folio = obtenerFolioSelector( row );
-	
-	// Obtiene el folio
-	string registro = (char *)data;
-	database.open( databaseFile );
-	database.query( "select * from " + registro + " where id_producto = " + to_string( folio ) );
-	database.close();
-
-	if( results.size() > 0 ){
-		// Obtiene el renglon
-		unordered_map< string, string > *resultados = results.at( 0 );
-
-		// Establece la clave del registro
-		stringstream clave;
-		clave << setfill( '0' ) << setw( 7 ) << folio << setfill( ' ' );
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaClaveRegistro" ) ), clave.str().c_str() );
-	
-		// Establece el nombre del registro
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaNombreRegistro" ) ), (* resultados)[ "nombre" ].c_str() );
-
-		// Establece la descripción
-		if( (* resultados)[ "descripcion" ].compare( "null" ) == 0 ){
-			gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaDescripcionRegistro" ) ), "Ninguno." );
-		}
-		else{
-			gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaDescripcionRegistro" ) ), (* resultados)[ "descripcion" ].c_str() );
-		}
-
-		// Establece imagen
-		if( (* resultados)[ "imagen" ].compare( "null" ) == 0 ){
-			gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenRegistroConsulta" ) ), "../recursos/imagenes/iconos/Producto.png" );
-		}
-		else{
-			string ruta = "../recursos/imagenes/";
-			ruta = ruta + (char *)data + "s/" + (* resultados)[ "imagen" ];
-			GdkPixbuf *imagen = imagen_cargar_escalar( ruta.c_str(), 180, 180 );
-			gtk_image_set_from_pixbuf( GTK_IMAGE(  buscar_objeto( "ImagenRegistroConsulta" ) ), imagen );
-		}
-
-		// Establece la vista de registro
-		irA( "Registro", false );
-	}
-}
-
-void vistaRegistroEditar( GtkWidget *widget, gpointer data )
-{
-	try{
-        GtkListBoxRow *itemSeleccionado = gtk_list_box_get_selected_row( GTK_LIST_BOX( buscar_objeto( "ContenedorRegistros" ) ) );
-        if( itemSeleccionado == NULL ){
-            app_mostrar_error( "No se ha seleccionado ningún registro." );
-            return;
-        }
-
-		stringstream consulta;
-		consulta << "select * from Producto where id_producto = "
-				 << gtk_widget_get_name( GTK_WIDGET ( gtk_bin_get_child( GTK_BIN( itemSeleccionado ) ) ) );
-		
-		// Realiza la consultas
-		database.open( databaseFile );
-		database.query( consulta.str() );
-		database.close();
-
-		if( results.size() > 0 ){
-			unordered_map< string, string > *resultado = results.at( 0 );
-
-			// Estabece los datos del formulario
-			gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaClaveEditarRegistro" ) ), (* resultado )[ "id_producto" ].c_str() );
-			gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreEditarRegistro" ) ), (* resultado )[ "nombre" ].c_str() );
-			if( (* resultado)[ "descripcion" ].compare( "null" ) != 0 ){
-				gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "ProductoDescripcionEditar" ) ), (* resultado )[ "descripcion" ].c_str() );
-			}
-		}
-
-		irA( "ProductoEditar", false );
-	}
-	catch( invalid_argument &ia ){
-		app_mostrar_error( ia.what() );
-	}
-}
-
-void vistaRegistroEliminar( GtkWidget *widget, gpointer ptr ){
-	const char *mensaje = "ALERTA: Si el existen registros de pesaje que hagan\nreferencia a este registro, también serán eliminados.\n¿Estás seguro que deseas hacerlo?";
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "MensajeAlerta" ) ), mensaje );
-	gtk_widget_show( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
+	// Redirige a básculas
+	irA( "Basculas", false );
 }
 
 void vistaBasculaEliminar(){
@@ -174,9 +65,19 @@ void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
             	gtk_image_set_from_pixbuf( GTK_IMAGE( gtk_builder_get_object( builder, "ImagenEmpresaPropia" ) ), imagen );
             }
 		}
-	} 
+
+		// Establece su domicilio
+		domicilio_empresa_registros_actualizar( "DomicilioEmpresaPropia", "ContenedorEmpresaPropiaDomicilios", stoi( (* resultado)[ "id_empresa" ] ) );
+	}
 
 	// Establece la señal de eliminar bascula
+	conectar_senal( senal_domicilio_empresa_propia_agregar, G_CALLBACK( irHacia ), (void *)"AgregarDomicilio" );
+	conectar_senal( senal_domicilio_empresa_propia_editar, G_CALLBACK( empresa_propia_domicilio_editar ), nullptr );
+	conectar_senal( senal_domicilio_empresa_propia_eliminar, G_CALLBACK( domicilio_empresa_propia_eliminar ), nullptr );
+
+	conectar_senal( senal_domicilio_guardar_nuevo, G_CALLBACK( empresa_propia_domicilio_guardar_nuevo ), nullptr );
+	conectar_senal( senal_domicilio_cancelar_nuevo, G_CALLBACK( regresarVista ), nullptr );
+	conectar_senal( senal_opcion_basculas, G_CALLBACK( bascula_configuracion ), nullptr );
 	//conectar_senal( botonSi, G_CALLBACK( basculaEliminar ), nullptr );
 
 	// Se dirige a la vista
@@ -214,22 +115,22 @@ void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
 	// Folio
 	stringstream folio;
 	folio << setfill( '0' ) << setw( 7 ) << (folioActualPublico + 1);
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), folio.str() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), folio.str().c_str() );
 	
 	// Fecha
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico", tiempo_leer_fecha_corta() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico" ) ), tiempo_leer_fecha_corta().c_str() );
 	
 	// Producto
-	gtk_entry_set_editable( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ), TRUE );
+	gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaNombreProductoPublico" ) ), TRUE );
 	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ), "" );
 	
 	// Nombre del conductor
-	gtk_entry_set_editable( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico"  ) ), TRUE );
+	gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaNombreConductorPublico"  ) ), TRUE );
 	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ), "" );
 	
 	// Numero de placas
-	gtk_entry_set_editable( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico"  ) ), TRUE );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ), "" ) );
+	gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaNumeroPlacasPublico"  ) ), TRUE );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ), "" );
 	
 	// Hora entrada y Peso Bruto
 	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ), "No establecida" );
@@ -243,7 +144,7 @@ void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
 	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "ViajeLocal" ) ), TRUE );
 	
 	// Peso neto
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), "No establecido" ) );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), "No establecido" );
 	
 	// Establece el completador de producto
 	//  gtk_entry_set_completion( GTK_ENTRY( objecto ), completador );
@@ -269,7 +170,7 @@ void vistaPublicoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 		
 		// Folio
 		entrada << setfill( '0' ) << setw( 7 ) << registroPublico -> obtenerFolio();
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), entrada.str().c_str() ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), entrada.str().c_str() );
 		
 		// Fecha
 		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico" ) ), registroPublico -> obtenerFecha().c_str() );
@@ -283,27 +184,27 @@ void vistaPublicoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 		}
 		
 		// Nombre del producto (no permite edicion)
-		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ), registroPublico -> obtenerProducto() -> obtenerNombre() ) );
-		gtk_entry_set_editable( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico"  ) ), FALSE );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ), registroPublico -> obtenerProducto() -> obtenerNombre().c_str() );
+		gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaNombreProductoPublico"  ) ), FALSE );
 		
 		// Nombre del conductor (no permite edicion)
-		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ), registroPublico -> obtenerNombreConductor() ) );
-		gtk_entry_set_editable( GTK_ENTRY( buscar_objeto(  "EntradaNombreConductorPublico"  ) ), FALSE );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ), registroPublico -> obtenerNombreConductor().c_str() );
+		gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto(  "EntradaNombreConductorPublico"  ) ), FALSE );
 		
 		// Numero de placas (no permite edicion)
-		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ), registroPublico -> obtenerNumeroPlacas() );
-		gtk_entry_set_editable( GTK_ENTRY( buscar_objeto(  "EntradaNumeroPlacasPublico"  ) ), FALSE );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ), registroPublico -> obtenerNumeroPlacas().c_str() );
+		gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto(  "EntradaNumeroPlacasPublico"  ) ), FALSE );
 		
 		// Hora entrada y peso bruto
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ), ( registroPublico -> estaPesoBrutoEstablecido() ? registroPublico -> obtenerHoraEntrada() : "No establecida" ) );
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ), ( registroPublico -> estaPesoBrutoEstablecido() ? pesoString( registroPublico -> obtenerPesoBruto(), 2 ) : "No establecido" ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ), ( registroPublico -> estaPesoBrutoEstablecido() ? registroPublico -> obtenerHoraEntrada() : "No establecida" ).c_str() );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ), ( registroPublico -> estaPesoBrutoEstablecido() ? pesoString( registroPublico -> obtenerPesoBruto(), 2 ) : "No establecido" ).c_str() );
 		
 		// Hora salida y peso tara
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ), ( registroPublico -> estaPesoTaraEstablecido() ? registroPublico -> obtenerHoraSalida() : "No establecida" ) );
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ), ( registroPublico -> estaPesoTaraEstablecido() ? pesoString( registroPublico -> obtenerPesoTara(), 2 ) : "No establecido" ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ), ( registroPublico -> estaPesoTaraEstablecido() ? registroPublico -> obtenerHoraSalida() : "No establecida" ).c_str() );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ), ( registroPublico -> estaPesoTaraEstablecido() ? pesoString( registroPublico -> obtenerPesoTara(), 2 ) : "No establecido" ).c_str() );
 		
 		// Peso neto
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), ( registroPublico -> estaPesoNetoEstablecido() ? pesoString( registroPublico -> obtenerPesoNeto(), 2 ) : "No establecido" ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), ( registroPublico -> estaPesoNetoEstablecido() ? pesoString( registroPublico -> obtenerPesoNeto(), 2 ) : "No establecido" ).c_str() );
 		
 		// Establece el texto de finalizar
 		gtk_label_set_text( GTK_LABEL( buscar_objeto( "BotonRegistrarPublico" ) ), "Finalizar" );
@@ -321,7 +222,7 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	// Folio
 	stringstream folio;
 	folio << setfill( '0' ) << setw( 7 ) << (folioActual + 1);
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioInterno" ) ), folio.str().C_str() );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioInterno" ) ), folio.str().c_str() );
 	
 	// Fecha
 	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFechaInterno" ) ), tiempo_leer_fecha_corta().c_str() );
@@ -332,7 +233,7 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	// Descuento
 	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "NoDescuentoInterno" ) ), TRUE );
 	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ), "" );
-	gtk_entry_set_editable( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ), FALSE );
+	gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaDescuentoInterno" ) ), FALSE );
 
 	// Tipo de registro (registra entrada por defecto)
 	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "RegistraEntrada" ) ), TRUE );
@@ -400,21 +301,21 @@ void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 	
 	// Descuento
 	if( ticket -> permitirDescuento() ){
-		interfaz.establecerActivoBotonToggle( "SiDescuentoInterno" );
-		interfaz.habilitarEdicionEntrada( "EntradaDescuentoInterno" );
-		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", pesoString( ticket -> obtenerDescuento(), 2, false ) );
+		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "SiDescuentoInterno" ) ), TRUE );
+		gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaDescuentoInterno" ) ), TRUE );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ), pesoString( ticket -> obtenerDescuento(), 2, false ).c_str() );
 	}
 	else{
-		interfaz.establecerActivoBotonToggle( "NoDescuentoInterno" );
-		interfaz.deshabilitarEdicionEntrada( "EntradaDescuentoInterno" );
-		interfaz.establecerTextoEntrada( "EntradaDescuentoInterno", "" );
+		gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "NoDescuentoInterno" ) ), TRUE );
+		gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaDescuentoInterno" ) ), FALSE );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaDescuentoInterno" ) ), "" );
 	}
 
 	// Peso neto
-	interfaz.establecerTextoEtiqueta( "EntradaPesoNetoInterno", ( ticket -> estaPesoNetoEstablecido() ? pesoString( ticket -> obtenerPesoNeto(), 2 ) : "No establecido" ) );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoInterno" ) ), ( ticket -> estaPesoNetoEstablecido() ? pesoString( ticket -> obtenerPesoNeto(), 2 ) : "No establecido" ).c_str() );
 		
 	// Motivos y observaciones
-	interfaz.establecerTextoEntrada( "EntradaObservacionesInterno", ticket -> obtenerObservaciones() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaObservacionesInterno" ) ), ticket -> obtenerObservaciones().c_str() );
 	
 	// Va hacia la vista
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
@@ -524,19 +425,19 @@ void vistaInternoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointe
 	// Establece los datos del ticket en el formulario
 	gtk_label_set_text( GTK_LABEL( buscar_objeto( "FolioInterno" ) ), to_string( ticket -> obtenerFolio() ).c_str() ); 			 // Folio
 	gtk_label_set_text( GTK_LABEL( buscar_objeto( "FechaInterno" ) ), ticket -> obtenerFecha().c_str() );			   			 // Fecha
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreEmpresaInterno" ) ), ticket -> obtenerEmpresa() -> obtenerNombre() );   // Empresa
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreProductoInterno" ) ), ticket -> obtenerProducto() -> obtenerNombre() ); // Producto
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreConductorInterno" ) ), ticket -> obtenerNombreConductor() );  		     // Nombre del conductor
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NumeroPlacasInterno" ) ), ticket -> obtenerNumeroPlacas() );					// Número de placas
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraEntradaInterno" ) ), ticket -> obtenerHoraEntrada()  );  				// Hora entrada
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoBrutoInterno" ) ), to_string( ticket -> obtenerPesoBruto() ) ); 			// Peso bruto
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraSalidaInterno" ) ), ticket -> obtenerHoraSalida() );						// Hora salida
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoTaraInterno" ) ), to_string( ticket -> obtenerPesoTara() ) ); 			// Peso tara
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreEmpresaInterno" ) ), ticket -> obtenerEmpresa() -> obtenerNombre().c_str() );   // Empresa
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreProductoInterno" ) ), ticket -> obtenerProducto() -> obtenerNombre().c_str() ); // Producto
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreConductorInterno" ) ), ticket -> obtenerNombreConductor().c_str() );  		     // Nombre del conductor
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NumeroPlacasInterno" ) ), ticket -> obtenerNumeroPlacas().c_str() );					// Número de placas
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraEntradaInterno" ) ), ticket -> obtenerHoraEntrada().c_str()  );  				// Hora entrada
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoBrutoInterno" ) ), to_string( ticket -> obtenerPesoBruto() ).c_str() ); 			// Peso bruto
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraSalidaInterno" ) ), ticket -> obtenerHoraSalida().c_str() );						// Hora salida
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoTaraInterno" ) ), to_string( ticket -> obtenerPesoTara() ).c_str() ); 			// Peso tara
 	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "PermitirDescuentoInterno" ) ), ( ticket -> permitirDescuento() ? "Sí" : "No" ) ); 						    	// Descuento (permiso)
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DescuentoInterno" ) ), ( ticket -> permitirDescuento() ? to_string( ticket -> obtenerDescuento() ) : "" ) );     // Descuento
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "DescuentoInterno" ) ), ( ticket -> permitirDescuento() ? to_string( ticket -> obtenerDescuento() ) : "" ).c_str() );     // Descuento
 	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "TipoRegistroInterno" ) ), ( ticket -> obtenerTipoRegistro() == TIPO_REGISTRO_ENTRADA ? "Entrada" : "Salida" ) );	// Tipo de registro
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoNetoInterno" ) ), to_string( ticket -> obtenerPesoNeto() ) ); 			// Peso neto
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "ObservacionesInterno" ) ), ticket -> obtenerObservaciones() );				// Observaciones
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoNetoInterno" ) ), to_string( ticket -> obtenerPesoNeto() ).c_str() ); 			// Peso neto
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "ObservacionesInterno" ) ), ticket -> obtenerObservaciones().c_str() );				// Observaciones
 
 	// Señal de boton si
 	conectar_senal( botonSi, G_CALLBACK( internoEliminarSeleccionado ), nullptr );
@@ -557,17 +458,17 @@ void vistaPublicoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointe
 		return;
 	}
 	
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ), to_string( registroPublico -> obtenerFolio() ) );						// Folio
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "FechaPublico" ) ), registroPublico -> obtenerFecha() );									// Fecha
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreProductoPublico" ) ), registroPublico -> obtenerProducto() -> obtenerNombre() );	// Producto
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreConductorPublico" ) ), registroPublico -> obtenerNombreConductor() );				// Nombre del conductor	
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NumeroPlacasPublico" ) ), registroPublico -> obtenerNumeroPlacas() );					// Número de placas
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraEntradaPublico" ) ), registroPublico -> obtenerHoraEntrada() );						// Hora entrada
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoBrutoPublico" ) ),  to_string( registroPublico -> obtenerPesoBruto() ) );			// Peso bruto
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraSalidaPublico" ) ), registroPublico -> obtenerHoraSalida() );						// Hora salida
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoTaraPublico" ) ), to_string( registroPublico -> obtenerPesoTara() ) ) ;				// Peso tara
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ), to_string( registroPublico -> obtenerFolio() ).c_str() );						// Folio
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "FechaPublico" ) ), registroPublico -> obtenerFecha().c_str() );									// Fecha
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreProductoPublico" ) ), registroPublico -> obtenerProducto() -> obtenerNombre().c_str() );	// Producto
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreConductorPublico" ) ), registroPublico -> obtenerNombreConductor().c_str() );				// Nombre del conductor	
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NumeroPlacasPublico" ) ), registroPublico -> obtenerNumeroPlacas().c_str() );					// Número de placas
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraEntradaPublico" ) ), registroPublico -> obtenerHoraEntrada().c_str() );						// Hora entrada
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoBrutoPublico" ) ),  to_string( registroPublico -> obtenerPesoBruto() ).c_str() );			// Peso bruto
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraSalidaPublico" ) ), registroPublico -> obtenerHoraSalida().c_str() );						// Hora salida
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoTaraPublico" ) ), to_string( registroPublico -> obtenerPesoTara() ).c_str() ) ;				// Peso tara
 	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "TipoViajePublico" ) ), ( registroPublico -> obtenerTipoViaje() == VIAJE_LOCAL ? "Local" : "Foráneo" ) ); // Tipo de registro
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoNetoPublico" ) ), to_string( registroPublico -> obtenerPesoNeto() );					// Peso neto
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoNetoPublico" ) ), to_string( registroPublico -> obtenerPesoNeto() ).c_str() );					// Peso neto
 
 	// Señal boton de eliminar registro interno seleccionado
 	conectar_senal( eliminarRegistroInterno, G_CALLBACK( internoAlertaEliminar ), nullptr );
@@ -607,20 +508,20 @@ void regresarInicio()
 
 void vistaConsultarUsuario()
 {
-	usuarioConsultado = buscarUsuarioPorNombreUsuario( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaConsultarUsuario" ) ), registrosUsuarios ) );
+	usuarioConsultado = buscarUsuarioPorNombreUsuario( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaConsultarUsuario" ) ) ), registrosUsuarios );
 	if( usuarioConsultado == nullptr ){
 		app_mostrar_mensaje( "El usuario que se desea consultar no fue encontrado." );
 		return;
 	}
 
 	// Nombre
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreConsultado" ) ), usuarioConsultado -> obtenerNombre() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreConsultado" ) ), usuarioConsultado -> obtenerNombre().c_str() );
 
 	// Apellidos
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "ApellidosConsultado" ) ), usuarioConsultado -> obtenerApellidos() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "ApellidosConsultado" ) ), usuarioConsultado -> obtenerApellidos().c_str() );
 
 	// Nombre de usuario
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreUsuarioConsultado" ) ), usuarioConsultado -> obtenerNombreUsuario() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "NombreUsuarioConsultado" ) ), usuarioConsultado -> obtenerNombreUsuario().c_str() );
 
 	// Administrador
 	if( usuarioConsultado -> esAdministrador() ){
@@ -667,12 +568,12 @@ void vistaBascula( GtkListBox *box, GtkListBoxRow *row, gpointer data )
 	}
 
 	// Establece las opciones que indica la bascula
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "OpcionesBasculaCodigo" ) ), to_string( obtenerFolioSelector( row ) ) );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaNombre" ) ), bascula -> obtenerNombre() );
-	gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaPuerto" ) ), bascula -> obtenerPuerto() );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsDatos" ) ), to_string( bascula -> obtenerByteSize() ) );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsStop" ) ), to_string( bascula -> obtenerStopBits() ) );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBytesIgnorados" ) ), to_string( bascula -> obtenerBytesIgnorados() ) );
+	gtk_label_set_text( GTK_LABEL( buscar_objeto( "OpcionesBasculaCodigo" ) ), to_string( obtenerFolioSelector( row ) ).c_str() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaNombre" ) ), bascula -> obtenerNombre().c_str() );
+	gtk_combo_box_set_active_id( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaPuerto" ) ), bascula -> obtenerPuerto().c_str() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsDatos" ) ), to_string( bascula -> obtenerByteSize() ).c_str() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsStop" ) ), to_string( bascula -> obtenerStopBits() ).c_str() );
+	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBytesIgnorados" ) ), to_string( bascula -> obtenerBytesIgnorados() ).c_str() );
 
 	// Redirige hacia la vista
 	irA( "OpcionesBascula", false );

@@ -1,4 +1,8 @@
 {
+    "includePath" : [
+        "D:\\msys\\mingw64\\include"
+    ],
+
     "files.associations": {
         "string": "cpp",
         "iomanip": "cpp",

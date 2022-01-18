@@ -14,6 +14,8 @@ using namespace std;
 
 Signal botonInicioRazonSocial{ "BotonRegistrarEmpresaPropia", "clicked", 0 };
 
+Signal senal_empresa_propia_editar = { "OpcionEmpresa", "clicked", 0 };
+
 // Señales para registrar la empresa propia
 Signal senal_empresa_inicio_imagen_seleccionar = { "InicioSeleccionarFotoEmpresa", "clicked", 0 };
 Signal senal_empresa_inicio_imagen_guardar = { "InicioAgregarFotoEmpresa", "clicked", 0 };
@@ -673,6 +675,111 @@ void empresa_propia_domicilio_guardar_nuevo( GtkWidget *widget, gpointer info ){
             app_mostrar_error( "Código Postal no válido." );
         }
     }
+}
+
+void empresa_propia_editar( GtkWidget *widget, gpointer info ){
+    // Obtiene la informacion de la empresa
+    database.open( databaseFile );
+    database.query( "select * from EmpresaPropia where id_empresa = 1" );
+    database.close();
+
+    if( results.size() > 0 ){
+        // Lee el renglon resultante
+        unordered_map< string, string > *empresa = results.at( 0 );
+
+        // Completa los campos con la información dada
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "EmpresaClaveEditar" ) ), (* empresa)[ "id_empresa" ].c_str() );
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EmpresaRazonSocialEditar" ) ), (* empresa)[ "razon_social" ].c_str() );
+        gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EmpresaRFCEditar" ) ), "" );
+        if( (* empresa)[ "RFC" ].compare( "null" ) != 0 ){
+            gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EmpresaRFCEditar" ) ), (* empresa)[ "RFC" ].c_str() );
+        }
+
+        gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenEmpresaEditar" ) ), "../recursos/imagenes/iconos/Empresas.png" );
+        if( (* empresa)[ "imagen" ].compare( "null" ) != 0 ){
+            GdkPixbuf *imagen = imagen_cargar_escalar( "../recursos/imagenes/empresas/" + (*empresa)[ "imagen" ], 128, 128 );
+            if( imagen != nullptr ){
+                gtk_image_set_from_pixbuf( GTK_IMAGE( buscar_objeto( "ImagenEmpresaEditar" ) ), imagen );
+            }
+        }
+    }
+
+    // Conecta
+    conectar_senal( senal_empresa_imagen_seleccionar, G_CALLBACK( seleccionar_archivo ), nullptr );
+    conectar_senal( senal_imagen_guardar_edicion, G_CALLBACK( empresa_imagen_escribir ), nullptr );
+    conectar_senal( senal_imagen_cancelar_edicion, G_CALLBACK( imagen_cancelar ), nullptr );
+    conectar_senal( senal_empresa_guardar_edicion, G_CALLBACK( empresa_propia_guardar_edicion ), nullptr );
+    conectar_senal( senal_empresa_cancelar_edicion, G_CALLBACK( regresarVista ), nullptr );
+
+    irA( "EmpresaEditar", false );
+}
+
+void empresa_propia_guardar_edicion( GtkWidget *widget, gpointer info ){
+    cout << "empresa_guardar_edicion" << endl;
+    // Obtiene la información del formulario
+    string clave = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EmpresaClaveEditar" ) ) );
+    string nombre = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EmpresaRazonSocialEditar" ) ) );
+    string descripcion = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EmpresaRFCEditar" ) ) );
+
+    // Realiza la insercion
+    stringstream consulta;
+    consulta << "update EmpresaPropia set razon_social = '" << nombre << "', "
+             << "RFC = '" << descripcion << "' " 
+             << "where id_empresa = " << clave;
+
+    database.open( databaseFile );
+    database.query( consulta.str() );
+    database.close();
+
+    // Guarda el archivo de la empresa
+    if( imagen_temporal != nullptr && !nombreTemporal.empty() ){
+        // Variables de entrada
+        string ruta_nuevo = "../recursos/imagenes/empresas/" + nombreTemporal;
+        string ruta_anterior;
+
+        // Obtiene el nombre anterior de la imagen
+        consulta.str( "" );
+        consulta << "select imagen from EmpresaPropia where id_empresa = " << clave;
+        database.open( databaseFile );
+        database.query( consulta.str() );
+
+        if( results.size() > 0 && (* results.at( 0 ))[ "imagen" ].compare( "null" ) != 0 ){
+            cout << "llego aquí" << endl;
+            // Construye la ruta en la que se guardará el archivo nuevo y en la que se guardaba el archivo anterior
+            ruta_anterior = "../recursos/imagenes/empresas/" + (* results.at( 0 ))[ "imagen" ];
+
+            // Si la ruta anterior es distinta de la ruta nueva se elimina el archivo anterior
+            if( ruta_nuevo.compare( ruta_anterior ) != 0 ){
+                cout << "Eliminando " << ruta_anterior << endl;
+                remove( ruta_anterior.c_str() );
+            }
+        }
+
+        // Guarda la imagen editada
+        imagen_guardar( ruta_nuevo );
+
+        // Registra el nuevo nombre de la imagen
+        consulta.str( "" );
+        consulta << "update EmpresaPropia set imagen = '" << nombreTemporal << "' where id_empresa = " << clave;
+        cout << clave << endl;
+        database.query( consulta.str() );
+        database.close();
+
+        //
+        gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenEmpresaPropia" ) ), ( "../recursos/imagenes/empresas" + nombreTemporal ).c_str() );
+
+        // Cancela la imagen
+        imagen_cancelar();
+    }
+
+    // Actualiza el nombre de la empresa
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreEmpresa" ) ), nombre.c_str() );
+
+    // Muestra el mensaje de que se actualizó la información del registro
+    app_mostrar_error( "Nombre de la empresa editado correctamente." );
+
+    // Cancela el resto
+    empresa_cancelar_edicion();
 }
 
 void empresa_propia_domicilio_editar( GtkWidget *widget, gpointer info ){

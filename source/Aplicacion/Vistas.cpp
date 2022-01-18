@@ -10,6 +10,7 @@
 #include "Imagen.h"
 #include "GestorBasculas.h"
 #include "GestorRegistros.h"
+#include "Basculas.h"
 #include "RegistrosInternos.h"
 #include "RegistrosPublicos.h"
 #include "Domicilio.h"
@@ -20,7 +21,7 @@ Signal senal_opcion_basculas = { "OpcionBasculas", "clicked", 0 };
 
 void bascula_configuracion( GtkWidget *widget, gpointer ){
 	// Actualiza los registros de básculas
-	
+	conectar_senal( senal_bascula_guardar_nuevo, G_CALLBACK( bascula_guardar_nuevo ), nullptr );
 
 	// Redirige a básculas
 	irA( "Basculas", false );
@@ -74,10 +75,12 @@ void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
 	conectar_senal( senal_domicilio_empresa_propia_agregar, G_CALLBACK( irHacia ), (void *)"AgregarDomicilio" );
 	conectar_senal( senal_domicilio_empresa_propia_editar, G_CALLBACK( empresa_propia_domicilio_editar ), nullptr );
 	conectar_senal( senal_domicilio_empresa_propia_eliminar, G_CALLBACK( domicilio_empresa_propia_eliminar ), nullptr );
+	conectar_senal( senal_empresa_propia_editar, G_CALLBACK( empresa_propia_editar ), nullptr );
 
 	conectar_senal( senal_domicilio_guardar_nuevo, G_CALLBACK( empresa_propia_domicilio_guardar_nuevo ), nullptr );
 	conectar_senal( senal_domicilio_cancelar_nuevo, G_CALLBACK( regresarVista ), nullptr );
 	conectar_senal( senal_opcion_basculas, G_CALLBACK( bascula_configuracion ), nullptr );
+	conectar_senal( botonConsultarUsuario, G_CALLBACK( vistaConsultarUsuarios ), nullptr );
 	//conectar_senal( botonSi, G_CALLBACK( basculaEliminar ), nullptr );
 
 	// Se dirige a la vista
@@ -249,8 +252,7 @@ void vistaCrearRegistro( GtkWidget *widget, gpointer ptr )
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
 }
 
-void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data )
-{
+void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
 	Ticket *ticket = buscarRegistroInternoPorFolio( obtenerFolioSelector( row ), registrosInternosPendientes );
 	
 	// Si no encuentra el ticket
@@ -483,15 +485,15 @@ void vistaPublicoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointe
 	irA( "PesajePublico", false );
 }
 
-void vistaConsultarUsuarios()
-{
+void vistaConsultarUsuarios(){
 	// Obtiene todos los usuarios registrados
-	obtenerUsuariosRegistrados();
+	//obtenerUsuariosRegistrados();
 
 	// Establece el contenedor de usuarios registrados
 	actualizarRegistrosUsuarios( registrosUsuarios, "ContenedorUsuarios" );
 
-	irHacia( nullptr, (void *)"ConsultarUsuarios" );
+
+	irA( "ConsultarUsuarios", false );
 }
 
 void regresarInicio()

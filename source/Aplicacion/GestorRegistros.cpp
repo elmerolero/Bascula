@@ -210,7 +210,7 @@ void obtenerUsuariosRegistrados()
     database.open( databaseFile );
     
     // Obtiene los tickets del día
-    string consulta = "select * from usuarios";
+    string consulta = "select * from Usuario";
     database.query( consulta );
     if( results.size() > 0 ){
         for( auto *renglon : results ){            
@@ -707,7 +707,8 @@ void actualizarRegistrosUsuarios( list< Usuario * > &usuarios, std::string idCon
 
         if( gtk_builder_add_from_file( builder, "../recursos/interfaces/ElementoUsuario.glade", &error ) ){
             for( unordered_map< string, string > *usuario : results ){
-                gtk_label_set_text( GTK_LABEL( buscar_objeto( "ItemEntradaNombre" ) ), ( (* usuario)[ "nombre" ] + " " + (* usuario)[ "apellidos" ] ).c_str() );
+                gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaClaveUsuario" ) ), (* usuario)[ "id_usuario" ].c_str() );
+                gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaNombre" ) ), ( (* usuario)[ "nombre" ] + " " + (* usuario)[ "apellidos" ] ).c_str() );
                 if( (* usuario)[ "imagen" ].compare( "null" ) != 0 ){
                     GdkPixbuf *imagen = imagen_cargar_escalar( "../recursos/imagenes/usuarios/" + (*usuario)[ "imagen" ], 64, 64 );
                     if( imagen != nullptr ){
@@ -715,7 +716,7 @@ void actualizarRegistrosUsuarios( list< Usuario * > &usuarios, std::string idCon
                     }
                 }
 
-                gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( idContenedor ) ), GTK_WIDGET( buscar_objeto( "ItemUsuario" ) ), stoi( (*usuario)[ "id_usuario" ] ) );
+                gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( idContenedor ) ), GTK_WIDGET( gtk_builder_get_object( builder, "ItemUsuario" ) ), stoi( (*usuario)[ "id_usuario" ] ) );
             }
         }
     }

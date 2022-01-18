@@ -138,9 +138,6 @@ extern Signal botonBasculaAgregar;
 extern Signal botonBasculaEditar;
 extern Signal botonBasculaEliminar;
 
-// Basculas Agregar/Editar
-extern Signal botonGuardarBascula;
-
 // Bascula Lector
 extern Signal comboBoxBasculasRegistradas;
 extern Signal botonCancelarPeso;

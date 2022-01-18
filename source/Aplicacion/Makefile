@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3` -mwindows
 LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
-OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Empresa.o Registro.o Database.o ContenedorRegistros.o Vistas.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o Senales.o Bascula.o GestorBasculas.o Imagen.o Producto.o Domicilio.o aplicacion.res
+OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Empresa.o Registro.o Database.o ContenedorRegistros.o Vistas.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o Senales.o Bascula.o GestorBasculas.o Imagen.o Producto.o Domicilio.o Basculas.o aplicacion.res
 
 ../../build/aplicacion:  main.cpp $(OBJS)
 	$(CC) main.cpp $(CFLAGS) -g -o ../../build/aplicacion $(OBJS) $(LIBS)
@@ -56,6 +56,9 @@ Senales.o: Senales.h Senales.cpp
 
 GestorBasculas.o: GestorBasculas.h GestorBasculas.cpp
 	$(CC) $(CFLAGS) -g -c GestorBasculas.h GestorBasculas.cpp $(LIBS)
+
+Basculas.o: Basculas.h Basculas.cpp
+	$(CC) $(CFLAGS) -c Basculas.h Basculas.cpp $(LIBS)
 
 Bascula.o: Bascula.h Bascula.cpp
 	$(CC) $(CFLAGS) -c Bascula.h Bascula.cpp $(LIBS)

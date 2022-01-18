@@ -101,12 +101,10 @@ void basculaObtenerRegistros(){
         }
         
         // Obtiene el codigo máximo registrado
-        consulta = "select max( clave ) as clave from basculas";
+        consulta = "select max( id_bascula ) as clave from basculas";
         database.open( databaseFile );
         database.query( consulta );
         database.close();
-
-        codigoBasculaActual = ( results.size() > 0 ? stoi( (* results.at( 0 ))[ "clave" ] ) : 0 );
 
         // Actualiza la vista de básculas registradas
         basculaActualizarRegistros();
@@ -254,7 +252,7 @@ void basculaEliminar()
 
         // Agrega la información a la base de datos si llegó aquí
         stringstream consulta;
-        consulta << "delete from basculas where clave = " << bascula -> obtenerCodigo() ; 
+        consulta << "delete from basculas where id_bascula = " << bascula -> obtenerCodigo() ; 
 
         database.open( databaseFile );
         database.query( consulta.str() );
@@ -320,7 +318,6 @@ void basculaActualizarRegistros()
 
 void basculaLimpiarFormulario( void ){
     cout << "buscula_limpiar_formulario" << endl;
-    gtk_label_set_text( GTK_LABEL( buscar_objeto( "OpcionesBasculaCodigo" ) ), to_string( codigoBasculaActual + 1 ).c_str() );
     gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaNombre" ) ), "" );
     gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaPuerto" ) ), 0 );
     gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaBaudrate" ) ), 6 );

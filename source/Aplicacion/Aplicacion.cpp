@@ -84,17 +84,8 @@ void cargarInformacion()
         // Carga el nombre de la empresa
         empresa_leer_informacion();
 
-        // Obtiene las empresas y los productos registrados en la base de datos
-        /*productos.establecerNombrePlural( "productos" );
-        productos.establecerNombreSingular( "Producto" );
-        productos.obtenerRegistros();*/
-
-        /*empresas.establecerNombrePlural( "empresas" );
-        empresas.establecerNombreSingular( "empresa" );
-        empresas.obtenerRegistros();
-
         // Obtiene los tickets registrados y pendientes
-        obtenerFolioActualInterno();
+        /*obtenerFolioActualInterno();
         obtenerFolioActualPublico();
         obtenerRegistrosInternosPendientes();
         obtenerRegistrosPublicosPendientes();
@@ -103,12 +94,11 @@ void cargarInformacion()
         actualizarElementosLista( &listaNombresConductor, &completadorNombresConductor, "nombre_conductor" );
         actualizarElementosLista( &listaNumerosPlaca, &completadorNumerosPlaca, "numero_placas" );
         gtk_entry_set_completion( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorInterno" ) ), completadorNombresConductor ); 
-        gtk_entry_set_completion( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasInterno" ) ), completadorNumerosPlaca  );
+        gtk_entry_set_completion( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasInterno" ) ), completadorNumerosPlaca  );*/
 
         // Carga la configuración de la bascula
-        cargarOpcionesImpresion();
+        //cargarOpcionesImpresion();
         basculaObtenerPuertosDisponibles();
-        basculaObtenerRegistros();*/
     }
     catch( runtime_error re ){
         throw re;
@@ -182,7 +172,6 @@ void conectarSenales()
     conectar_senal( imprimirRegistroInterno, G_CALLBACK( internoImprimirSeleccionado ), nullptr );
 
     // Vista de configuración de báscula
-    //conectar_senal( botonGuardarBascula, nullptr );
     conectar_senal( basculaSeleccionada, G_CALLBACK( vistaBascula ), nullptr );
     conectar_senal( botonBasculaAgregar, G_CALLBACK( vistaBasculaEdicion ), nullptr );
     conectar_senal( botonBasculaEliminar, G_CALLBACK( vistaBasculaEliminar ), nullptr );
@@ -217,7 +206,6 @@ void conectarSenalesAdministrador(){
 
     // Vista de administración de usuarios
 	conectar_senal( entradaConsultarUsuario, G_CALLBACK( vistaConsultarUsuario ), nullptr );
-	conectar_senal( botonConsultarUsuario, G_CALLBACK( vistaConsultarUsuario ), nullptr );
     conectar_senal( botonObtenerCodigoRecuperacion, G_CALLBACK( generarCodigoRecuperacion ), nullptr );
     conectar_senal( usuarioAdministrador, G_CALLBACK( actualizarEstadoAdministrador ), nullptr );
 }

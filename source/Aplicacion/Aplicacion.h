@@ -58,6 +58,7 @@ void app_mostrar_mensaje( std::string mensaje );
 void app_aceptar_mensaje( GtkWidget *widget, gpointer ptr );
 
 void app_mostrar_error( std::string mensajeError );
+void app_mostrar_exito( std::string mensajeExito );
 
 // Obtiene la hora
 std::string tiempo_leer_hora( bool hora_corta );

@@ -17,16 +17,6 @@
 #include "Senales.h"
 using namespace std;
 
-Signal senal_opcion_basculas = { "OpcionBasculas", "clicked", 0 };
-
-void bascula_configuracion( GtkWidget *widget, gpointer ){
-	// Actualiza los registros de básculas
-	conectar_senal( senal_bascula_guardar_nuevo, G_CALLBACK( bascula_guardar_nuevo ), nullptr );
-
-	// Redirige a básculas
-	irA( "Basculas", false );
-}
-
 void vistaBasculaEliminar(){
 	gtk_label_set_text( GTK_LABEL( buscar_objeto( "MensajeAlerta" ) ), "¿Quieres eliminar la báscula seleccionada?" );
 	gtk_widget_show( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
@@ -79,7 +69,7 @@ void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
 
 	conectar_senal( senal_domicilio_guardar_nuevo, G_CALLBACK( empresa_propia_domicilio_guardar_nuevo ), nullptr );
 	conectar_senal( senal_domicilio_cancelar_nuevo, G_CALLBACK( regresarVista ), nullptr );
-	conectar_senal( senal_opcion_basculas, G_CALLBACK( bascula_configuracion ), nullptr );
+	conectar_senal( senal_bascula_registros_listar, G_CALLBACK( bascula_registros_listar ), nullptr );
 	conectar_senal( botonConsultarUsuario, G_CALLBACK( vistaConsultarUsuarios ), nullptr );
 	//conectar_senal( botonSi, G_CALLBACK( basculaEliminar ), nullptr );
 
@@ -578,5 +568,5 @@ void vistaBascula( GtkListBox *box, GtkListBoxRow *row, gpointer data )
 	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBytesIgnorados" ) ), to_string( bascula -> obtenerBytesIgnorados() ).c_str() );
 
 	// Redirige hacia la vista
-	irA( "OpcionesBascula", false );
+	irA( "BasculaEditar", false );
 }

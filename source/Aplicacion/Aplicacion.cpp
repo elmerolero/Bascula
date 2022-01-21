@@ -171,11 +171,6 @@ void conectarSenales()
     // Consultar registro interno
     conectar_senal( imprimirRegistroInterno, G_CALLBACK( internoImprimirSeleccionado ), nullptr );
 
-    // Vista de configuración de báscula
-    conectar_senal( basculaSeleccionada, G_CALLBACK( vistaBascula ), nullptr );
-    conectar_senal( botonBasculaAgregar, G_CALLBACK( vistaBasculaEdicion ), nullptr );
-    conectar_senal( botonBasculaEliminar, G_CALLBACK( vistaBasculaEliminar ), nullptr );
-
     // Ventana lectora de peso
     conectar_senal( ventanaLectorPeso, G_CALLBACK( basculaCerrarLector ), nullptr );
     conectar_senal( botonCancelarPeso, G_CALLBACK( basculaCerrarLector ), nullptr );
@@ -218,8 +213,16 @@ void app_alerta( GtkWidget *widget, gpointer data ){
 
 // Indica un error
 void app_mostrar_error( string error ){
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeExito" ) ) );
     gtk_label_set_text( GTK_LABEL( buscar_objeto( "MensajeError" ) ), error.c_str() );
     gtk_widget_show( GTK_WIDGET( buscar_objeto( "MensajeError" ) ) );
+}
+
+// Indica éxito
+void app_mostrar_exito( string exito ){
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeError" ) ) );
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "MensajeExito" ) ), exito.c_str() );
+    gtk_widget_show( GTK_WIDGET( buscar_objeto( "MensajeExito" ) ) );
 }
 
 // Abre la ventana de mensaje con el mensaje indicado
@@ -274,6 +277,10 @@ void reiniciarPilaVistas( void )
 
 // Regresa hacia la vista anterior
 void regresarVista( void ){
+    // Oculta los mensaje de exito y error
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeExito" ) ) );
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeError" ) ) );
+
     // ¿Hay elementos en la pila de vistas?
     if( pilaVistas.size() > 1 ){
         // Oculta el elemento actual

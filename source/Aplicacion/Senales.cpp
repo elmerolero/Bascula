@@ -132,12 +132,6 @@ Signal entradaReemplazarConfirmacion{ "EntradaReemplazarConfirmacion", "activate
 Signal ticketsPendientesSeleccionados{ "ContenedorTickets", "row-activated", 0 };
 Signal ticketsConsultadosSeleccionados{ "ContenedorRegistrosPesaje", "row-activated", 0 };
 
-// Vista de las basculas
-Signal basculaSeleccionada{ "ContenedorBasculas", "row-activated", 0 };
-Signal botonBasculaAgregar{ "BotonBasculaAgregar", "clicked", 0 };
-Signal botonBasculaEditar{ "BotonBasculaEditar", "clicked", 0 };
-Signal botonBasculaEliminar{ "BotonBasculaEliminar", "clicked", 0 };
-
 // Ventana lector peso
 Signal ventanaLectorPeso{ "VentanaLectorPeso", "delete-event", 0 };
 Signal comboBoxBasculasRegistradas{ "BasculasRegistradas", "changed", 0 };

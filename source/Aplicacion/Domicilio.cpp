@@ -119,7 +119,7 @@ string domicilio_validar_numero( std::string numero, bool obligatorio ){
 
 std::string domicilio_validar_descripcion( std::string descripcion ){
     // Formato que permite el nombre de un lugar
-    regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ\\s]*" );
+    regex formato( "[a-zA-Z0-9ÑñáéíóúÁÉÍÓÚ,\\s.]*" );
 
     // Obtiene la información del campo solicitado
     string informacion = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( descripcion ) ) );

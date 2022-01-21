@@ -132,12 +132,6 @@ extern Signal entradaReemplazarConfirmacion;
 extern Signal ticketsPendientesSeleccionados;
 extern Signal ticketsConsultadosSeleccionados;
 
-// Basculas configuración
-extern Signal basculaSeleccionada;
-extern Signal botonBasculaAgregar;
-extern Signal botonBasculaEditar;
-extern Signal botonBasculaEliminar;
-
 // Bascula Lector
 extern Signal comboBoxBasculasRegistradas;
 extern Signal botonCancelarPeso;

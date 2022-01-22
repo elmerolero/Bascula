@@ -25,15 +25,9 @@ void vistaPublicoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointe
 void vistaConsultarUsuarios();
 void vistaConsultarUsuario();
 
-void vistaBasculaEliminar();
-
-void vistaBasculaEdicion();
-
 void internoLimpiarFormulario();
 
 void regresarInicio();
 void regresarUsuarios();
-
-void vistaBascula( GtkListBox *box, GtkListBoxRow *row, gpointer data );
 
 #endif

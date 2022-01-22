@@ -133,8 +133,5 @@ extern Signal ticketsPendientesSeleccionados;
 extern Signal ticketsConsultadosSeleccionados;
 
 // Bascula Lector
-extern Signal comboBoxBasculasRegistradas;
-extern Signal botonCancelarPeso;
-extern Signal botonRegistrarPeso;
 
 #endif

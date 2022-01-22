@@ -25,16 +25,15 @@ void basculaAbrirLector()
     gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaPeso" ) ), "0 Kg" );
 
      // Conecta las señales convenientes
-    conectar_senal( comboBoxBasculasRegistradas, G_CALLBACK( basculaLecturaIniciar ), nullptr );
+    //coxBasculasRegistradas, G_CALLBACK( basculaLecturaIniciar ), nullptr );
 }
 
-gboolean basculaCerrarLector()
-{
+gboolean basculaCerrarLector(){
     // Oculta la ventana
 	gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaLectorPeso" ) ) );
 
     // Desconecta la señal de seleccion de bascula
-    desconectar_senal( comboBoxBasculasRegistradas );
+    //desconectar_senal( comboBoxBasculasRegistradas );
     
     // Desactiva la báscula seleccionada
     if( bascula != nullptr ){
@@ -118,11 +117,11 @@ void basculaObtenerRegistros(){
 void basculaObtenerPuertosDisponibles()
 {
 	// Limpia las opciones que había anteriormente
-    limpiar_contenedor( "OpcionesBasculaPuerto" );
+    limpiar_contenedor( "BasculaPuertoEditar" );
 	
 	// Agrega las opciones seleccionar y las establece como por defecto
-    gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( buscar_objeto( "OpcionesBasculaPuerto" ) ), "Seleccionar", "Seleccionar" );
-	gtk_combo_box_set_active_id( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaPuerto" ) ), "Seleccionar" );
+    gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( buscar_objeto( "BasculaPuertoEditar" ) ), "Seleccionar", "Seleccionar" );
+	gtk_combo_box_set_active_id( GTK_COMBO_BOX( buscar_objeto( "BasculaPuertoEditar" ) ), "Seleccionar" );
 
 	// Agrega los puertos seriales disponibles
 	char directorioPuerto[ 5000 ];
@@ -133,7 +132,7 @@ void basculaObtenerPuertosDisponibles()
 		string nombrePuerto = "COM" + to_string( contador );
 		DWORD intento = QueryDosDevice( nombrePuerto.c_str(), directorioPuerto, 5000 );
 		if( intento != 0 ){
-            gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( buscar_objeto( "OpcionesBasculaPuerto" ) ), ( contador > 9 ? "\\\\.\\" + nombrePuerto : nombrePuerto ).c_str(), ( contador > 9 ? "\\\\.\\" + nombrePuerto : nombrePuerto ).c_str() );
+            gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( buscar_objeto( "BasculaPuertoEditar" ) ), ( contador > 9 ? "\\\\.\\" + nombrePuerto : nombrePuerto ).c_str(), ( contador > 9 ? "\\\\.\\" + nombrePuerto : nombrePuerto ).c_str() );
 			contadorDispositivos++;
 		}
 	}
@@ -175,7 +174,6 @@ void basculaGuardar()
         }
 
         // Actualiza la lista de básculas registradas
-        basculaLimpiarFormulario();
         basculaActualizarRegistros();
 
         // Regresa
@@ -314,17 +312,6 @@ void basculaActualizarRegistros()
     catch( runtime_error &re ){
         throw re;
     }
-}
-
-void basculaLimpiarFormulario( void ){
-    cout << "buscula_limpiar_formulario" << endl;
-    gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaNombre" ) ), "" );
-    gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaPuerto" ) ), 0 );
-    gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaBaudrate" ) ), 6 );
-    gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsDatos" ) ), "8" );
-    gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsStop" ) ), "0" );
-    gtk_combo_box_set_active( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaParidad" ) ), 0 );
-    gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBytesIgnorados" ) ), "0" );
 }
 
 void basculaRegistrarPeso( string etiquetaPeso, string etiquetaHora )

@@ -17,18 +17,6 @@
 #include "Senales.h"
 using namespace std;
 
-void vistaBasculaEliminar(){
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "MensajeAlerta" ) ), "¿Quieres eliminar la báscula seleccionada?" );
-	gtk_widget_show( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
-}
-
-void vistaBasculaEdicion(){
-	basculaLimpiarFormulario();
-
-	irA( "OpcionesBascula", false );
-}
-
-
 void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
 {
 	// Obtiene la información de la empresa
@@ -316,25 +304,25 @@ void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 void vistaLeerPesoBruto()
 {
 	basculaAbrirLector();
-	conectar_senal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoBruto ), nullptr );
+	//conectar_senal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoBruto ), nullptr );
 }
 
 void vistaLeerPesoTara()
 {
 	basculaAbrirLector();
-	conectar_senal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoTara ), nullptr );
+	//conectar_senal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoTara ), nullptr );
 }
 
 void vistaLeerPesoBrutoPublico()
 {
 	basculaAbrirLector();
-	conectar_senal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoBruto ), nullptr );
+	//conectar_senal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoBruto ), nullptr );
 }
 
 void vistaLeerPesoTaraPublico()
 {
 	basculaAbrirLector();
-	conectar_senal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoTara ), nullptr );
+	//conectar_senal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoTara ), nullptr );
 }
 
 void vistaConsultarPesajesInternos()
@@ -549,24 +537,4 @@ void internoLimpiarFormulario(){
 	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraInterno" ) ), "No establecido" );		// Peso tara
 	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoInterno" ) ), "No establecido" );		// Peso neto
 	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaObservacionesInterno" ) ), "" );				// Observaciones		
-}
-
-void vistaBascula( GtkListBox *box, GtkListBoxRow *row, gpointer data )
-{
-	// Obtiene la bascula seleccionada
-	Bascula *bascula = basculaBuscarPorCodigo( obtenerFolioSelector( row ) );
-	if( bascula == nullptr ){
-		throw runtime_error( "Ocurrió un error al intentar recuperar la bascula seleccionada." );
-	}
-
-	// Establece las opciones que indica la bascula
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "OpcionesBasculaCodigo" ) ), to_string( obtenerFolioSelector( row ) ).c_str() );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaNombre" ) ), bascula -> obtenerNombre().c_str() );
-	gtk_combo_box_set_active_id( GTK_COMBO_BOX( buscar_objeto( "OpcionesBasculaPuerto" ) ), bascula -> obtenerPuerto().c_str() );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsDatos" ) ), to_string( bascula -> obtenerByteSize() ).c_str() );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBitsStop" ) ), to_string( bascula -> obtenerStopBits() ).c_str() );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "OpcionesBasculaBytesIgnorados" ) ), to_string( bascula -> obtenerBytesIgnorados() ).c_str() );
-
-	// Redirige hacia la vista
-	irA( "BasculaEditar", false );
 }

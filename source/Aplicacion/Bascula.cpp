@@ -65,19 +65,19 @@ void Bascula::conectar()
 		throw runtime_error( "No se pudo realizar la conexión.");
 	}
 
-	/*COMMTIMEOUTS timeout = { 0 };
-	timeout.ReadIntervalTimeout = 50;
-	timeout.ReadTotalTimeoutConstant = 50;
-	timeout.ReadTotalTimeoutMultiplier = 10;
+	COMMTIMEOUTS timeout = { 0 };
+	timeout.ReadIntervalTimeout = 10;
+	timeout.ReadTotalTimeoutConstant = 0;
+	timeout.ReadTotalTimeoutMultiplier = 0;
 
 	status = SetCommTimeouts( dispositivo, &timeout );
 	if( status == FALSE ){
-		throw runtime_error( "Error al establecer la información de .");
-	}*/
+		throw runtime_error( "Error al establecer la información de tiempos de espera.");
+	}
 
 	status = SetCommMask( dispositivo, EV_RXCHAR );
 	if( status == FALSE ){
-		throw runtime_error( "error informacion.");
+		throw runtime_error( "Error al configurar los parámetros de recepción.");
 	}
 
     // Indica que la báscula se encuentra activa

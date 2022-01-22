@@ -134,7 +134,4 @@ Signal ticketsConsultadosSeleccionados{ "ContenedorRegistrosPesaje", "row-activa
 
 // Ventana lector peso
 Signal ventanaLectorPeso{ "VentanaLectorPeso", "delete-event", 0 };
-Signal comboBoxBasculasRegistradas{ "BasculasRegistradas", "changed", 0 };
-Signal botonCancelarPeso{ "BotonCancelarLectura", "clicked", 0 };
-Signal botonRegistrarPeso{ "BotonRegistrarLectura", "clicked", 0 };
 

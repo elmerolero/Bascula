@@ -13,6 +13,7 @@
 #include "RegistrosPublicos.h"
 #include "GestorRegistros.h"
 #include "GestorBasculas.h"
+#include "Basculas.h"
 #include "Producto.h"
 #include "Empresa.h"
 #include <random>
@@ -146,8 +147,8 @@ void conectarSenales()
     conectar_senal( botonBasculaAdministrativo, G_CALLBACK( vistaBasculaInterna ), nullptr );
     
     // Nuevo para ticket interno
-    conectar_senal( botonLeerPesoBrutoInterno, G_CALLBACK( vistaLeerPesoBruto ), nullptr );
-    conectar_senal( botonLeerPesoTaraInterno, G_CALLBACK( vistaLeerPesoTara ), nullptr);
+    conectar_senal( botonLeerPesoBrutoInterno, G_CALLBACK( bascula_lector_abrir ), nullptr );
+    conectar_senal( botonLeerPesoTaraInterno, G_CALLBACK( bascula_lector_abrir ), nullptr);
     conectar_senal( botonRegistrarPendienteInterno, G_CALLBACK( internoRegistrarPendiente ), nullptr );
     conectar_senal( botonFinalizarPendienteInterno, G_CALLBACK( internoFinalizarPendiente ), nullptr );
     conectar_senal( entradaNumeroPlacasInterno, G_CALLBACK( convertirMayusculas ), nullptr );
@@ -172,8 +173,8 @@ void conectarSenales()
     conectar_senal( imprimirRegistroInterno, G_CALLBACK( internoImprimirSeleccionado ), nullptr );
 
     // Ventana lectora de peso
-    conectar_senal( ventanaLectorPeso, G_CALLBACK( basculaCerrarLector ), nullptr );
-    conectar_senal( botonCancelarPeso, G_CALLBACK( basculaCerrarLector ), nullptr );
+    //conectar_senal( ventanaLectorPeso, G_CALLBACK( bascula_lector_cerrar ), nullptr );
+    //conectar_senal( botonCancelarPeso, G_CALLBACK( bascula_lector_cerrar ), nullptr );
 }
 
 //
@@ -249,6 +250,7 @@ void irHacia( GtkWidget *widget, gpointer vista )
 void irA( string vista, bool reiniciarPila )
 {
     // Oculta cualquier mensaje de error dado
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeExito" ) ) );
     ocultar_elemento( "MensajeError" );
 
     // Reinicia la pila si así se indica

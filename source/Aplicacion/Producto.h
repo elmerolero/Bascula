@@ -35,5 +35,6 @@ void producto_actualizar_registros( void );
 void producto_conectar_senales( void );
 void producto_desconectar_senales( GtkWidget *widget, gpointer info );
 void producto_buscar( GtkSearchEntry* entry, GdkEvent* event );
+std::string producto_buscar_existente( std::string nombre );
 
 #endif

@@ -4,6 +4,11 @@
 #include <vector>
 #include <gtk/gtk.h> 
 
+struct Source{
+    GSource *source;
+    guint source_id;
+};
+
 struct Signal
 {
     std::string object;
@@ -12,6 +17,9 @@ struct Signal
 };
 
 extern GtkBuilder *builder;
+
+void source_conectar( Source &fuente, GSourceFunc funcion );
+void source_desconectar( Source &fuente );
 
 //void leer_Widget_seleccionado_listbox( std::string id );
 void conectar_senal( Signal &senal, GCallback callback, gpointer data );

@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3` -mwindows
 LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
-OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Empresa.o Registro.o Database.o ContenedorRegistros.o Vistas.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o RegistrosPublicos.o TicketPublico.o Senales.o Bascula.o GestorBasculas.o Imagen.o Producto.o Domicilio.o Basculas.o aplicacion.res
+OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Empresa.o Registro.o Database.o ContenedorRegistros.o Vistas.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o PesajesPublicos.o TicketPublico.o Senales.o Imagen.o Producto.o Domicilio.o Basculas.o aplicacion.res
 
 ../../build/aplicacion:  main.cpp $(OBJS)
 	$(CC) main.cpp $(CFLAGS) -g -o ../../build/aplicacion $(OBJS) $(LIBS)
@@ -45,8 +45,8 @@ sha256.o: sha256.h sha256.cpp
 RegistrosInternos.o: RegistrosInternos.h RegistrosInternos.cpp
 	$(CC) $(CFLAGS) -c RegistrosInternos.h RegistrosInternos.cpp $(LIBS)
 
-RegistrosPublicos.o: RegistrosPublicos.h RegistrosPublicos.cpp
-	$(CC) $(CFLAGS) -c RegistrosPublicos.h RegistrosPublicos.cpp $(LIBS)
+PesajesPublicos.o: PesajesPublicos.h PesajesPublicos.cpp
+	$(CC) $(CFLAGS) -c PesajesPublicos.h PesajesPublicos.cpp $(LIBS)
 
 TicketPublico.o: TicketPublico.h TicketPublico.cpp
 	$(CC) -c TicketPublico.h TicketPublico.cpp $(LIBS)
@@ -54,14 +54,8 @@ TicketPublico.o: TicketPublico.h TicketPublico.cpp
 Senales.o: Senales.h Senales.cpp
 	$(CC) $(CFLAGS) -c Senales.h Senales.cpp $(LIBS)
 
-GestorBasculas.o: GestorBasculas.h GestorBasculas.cpp
-	$(CC) $(CFLAGS) -g -c GestorBasculas.h GestorBasculas.cpp $(LIBS)
-
 Basculas.o: Basculas.h Basculas.cpp
 	$(CC) $(CFLAGS) -c Basculas.h Basculas.cpp $(LIBS)
-
-Bascula.o: Bascula.h Bascula.cpp
-	$(CC) $(CFLAGS) -c Bascula.h Bascula.cpp $(LIBS)
 
 Imagen.o: Imagen.h Imagen.cpp
 	$(CC) $(CFLAGS) -c Imagen.h Imagen.cpp $(LIBS)

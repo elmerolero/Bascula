@@ -6,4 +6,7 @@
 *.html
 *.csv
 /build
+recursos/imagenes/productos/
+recursos/imagenes/empresas/
+recursos/datos/
 resources/data/

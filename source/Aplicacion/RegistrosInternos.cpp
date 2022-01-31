@@ -1,11 +1,11 @@
 #include "RegistrosInternos.h"
 #include "GestorRegistros.h"
-#include "GestorBasculas.h"
 #include "Aplicacion.h"
 #include "Funciones.h"
 #include "Vistas.h"
 #include <stdexcept>
 #include <iostream>
+#include <Windows.h>
 #include <fstream>
 #include <iomanip>
 #include <cmath>
@@ -314,7 +314,7 @@ void internoFinalizarPendiente()
 void internoRegistrarPesoBruto()
 {
 	// Registra el peso bruto
-	basculaRegistrarPeso( "EntradaPesoBrutoInterno", "EntradaHoraEntradaInterno" );
+	//basculaRegistrarPeso( "EntradaPesoBrutoInterno", "EntradaHoraEntradaInterno" );
 
 	// Intenta calcula el peso neto
 	internoActualizarPesoNeto();
@@ -324,7 +324,7 @@ void internoRegistrarPesoBruto()
 void internoRegistrarPesoTara()
 {
 	// Registra el peso tara
-	basculaRegistrarPeso( "EntradaPesoTaraInterno", "EntradaHoraSalidaInterno" );
+	//basculaRegistrarPeso( "EntradaPesoTaraInterno", "EntradaHoraSalidaInterno" );
 
 	// Intenta calcular el peso neto
 	internoActualizarPesoNeto();

@@ -6,14 +6,8 @@
 #include "ContenedorRegistros.h"
 
 void vistaConfiguracion( GtkWidget *widget, gpointer ptr );
-void vistaBasculaPublica( GtkWidget *widget, gpointer ptr );
 void vistaBasculaInterna( GtkWidget *widget, gpointer ptr );
-void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr );
 void vistaCrearRegistro( GtkWidget *widget, gpointer ptr );
-void vistaLeerPesoBruto();
-void vistaLeerPesoTara();
-void vistaLeerPesoBrutoPublico();
-void vistaLeerPesoTaraPublico();
 void vistaConsultarPesajesInternos();
 void vistaConsultarPesajesPublicos();
 void vistaSeleccionarDia();

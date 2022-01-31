@@ -1,5 +1,6 @@
 #include "Basculas.h"
 #include "Aplicacion.h"
+#include "Widget.h"
 #include "Funciones.h"
 #include "Senales.h"
 #include "Vistas.h"
@@ -20,27 +21,7 @@ int id_bascula;
 bool bascula_esperando = false;
 bool bascula_entrada_manual_habilitado = false;
 
-struct Source{
-    GSource *source;
-    guint source_id;
-};
-
 Source fuente_lector = { NULL, 0 };
-
-void source_conectar( Source &fuente, GSourceFunc funcion ){
-    fuente.source = g_idle_source_new();
-    g_source_set_callback( fuente.source, funcion, NULL, NULL );
-    fuente.source_id = g_source_attach( fuente.source, NULL );
-}
-
-void source_desconectar( Source &fuente ){
-    if( fuente.source != NULL && fuente.source_id > 0 ){
-        g_source_remove( fuente.source_id );
-        g_source_destroy( fuente.source );
-        fuente.source = nullptr;
-        fuente.source_id = 0;
-    }
-}
 
 // Actividades
 Signal senal_bascula_guardar{ "BotonGuardarBascula", "clicked", 0 };
@@ -297,7 +278,7 @@ void bascula_lector_abrir( GtkWidget *widget, gpointer info ){
 
     // Conecta la señal
     conectar_senal( senal_opcion_seleccionar, G_CALLBACK( bascula_lector_seleccionar ), nullptr );
-    conectar_senal( senal_bascula_registrar_pesaje, G_CALLBACK( bascula_registrar_pesaje ), (char *)"EntradaHoraEntradaInterno EntradaPesoBrutoInterno" );
+    conectar_senal( senal_bascula_registrar_pesaje, G_CALLBACK( bascula_registrar_pesaje ), info );
     conectar_senal( senal_bascula_cancelar_pesaje, G_CALLBACK( bascula_lector_cerrar ), nullptr  );
 
     // Abre la ventana
@@ -512,6 +493,9 @@ void bascula_registrar_pesaje( GtkWidget *widget, gpointer info ){
         gtk_label_set_text( GTK_LABEL( buscar_objeto( etiquetaHora ) ), tiempo_leer_hora( 1 ).c_str() );
         gtk_label_set_text( GTK_LABEL( buscar_objeto( etiquetaPeso ) ), peso.c_str() );
 
+        // Desconecta la señal de seleccion de bascula
+        desconectar_senal( senal_opcion_seleccionar );
+
         // Cierra la ventana
         gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaLectorPeso" ) ) );   
     }
@@ -585,6 +569,34 @@ void bascula_perro_guardian( unsigned int milisegundos ){
 }
 
 int velocidades_tasa_baudios[] = { 110, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 38400, 57600, 115200, 128000, 256000 };
+
+// Obtiene todos los puertos disponibles
+void basculaObtenerPuertosDisponibles(){
+	// Limpia las opciones que había anteriormente
+    limpiar_contenedor( "BasculaPuertoEditar" );
+	
+	// Agrega las opciones seleccionar y las establece como por defecto
+    gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( buscar_objeto( "BasculaPuertoEditar" ) ), "Seleccionar", "Seleccionar" );
+	gtk_combo_box_set_active_id( GTK_COMBO_BOX( buscar_objeto( "BasculaPuertoEditar" ) ), "Seleccionar" );
+
+	// Agrega los puertos seriales disponibles
+	char directorioPuerto[ 5000 ];
+
+	// Revisa si hay puertos disponibles
+	int contadorDispositivos = 0;
+	for( unsigned contador = 0; contador < 255; ++contador ){
+		string nombrePuerto = "COM" + to_string( contador );
+		DWORD intento = QueryDosDevice( nombrePuerto.c_str(), directorioPuerto, 5000 );
+		if( intento != 0 ){
+            gtk_combo_box_text_append( GTK_COMBO_BOX_TEXT( buscar_objeto( "BasculaPuertoEditar" ) ), ( contador > 9 ? "\\\\.\\" + nombrePuerto : nombrePuerto ).c_str(), ( contador > 9 ? "\\\\.\\" + nombrePuerto : nombrePuerto ).c_str() );
+			contadorDispositivos++;
+		}
+	}
+
+	if( contadorDispositivos < 1 ){
+        app_mostrar_mensaje( "No se detectaron básculas." );
+    }
+}
 
 string bascula_nombre_validar( string nombre ){
     // Formato que contiene la expresion regular

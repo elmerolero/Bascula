@@ -43,5 +43,6 @@ const char *bascula_paridad_leer_opcion( std::string paridad );
 int bascula_paridad_validar( std::string paridad );
 
 void bascula_perro_guardian( unsigned int milisegundos );
+void basculaObtenerPuertosDisponibles();
 
 #endif

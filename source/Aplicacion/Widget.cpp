@@ -7,14 +7,20 @@ using namespace std;
 GtkBuilder *builder = nullptr;
 std::vector< GdkPixbuf * > imagenesRegistros;
 
+void source_conectar( Source &fuente, GSourceFunc funcion ){
+    fuente.source = g_idle_source_new();
+    g_source_set_callback( fuente.source, funcion, NULL, NULL );
+    fuente.source_id = g_source_attach( fuente.source, NULL );
+}
 
-/*void leer_widget_seleccionado_listbox( string id ){
-    // Busca el renglón seleccionado y si no se ha seleccionado ninguno, lanza un excepción
-    GtkListBoxRow *row = 
-
-    // Retorna el nombre del widget seleccionado
-	return gtk_bin_get_child( GTK_BIN( row ) );
-}*/
+void source_desconectar( Source &fuente ){
+    if( fuente.source != NULL && fuente.source_id > 0 ){
+        g_source_remove( fuente.source_id );
+        g_source_destroy( fuente.source );
+        fuente.source = nullptr;
+        fuente.source_id = 0;
+    }
+}
 
 
 GObject *buscar_objeto( string id ){

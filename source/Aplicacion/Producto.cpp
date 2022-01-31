@@ -511,3 +511,35 @@ void producto_buscar( GtkSearchEntry* entry, GdkEvent* event ){
         }
     }
 }
+
+string producto_buscar_existente( string producto_nombre ){
+    cout << "producto_buscar_existente" << endl;
+    try{
+        // Valida el nombre del producto
+        producto_validar_nombre( producto_nombre );
+
+        // Verifica que no exista un registro con ese nombre
+		stringstream consulta;
+		consulta << "select id_producto from Producto where nombre like '%" << producto_nombre << "'";
+		database.open( databaseFile );
+		database.query( consulta.str() );
+		database.close();
+
+		if( results.size() > 0 ){
+			return (* results.at( 0 ))[ "id_producto" ];
+		}
+
+        consulta.str( "" );
+        consulta << "insert into Producto values( null, '" << producto_nombre << "', null, null )";
+
+        // Efectua la consulta
+        database.open( databaseFile );
+        database.query( consulta.str() );
+        database.close();
+
+        return producto_nombre;
+    }
+    catch( invalid_argument &ia ){
+        throw ia;
+    }
+}

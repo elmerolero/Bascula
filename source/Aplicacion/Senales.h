@@ -45,7 +45,6 @@ extern Signal enlaceCreditos;
 extern Signal botonActualizarCuenta;
 
 // Seleccion servicio
-extern Signal botonBasculaPublica;
 extern Signal botonBasculaAdministrativo;
     
 // Uso bascula de uso interno
@@ -53,7 +52,6 @@ extern Signal entradaSeguimiento;
 extern Signal entradaSeguimientoMayusculas;
 
 // Uso bascula de uso interno
-extern Signal botonBasculaNuevo;
 extern Signal botonSeguimiento;
 extern Signal entradaSeguimientoMayusculas;
 extern Signal entradaSeguimiento;
@@ -129,7 +127,6 @@ extern Signal botonEliminarUsuario;
 extern Signal botonCambiarContrasena;
 extern Signal entradaReemplazarConfirmacion;
 
-extern Signal ticketsPendientesSeleccionados;
 extern Signal ticketsConsultadosSeleccionados;
 
 // Bascula Lector

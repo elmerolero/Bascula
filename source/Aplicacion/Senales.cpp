@@ -1,11 +1,10 @@
 #include "Senales.h"
 #include "Aplicacion.h"
 #include "Sesion.h"
-#include "GestorBasculas.h"
 #include "Funciones.h"
 #include "GestorRegistros.h"
 #include "RegistrosInternos.h"
-#include "RegistrosPublicos.h"
+#include "PesajesPublicos.h"
 #include "Producto.h"
 #include "Widget.h"
 
@@ -54,11 +53,9 @@ Signal botonActualizarCuenta{ "BotonActualizarCuenta", "clicked", 0 };
 
 // Seleccion servicio
 Signal enlaceTipoBasculaRegresar{ "EnlaceTipoBasculaRegresar", "activate-link", 0 };
-Signal botonBasculaPublica{ "BotonBasculaPublica", "clicked", 0 };
 Signal botonBasculaAdministrativo{ "BotonBasculaAdministrativo", "clicked", 0 };
     
 // Uso bascula de uso interno
-Signal botonBasculaNuevo{ "BotonBasculaNuevo", "clicked", 0 };
 Signal botonSeguimiento{ "BotonSeguimiento", "clicked", 0 };
 Signal entradaSeguimientoMayusculas{ "EntradaSeguimiento", "insert-text", 0 };
 Signal entradaSeguimiento{ "EntradaSeguimiento", "activate", 0 };
@@ -129,7 +126,6 @@ Signal botonEliminarUsuario{ "BotonEliminarUsuario", "clicked", 0 };
 Signal botonCambiarContrasena{ "BotonCambiarContrasena", "clicked", 0 };
 Signal entradaReemplazarConfirmacion{ "EntradaReemplazarConfirmacion", "activate", 0 };
 
-Signal ticketsPendientesSeleccionados{ "ContenedorTickets", "row-activated", 0 };
 Signal ticketsConsultadosSeleccionados{ "ContenedorRegistrosPesaje", "row-activated", 0 };
 
 // Ventana lector peso

@@ -8,11 +8,10 @@
 #include "Funciones.h"
 #include "Sesion.h"
 #include "Imagen.h"
-#include "GestorBasculas.h"
 #include "GestorRegistros.h"
 #include "Basculas.h"
 #include "RegistrosInternos.h"
-#include "RegistrosPublicos.h"
+#include "PesajesPublicos.h"
 #include "Domicilio.h"
 #include "Senales.h"
 using namespace std;
@@ -65,75 +64,17 @@ void vistaConfiguracion( GtkWidget *widget, gpointer ptr )
 	irA( "Configuracion", false );
 }
 
-void vistaBasculaPublica( GtkWidget *widget, gpointer ptr )
-{	
-	// Obtiene los tickets pendientes
-	publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
-	
-	// Conecta las señales correspondientes
-	conectar_senal( botonBasculaNuevo, G_CALLBACK( vistaCrearRegistroPublico ), nullptr );
-	conectar_senal( ticketsPendientesSeleccionados, G_CALLBACK( vistaPublicoEditarRegistro ), nullptr );
-
-	// Establece las vistas
-	irA( "Tickets", false );
-}
-
 void vistaBasculaInterna( GtkWidget *widget, gpointer ptr )
 {	
 	// Obtiene los tickets pendiente
 	internoActualizarRegistros( registrosInternosPendientes, "ContenedorTickets" );
 	
 	// Conecta las señales correspondientes
-    conectar_senal( botonBasculaNuevo, G_CALLBACK( vistaCrearRegistro ), nullptr );
-    conectar_senal( ticketsPendientesSeleccionados, G_CALLBACK( vistaInternoEditarRegistro ), nullptr);
+    //conectar_senal( botonBasculaNuevo, G_CALLBACK( vistaCrearRegistro ), nullptr );
+    ///sconectar_senal( ticketsPendientesSeleccionados, G_CALLBACK( vistaInternoEditarRegistro ), nullptr);
 
     // Establece las vistas
 	irHacia( nullptr, (void *)"Tickets" );
-}
-
-void vistaCrearRegistroPublico( GtkWidget *widget, gpointer ptr )
-{	
-	// Folio
-	stringstream folio;
-	folio << setfill( '0' ) << setw( 7 ) << (folioActualPublico + 1);
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), folio.str().c_str() );
-	
-	// Fecha
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico" ) ), tiempo_leer_fecha_corta().c_str() );
-	
-	// Producto
-	gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaNombreProductoPublico" ) ), TRUE );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ), "" );
-	
-	// Nombre del conductor
-	gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaNombreConductorPublico"  ) ), TRUE );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ), "" );
-	
-	// Numero de placas
-	gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaNumeroPlacasPublico"  ) ), TRUE );
-	gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ), "" );
-	
-	// Hora entrada y Peso Bruto
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ), "No establecida" );
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ), "No establecido" );
-	
-	// Hora salida y Peso Tara
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ), "No establecida" );
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ), "No establecido" );
-	
-	// Tipo de registro
-	gtk_toggle_button_set_active( GTK_TOGGLE_BUTTON( buscar_objeto( "ViajeLocal" ) ), TRUE );
-	
-	// Peso neto
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), "No establecido" );
-	
-	// Establece el completador de producto
-	//  gtk_entry_set_completion( GTK_ENTRY( objecto ), completador );
-	//establecerCompletadorEntrada( "EntradaNombreProductoInterno", NULL );
-	//establecerCompletadorEntrada( "EntradaNombreProductoPublico", productos.obtenerCompletador() ); 
-	
-	// Establece la vista de nuevo ticket
-	irA( "NuevoTicketPublico", false );
 }
 
 void vistaPublicoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data )
@@ -299,30 +240,6 @@ void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 	
 	// Va hacia la vista
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
-}
-
-void vistaLeerPesoBruto()
-{
-	basculaAbrirLector();
-	//conectar_senal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoBruto ), nullptr );
-}
-
-void vistaLeerPesoTara()
-{
-	basculaAbrirLector();
-	//conectar_senal( botonRegistrarPeso, G_CALLBACK( internoRegistrarPesoTara ), nullptr );
-}
-
-void vistaLeerPesoBrutoPublico()
-{
-	basculaAbrirLector();
-	//conectar_senal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoBruto ), nullptr );
-}
-
-void vistaLeerPesoTaraPublico()
-{
-	basculaAbrirLector();
-	//conectar_senal( botonRegistrarPeso, G_CALLBACK( publicoRegistrarPesoTara ), nullptr );
 }
 
 void vistaConsultarPesajesInternos()

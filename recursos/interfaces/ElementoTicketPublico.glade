@@ -3,7 +3,7 @@
 <interface>
   <requires lib="gtk+" version="3.20"/>
   <!-- n-columns=3 n-rows=1 -->
-  <object class="GtkGrid" id="Ticket">
+  <object class="GtkGrid" id="Pesaje">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="margin-top">10</property>
@@ -14,7 +14,7 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="halign">start</property>
-        <property name="pixbuf">..\imagenes\icons\producto64.png</property>
+        <property name="pixbuf">..\imagenes\iconos\Camioneta.png</property>
       </object>
       <packing>
         <property name="left-attach">0</property>
@@ -51,7 +51,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="ItemEntradaProductoInterno">
+              <object class="GtkLabel" id="ElementoPesajeProducto">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">Nombre del producto</property>
@@ -91,7 +91,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="ItemEntradaPlacaInterno">
+              <object class="GtkLabel" id="ElementoPesajePlaca">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">XXXXXXX</property>
@@ -148,7 +148,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="ItemEntradaFolioInterno">
+              <object class="GtkLabel" id="ElementoPesajeFolio">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">XXXXXX</property>
@@ -191,7 +191,7 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="ItemEntradaFechaInterno">
+              <object class="GtkLabel" id="ElementoPesajeFecha">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="label" translatable="yes">DD-MM-AAAA</property>

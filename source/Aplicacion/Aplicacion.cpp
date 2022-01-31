@@ -10,10 +10,10 @@
 #include "Imagen.h"
 #include "Vistas.h"
 #include "RegistrosInternos.h"
-#include "RegistrosPublicos.h"
+#include "PesajesPublicos.h"
 #include "GestorRegistros.h"
-#include "GestorBasculas.h"
 #include "Basculas.h"
+#include "Funciones.h"
 #include "Producto.h"
 #include "Empresa.h"
 #include <random>
@@ -26,6 +26,10 @@ bool aplicacionActiva;
 vector< string > pilaVistas;
 
 struct tm tiempo;
+
+void cancelarAccion( GtkWidget *widget, gpointer info ){
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
+}
 
 void iniciar( GtkApplication *aplicacion, gpointer informacion ){
     try{
@@ -143,12 +147,12 @@ void conectarSenales()
     conectar_senal( botonActualizarCuenta, G_CALLBACK( autorizarCambios ), nullptr );
 
     // Vista seleccion servicio
-    conectar_senal( botonBasculaPublica, G_CALLBACK( vistaBasculaPublica ), nullptr );
+    conectar_senal( senal_listar_registros_pendientes, G_CALLBACK( publico_registros_listar_pendientes ), nullptr );
     conectar_senal( botonBasculaAdministrativo, G_CALLBACK( vistaBasculaInterna ), nullptr );
     
     // Nuevo para ticket interno
-    conectar_senal( botonLeerPesoBrutoInterno, G_CALLBACK( bascula_lector_abrir ), nullptr );
-    conectar_senal( botonLeerPesoTaraInterno, G_CALLBACK( bascula_lector_abrir ), nullptr);
+    conectar_senal( botonLeerPesoBrutoInterno, G_CALLBACK( bascula_lector_abrir ), (void *)"EntradaHoraEntradaInterno EntradaPesoBrutoInterno" );
+    conectar_senal( botonLeerPesoTaraInterno, G_CALLBACK( bascula_lector_abrir ), (void *)"EntradaHoraSalidaInterno EntradaPesoTaraInterno" );
     conectar_senal( botonRegistrarPendienteInterno, G_CALLBACK( internoRegistrarPendiente ), nullptr );
     conectar_senal( botonFinalizarPendienteInterno, G_CALLBACK( internoFinalizarPendiente ), nullptr );
     conectar_senal( entradaNumeroPlacasInterno, G_CALLBACK( convertirMayusculas ), nullptr );
@@ -158,10 +162,10 @@ void conectarSenales()
 
     // Nuevo para ticket publico
     conectar_senal( entradaNumeroPlacasPublico, G_CALLBACK( convertirMayusculas ), nullptr );
-    conectar_senal( botonLeerPesoBrutoPublico, G_CALLBACK( vistaLeerPesoBrutoPublico ), nullptr );
-    conectar_senal( botonLeerPesoTaraPublico, G_CALLBACK( vistaLeerPesoTaraPublico ), nullptr );
-    conectar_senal( botonRegistrarPendientePublico, G_CALLBACK( publicoRegistrarPendiente ), nullptr );
-    conectar_senal( botonFinalizarPendientePublico, G_CALLBACK( publicoFinalizarPendiente ), nullptr );
+    conectar_senal( botonLeerPesoBrutoPublico, G_CALLBACK( bascula_lector_abrir ), (void *)"EntradaHoraEntradaPublico EntradaPesoBrutoPublico" );
+    conectar_senal( botonLeerPesoTaraPublico, G_CALLBACK( bascula_lector_abrir ), (void *)"EntradaHoraSalidaPublico EntradaPesoTaraPublico" );
+    //conectar_senal( botonRegistrarPendientePublico, G_CALLBACK( publicoRegistrarPendiente ), nullptr );
+    //conectar_senal( botonFinalizarPendientePublico, G_CALLBACK( publicoFinalizarPendiente ), nullptr );
      
     // Vista que solicita la contrasena
     conectar_senal( botonPermitirCambios, G_CALLBACK( actualizarDatosUsuario ), nullptr );

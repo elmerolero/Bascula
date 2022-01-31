@@ -35,11 +35,11 @@
             <property name="can-focus">False</property>
             <property name="spacing">10</property>
             <child>
-              <object class="GtkLabel" id="ItemNumeroPlaca">
+              <object class="GtkLabel" id="ItemNumeroEconomico">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
-                <property name="label" translatable="yes">Nombre:</property>
+                <property name="label" translatable="yes">Clave:</property>
                 <attributes>
                   <attribute name="weight" value="bold"/>
                 </attributes>
@@ -51,10 +51,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="ItemEntradaNombre">
+              <object class="GtkLabel" id="ItemEntradaClaveUsuario">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">Nombre Primer Segundo</property>
+                <property name="label" translatable="yes">clave</property>
               </object>
               <packing>
                 <property name="expand">False</property>
@@ -75,11 +75,11 @@
             <property name="can-focus">False</property>
             <property name="spacing">10</property>
             <child>
-              <object class="GtkLabel" id="ItemNumeroEconomico">
+              <object class="GtkLabel" id="ItemNumeroPlaca">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">start</property>
-                <property name="label" translatable="yes">Usuario:</property>
+                <property name="label" translatable="yes">Nombre:</property>
                 <attributes>
                   <attribute name="weight" value="bold"/>
                 </attributes>
@@ -91,10 +91,10 @@
               </packing>
             </child>
             <child>
-              <object class="GtkLabel" id="ItemEntradaUsuario">
+              <object class="GtkLabel" id="ItemEntradaNombre">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="label" translatable="yes">nombre_usuario</property>
+                <property name="label" translatable="yes">Nombre Primer Segundo</property>
               </object>
               <packing>
                 <property name="expand">False</property>

@@ -15,7 +15,6 @@ extern Signal botonUsuarios;
 extern Signal botonRegistrosEmpresas;
 extern Signal botonRegistrosProductos;
 extern Signal botonRegistrosPesajesInternos;
-extern Signal botonRegistrosBasculaPublica;
 
 // Señales base
 extern Signal enlaceRegistrarNuevoUsuario;
@@ -66,13 +65,6 @@ extern Signal botonCalcularDescuento;
 extern Signal opcionDescuentoInterno;
 extern Signal opcionRegistraEntrada;
 
-// Nuevo para ticket publico
-extern Signal entradaNumeroPlacasPublico;
-extern Signal botonLeerPesoBrutoPublico;
-extern Signal botonLeerPesoTaraPublico;
-extern Signal botonRegistrarPendientePublico;
-extern Signal botonFinalizarPendientePublico;
-
 // Vista de registro de peso
 extern Signal botonCancelarLectura;
 extern Signal ventanaLectorPeso;
@@ -106,7 +98,6 @@ extern Signal botonRegistroCancelarEdicion;
 // Noc
 extern Signal imprimirRegistroPublico;
 extern Signal eliminarRegistroInterno;
-extern Signal eliminarRegistroPublico;
 
 extern Signal botonRegistroGuardarNuevo;
 extern Signal botonRegistroCancelarNuevo;
@@ -114,21 +105,15 @@ extern Signal botonSi;
 extern Signal botonNo;
 
 extern Signal enlaceRegistrosPesajeRegresar;
-extern Signal botonRegistrosPesajeSeleccionarDia;
 extern Signal botonRegistrosPesajeObtenerInforme;
 extern Signal entradaRegistrosPesajeFolio;
 extern Signal botonRegistrosPesajeConsultarRegistro;
 
 extern Signal botonConsultarDia;
-extern Signal botonObtenerRegistrosRango;
 extern Signal botonObtenerRegistros;
 
 extern Signal botonEliminarUsuario;
 extern Signal botonCambiarContrasena;
 extern Signal entradaReemplazarConfirmacion;
-
-extern Signal ticketsConsultadosSeleccionados;
-
-// Bascula Lector
 
 #endif

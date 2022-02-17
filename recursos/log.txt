@@ -1,27 +1,12 @@
-[Fecha: 2022-01-17 Hora: 00:44:31 ]: Error querying. Error: near "Tlaquepaque": syntax error
-[Fecha: 2022-01-17 Hora: 10:45:21 ]: Error querying. Error: near "values": syntax error
-[Fecha: 2022-01-17 Hora: 11:16:03 ]: Error querying. Error: no such table: usuarios
-[Fecha: 2022-01-18 Hora: 00:31:25 ]: Error querying. Error: no such column: clave
-[Fecha: 2022-01-18 Hora: 12:03:56 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-18 Hora: 12:12:49 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-20 Hora: 12:36:11 ]: Error querying. Error: no such table: registros_internos
-[Fecha: 2022-01-20 Hora: 17:13:55 ]: stoi
-[Fecha: 2022-01-20 Hora: 21:01:31 ]: El objeto con el ID OpcionesBascula no se encuentra.
-[Fecha: 2022-01-20 Hora: 21:03:42 ]: El objeto con el ID OpcionesBascula no se encuentra.
-[Fecha: 2022-01-20 Hora: 21:46:22 ]: stoi
-[Fecha: 2022-01-20 Hora: 21:54:47 ]: Error querying. Error: no such table: registros_publicos
-[Fecha: 2022-01-21 Hora: 03:02:14 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-21 Hora: 03:07:22 ]: Error querying. Error: no such table: registros_publicos
-[Fecha: 2022-01-21 Hora: 16:21:49 ]: Error querying. Error: no such table: registros_publicos
-[Fecha: 2022-01-21 Hora: 17:28:01 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-21 Hora: 17:31:29 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-21 Hora: 17:36:45 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-21 Hora: 21:01:04 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-21 Hora: 21:17:45 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-21 Hora: 23:01:00 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-22 Hora: 13:11:25 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-22 Hora: 13:14:52 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-22 Hora: 17:32:54 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-22 Hora: 17:33:41 ]: basic_string::_M_construct null not valid
-[Fecha: 2022-01-23 Hora: 01:47:44 ]: Error querying. Error: no such column: Sandia
-[Fecha: 2022-01-23 Hora: 01:52:05 ]: Error querying. Error: table PesajesPublicos has 13 columns but 12 values were supplied
+[Fecha: 2022-02-14 Hora: 01:25:48]: basic_string::_M_construct null not valid
+[Fecha: 2022-02-14 Hora: 01:29:13]: Error querying. Error: near "pendiente": syntax error
+[Fecha: 2022-02-14 Hora: 01:31:12]: interno_pendiente_finalizar: Ha ocurrido al intentar identificar el renglon de existencias para el producto Papaya
+[Fecha: 2022-02-14 Hora: 01:33:52]: interno_pendiente_finalizar: Ha ocurrido al intentar identificar el renglon de existencias para el producto 
+[Fecha: 2022-02-15 Hora: 00:30:16]: stoi
+[Fecha: 2022-02-15 Hora: 00:40:42]: Error querying. Error: no such column: pese_bruto_manual
+[Fecha: 2022-02-15 Hora: 00:43:38]: Error querying. Error: no such column: PesajesInterno.id_basculista
+[Fecha: 2022-02-15 Hora: 01:06:51]: stoi
+[Fecha: 2022-02-15 Hora: 16:19:02]: Error querying. Error: Unknown error
+[Fecha: 2022-02-15 Hora: 16:58:45]: Error querying. Error: ambiguous column name: id_producto
+[Fecha: 2022-02-15 Hora: 17:08:44]: Error querying. Error: Unknown error
+[Fecha: 2022-02-15 Hora: 17:11:35]: Error querying. Error: Unknown error

@@ -44,4 +44,6 @@ void empresa_inicio_senales_conectar();
 void empresa_inicio_senales_desconectar();
 void empresa_senales_conectar( void );
 
+std::string empresa_buscar_existente( std::string empresa_nombre );
+
 #endif

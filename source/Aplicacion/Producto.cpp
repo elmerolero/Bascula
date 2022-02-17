@@ -115,8 +115,30 @@ void producto_nuevo( GtkWidget *widget, gpointer info ){
         database.query( consulta.str() );
         database.close();
 
+        // Vuelve a buscar el producto
+        consulta.str( "" );
+        string producto_id;
+        consulta << "select id_producto from Producto where nombre like '%" << producto_nombre << "'";
+        database.open( databaseFile );
+		database.query( consulta.str() );
+        if( results.size() > 0 ){
+            // Registra el nuevo producto
+            producto_id = (* results.at( 0 ))[ "id_producto" ];
+        }
+        
+        // Agrega el nuevo producto
+        if( !producto_id.empty() ){
+            consulta.str( "" );
+            consulta << "insert into Existencia values( 1, " << producto_id << ", 0, 0, 0 )";
+
+            database.query( consulta.str() );
+            database.close();
+		}
+
         // Actualiza los registros
         producto_actualizar_registros();
+
+        app_mostrar_exito( "Producto registrado correctamente." );
 
         // Redirige a la vista
         regresarVista();
@@ -206,9 +228,11 @@ void producto_eliminar( GtkWidget *widget, gpointer data ){
     }
 
 	// Elimina las dependencias del producto
-	/*consulta << "delete from where id_producto = " 
-			 << gtk_widget_get_name( GTK_WIDGET ( gtk_bin_get_child( GTK_BIN( gtk_list_box_get_selected_row( GTK_LIST_BOX( buscar_objeto( "ContenedorRegistros" ) ) ) ) ) ) )
-			 << */
+    consulta.str( "" );
+	consulta << "delete from PesajesPublicos where id_producto = " << id << "; ";
+    database.query( consulta.str() );
+    database.close();
+
     // Elimina el producto
     consulta.str( "" );
 	consulta << "delete from Producto where id_producto = " << id;
@@ -221,7 +245,7 @@ void producto_eliminar( GtkWidget *widget, gpointer data ){
 	producto_actualizar_registros();
 
     // Indica que se eliminó correctamente
-    app_mostrar_error( "Producto eliminado correctamente." );
+    app_mostrar_exito( "Producto eliminado correctamente." );
 }
 
 void producto_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
@@ -229,9 +253,9 @@ void producto_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
 	// Obtiene el id del folio
 	unsigned int folio = obtenerFolioSelector( row );
 	
-	// Obtiene el folio
+	// Obtiene el producto
 	database.open( databaseFile );
-	database.query( "select * from Producto where id_producto = " + to_string( folio ) );
+	database.query( "select Producto.id_producto, nombre, descripcion, imagen, entrante, saliente, total from Producto join Existencia on Existencia.id_producto = Producto.id_producto where Producto.id_producto = " + to_string( folio ) );
 	database.close();
 
 	if( results.size() > 0 ){
@@ -263,6 +287,11 @@ void producto_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
 			GdkPixbuf *imagen = imagen_cargar_escalar( ( ruta + (* resultados)[ "imagen" ] ).c_str(), 180, 180 );
 			gtk_image_set_from_pixbuf( GTK_IMAGE(  buscar_objeto( "ImagenRegistroConsulta" ) ), imagen );
 		}
+
+        // Establece la existencia
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaProductoEntrante" ) ), (* resultados)[ "entrante" ].c_str() );
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaProductoSaliente" ) ), (* resultados)[ "saliente" ].c_str() );
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "EtiquetaProductoTotal" ) ), (* resultados)[ "total" ].c_str() );
 
 		// Establece la vista de registro
 		irA( "Producto", false );
@@ -512,6 +541,20 @@ void producto_buscar( GtkSearchEntry* entry, GdkEvent* event ){
     }
 }
 
+string producto_buscar_por_id( string id ){
+    cout << "producto_buscar_por_id" << endl;
+    // Obtiene la base de datos
+    database.open( databaseFile );
+    database.query( "select nombre from Producto where id_producto = "  + id );
+    database.close();
+
+    if( results.size() > 0 ){
+        return (* results.at( 0 ))[ "nombre" ];
+    }
+
+    return "";
+}
+
 string producto_buscar_existente( string producto_nombre ){
     cout << "producto_buscar_existente" << endl;
     try{
@@ -523,8 +566,6 @@ string producto_buscar_existente( string producto_nombre ){
 		consulta << "select id_producto from Producto where nombre like '%" << producto_nombre << "'";
 		database.open( databaseFile );
 		database.query( consulta.str() );
-		database.close();
-
 		if( results.size() > 0 ){
 			return (* results.at( 0 ))[ "id_producto" ];
 		}
@@ -533,11 +574,30 @@ string producto_buscar_existente( string producto_nombre ){
         consulta << "insert into Producto values( null, '" << producto_nombre << "', null, null )";
 
         // Efectua la consulta
-        database.open( databaseFile );
         database.query( consulta.str() );
+
+        // Vuelve a buscar el producto
+        consulta.str( "" );
+        string producto_id;
+        consulta << "select id_producto from Producto where nombre like '%" << producto_nombre << "'";
+		database.query( consulta.str() );
+        if( results.size() > 0 ){
+            // Registra el nuevo producto
+            producto_id = (* results.at( 0 ))[ "id_producto" ];
+        }
+        
+        // Agrega el nuevo producto
+        if( !producto_id.empty() ){
+            consulta.str( "" );
+            consulta << "insert into Existencia values( 1, " << producto_id << ", 0, 0, 0 )";
+
+            database.query( consulta.str() );
+		}
+
+        // Cierra la conexión con la base de datos
         database.close();
 
-        return producto_nombre;
+        return producto_id;
     }
     catch( invalid_argument &ia ){
         throw ia;

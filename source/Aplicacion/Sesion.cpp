@@ -23,7 +23,7 @@ void registrarUsuario(){
 		string apellidos = Usuario::validarApellidos( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroApellidos" ) ) ) );
 		string nombreUsuario = Usuario::validarNombreUsuario( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroNombreUsuario" ) ) ) );
 		string contrasena = Usuario::validarContrasena( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroContrasena" ) ) ) );
-		string confirmacion = Usuario::validarContrasena( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroConfirmarContraseña" ) ) ) );
+		string confirmacion = Usuario::validarContrasena( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroConfirmarContrasena" ) ) ) );
 		
 		// Se asegura de que el usuario que se desea registrar no existe
 		nombreUsuarioOcupado( nombreUsuario );

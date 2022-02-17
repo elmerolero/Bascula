@@ -6,7 +6,7 @@ using namespace std;
 
 void actualizarTiempo( GtkWidget *widget, gpointer ptr );
 void establecerUsuario( GtkWidget *widget, gpointer ptr );
-
+ 
 int main( int argc, char *argv[] )
 {
     // Activa la aplicacion

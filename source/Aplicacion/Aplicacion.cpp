@@ -9,7 +9,7 @@
 #include "Sesion.h"
 #include "Imagen.h"
 #include "Vistas.h"
-#include "RegistrosInternos.h"
+#include "PesajesInternos.h"
 #include "PesajesPublicos.h"
 #include "GestorRegistros.h"
 #include "Basculas.h"
@@ -147,38 +147,14 @@ void conectarSenales()
     conectar_senal( botonActualizarCuenta, G_CALLBACK( autorizarCambios ), nullptr );
 
     // Vista seleccion servicio
-    conectar_senal( senal_listar_registros_pendientes, G_CALLBACK( publico_registros_listar_pendientes ), nullptr );
-    conectar_senal( botonBasculaAdministrativo, G_CALLBACK( vistaBasculaInterna ), nullptr );
-    
-    // Nuevo para ticket interno
-    conectar_senal( botonLeerPesoBrutoInterno, G_CALLBACK( bascula_lector_abrir ), (void *)"EntradaHoraEntradaInterno EntradaPesoBrutoInterno" );
-    conectar_senal( botonLeerPesoTaraInterno, G_CALLBACK( bascula_lector_abrir ), (void *)"EntradaHoraSalidaInterno EntradaPesoTaraInterno" );
-    conectar_senal( botonRegistrarPendienteInterno, G_CALLBACK( internoRegistrarPendiente ), nullptr );
-    conectar_senal( botonFinalizarPendienteInterno, G_CALLBACK( internoFinalizarPendiente ), nullptr );
-    conectar_senal( entradaNumeroPlacasInterno, G_CALLBACK( convertirMayusculas ), nullptr );
-    conectar_senal( botonCalcularDescuento, G_CALLBACK( internoActualizarPesoNeto ), nullptr );
-    conectar_senal( opcionDescuentoInterno, G_CALLBACK( internoHabilitarDescuento ), nullptr );
-    conectar_senal( opcionRegistraEntrada, G_CALLBACK( internoSeleccionarTipo ), nullptr );
-
-    // Nuevo para ticket publico
-    conectar_senal( entradaNumeroPlacasPublico, G_CALLBACK( convertirMayusculas ), nullptr );
-    conectar_senal( botonLeerPesoBrutoPublico, G_CALLBACK( bascula_lector_abrir ), (void *)"EntradaHoraEntradaPublico EntradaPesoBrutoPublico" );
-    conectar_senal( botonLeerPesoTaraPublico, G_CALLBACK( bascula_lector_abrir ), (void *)"EntradaHoraSalidaPublico EntradaPesoTaraPublico" );
-    //conectar_senal( botonRegistrarPendientePublico, G_CALLBACK( publicoRegistrarPendiente ), nullptr );
-    //conectar_senal( botonFinalizarPendientePublico, G_CALLBACK( publicoFinalizarPendiente ), nullptr );
+    conectar_senal( senal_publico_pendientes_listar, G_CALLBACK( publico_registros_listar_pendientes ), nullptr );
+    conectar_senal( senal_interno_pendientes_listar, G_CALLBACK( interno_registros_listar_pendientes ), nullptr );
      
     // Vista que solicita la contrasena
     conectar_senal( botonPermitirCambios, G_CALLBACK( actualizarDatosUsuario ), nullptr );
 
     // Vista de configuración
     conectar_senal( botonGuardarConfiguracion, G_CALLBACK( guardarConfiguracion ), nullptr );
-
-    // Consultar registro interno
-    conectar_senal( imprimirRegistroInterno, G_CALLBACK( internoImprimirSeleccionado ), nullptr );
-
-    // Ventana lectora de peso
-    //conectar_senal( ventanaLectorPeso, G_CALLBACK( bascula_lector_cerrar ), nullptr );
-    //conectar_senal( botonCancelarPeso, G_CALLBACK( bascula_lector_cerrar ), nullptr );
 }
 
 //
@@ -192,8 +168,8 @@ void conectarSenalesAdministrador(){
     // Vista Registros
     conectar_senal( botonRegistrosEmpresas, G_CALLBACK( empresa_listar_registros ), (void *)(&empresas) );
     conectar_senal( botonRegistrosProductos, G_CALLBACK( producto_listar_registros ), (void *)(&productos) );
-    conectar_senal( botonRegistrosPesajesInternos, G_CALLBACK( vistaConsultarPesajesInternos ), nullptr );
-    conectar_senal( botonRegistrosBasculaPublica, G_CALLBACK( vistaConsultarPesajesPublicos ), nullptr );
+    conectar_senal( senal_interno_opcion, G_CALLBACK( interno_registros_listar ), nullptr );
+    conectar_senal( senal_publico_opcion, G_CALLBACK( publico_registros_listar ), nullptr ); // vistaConsultarPesajesPublicos
 
     // Vista de listado de registros
     //conectar_senal( botonRegistroCancelarEdicion, nullptr );
@@ -336,7 +312,7 @@ string tiempo_leer_hora( bool HORA_CORTA ){
     stringstream hora;
 
     hora << setfill( '0' ) << setw( 2 ) << ( HORA_CORTA ? tiempo.tm_hour : ( ( tiempo.tm_hour == 0 || tiempo.tm_hour == 12 ) ? 12 : tiempo.tm_hour % 12 ) ) << ":"
-                 << setw( 2 ) << tiempo.tm_min << ":" << setw( 2 ) << tiempo.tm_sec << " " << ( HORA_CORTA ? "" : ( tiempo.tm_hour < 12 ) ? "am" : "pm" ) << setfill( ' ' );
+                 << setw( 2 ) << tiempo.tm_min << ":" << setw( 2 ) << tiempo.tm_sec << ( HORA_CORTA ? "" : ( tiempo.tm_hour < 12 ) ? " am" : " pm" ) << setfill( ' ' );
 
     // Devuelve la hora
     return hora.str();
@@ -374,7 +350,9 @@ string tiempo_construir_fecha( unsigned int dia, unsigned int mes, unsigned int 
     stringstream fecha;
     
     // Convierte la fecha
-    fecha << setfill( '0' ) << setw( 4 ) << anio << "-" << setw( 2 ) << mes << "-" << setw( 2 ) << dia << setfill( ' ' );
+    fecha << setfill( '0' ) << setw( 2 ) << dia << "-" << setw( 2 ) << mes << "-" << setw( 2 ) << anio << setfill( ' ' );
+
+    cout << fecha.str() << endl;
 
     // Retorna la fecha creada
     return fecha.str();

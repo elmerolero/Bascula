@@ -1,7 +1,7 @@
 CC=g++
-CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3` -mwindows
+CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3`
 LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
-OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Empresa.o Registro.o Database.o ContenedorRegistros.o Vistas.o GestorRegistros.o Sesion.o sha256.o RegistrosInternos.o PesajesPublicos.o TicketPublico.o Senales.o Imagen.o Producto.o Domicilio.o Basculas.o aplicacion.res
+OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Empresa.o Registro.o Database.o ContenedorRegistros.o Vistas.o GestorRegistros.o Sesion.o sha256.o PesajesInternos.o PesajesPublicos.o TicketPublico.o Senales.o Imagen.o Producto.o Domicilio.o Basculas.o aplicacion.res
 
 ../../build/aplicacion:  main.cpp $(OBJS)
 	$(CC) main.cpp $(CFLAGS) -g -o ../../build/aplicacion $(OBJS) $(LIBS)
@@ -42,8 +42,8 @@ Sesion.o: Sesion.h Sesion.cpp
 sha256.o: sha256.h sha256.cpp
 	$(CC) -c sha256.h sha256.cpp
 	
-RegistrosInternos.o: RegistrosInternos.h RegistrosInternos.cpp
-	$(CC) $(CFLAGS) -c RegistrosInternos.h RegistrosInternos.cpp $(LIBS)
+PesajesInternos.o: PesajesInternos.h PesajesInternos.cpp
+	$(CC) $(CFLAGS) -c PesajesInternos.h PesajesInternos.cpp $(LIBS)
 
 PesajesPublicos.o: PesajesPublicos.h PesajesPublicos.cpp
 	$(CC) $(CFLAGS) -c PesajesPublicos.h PesajesPublicos.cpp $(LIBS)

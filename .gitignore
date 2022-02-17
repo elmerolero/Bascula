@@ -5,8 +5,9 @@
 *.swp
 *.html
 *.csv
+*
 /build
 recursos/imagenes/productos/
 recursos/imagenes/empresas/
+resources/
 recursos/datos/
-resources/data/

@@ -192,7 +192,7 @@ void empresa_eliminar( GtkWidget *widget, gpointer info ){
 	empresa_actualizar_registros();
 
     // Indica que se eliminó correctamente
-    app_mostrar_error( "Empresa eliminada correctamente." );
+    app_mostrar_exito( "Empresa eliminada correctamente." );
 }
 
 void empresa_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data ){
@@ -370,7 +370,7 @@ void empresa_guardar_edicion( GtkWidget *widget, gpointer info ){
     empresa_actualizar_registros();
 
     // Muestra el mensaje de que se actualizó la información del registro
-    app_mostrar_error( "Registro editado correctamente." );
+    app_mostrar_exito( "Registro editado correctamente." );
 
     // Cancela el resto
     empresa_cancelar_edicion();
@@ -662,7 +662,7 @@ void empresa_propia_domicilio_guardar_nuevo( GtkWidget *widget, gpointer info ){
         domicilio_empresa_registros_actualizar( "DomicilioEmpresaPropia", "ContenedorEmpresaPropiaDomicilios", 1 );
 
         // Regresa
-        app_mostrar_error( "Domicilio agregado correctamente." );
+        app_mostrar_exito( "Domicilio agregado correctamente." );
         regresarVista();
     }
     catch( invalid_argument &ia ){
@@ -776,7 +776,7 @@ void empresa_propia_guardar_edicion( GtkWidget *widget, gpointer info ){
     gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreEmpresa" ) ), nombre.c_str() );
 
     // Muestra el mensaje de que se actualizó la información del registro
-    app_mostrar_error( "Nombre de la empresa editado correctamente." );
+    app_mostrar_exito( "Nombre de la empresa editado correctamente." );
 
     // Cancela el resto
     empresa_cancelar_edicion();
@@ -860,7 +860,7 @@ void empresa_propia_domicilio_guardar_edicion( GtkWidget *widget, gpointer info 
 
         // Regresa
         empresa_propia_domicilio_cancelar_edicion( nullptr, nullptr );
-        app_mostrar_error( "Domicilio editado correctamente." );
+        app_mostrar_exito( "Domicilio editado correctamente." );
     }
     catch( invalid_argument &ia ){
         // Obtiene el mensaje de error
@@ -904,4 +904,45 @@ void empresa_inicio_domicilio_cancelar( GtkWidget *widget, gpointer info ){
 
     app_mostrar_mensaje( "Puede agregar o actualizar los datos de\nla empresa mas adelante en configuración." );
     irA( "Inicio", true );
+}
+
+string empresa_buscar_existente( string empresa_nombre ){
+    cout << "producto_buscar_existente" << endl;
+    try{
+        // Valida el nombre del producto
+        empresa_validar_razon_social( empresa_nombre );
+
+        // Verifica que no exista un registro con ese nombre
+		stringstream consulta;
+		consulta << "select id_empresa from Empresas where razon_social like '%" << empresa_nombre << "'";
+		database.open( databaseFile );
+		database.query( consulta.str() );
+		if( results.size() > 0 ){
+			return (* results.at( 0 ))[ "id_empresa" ];
+		}
+
+        consulta.str( "" );
+        consulta << "insert into Empresas values( null, '" << empresa_nombre << "', null, null )";
+
+        // Efectua la consulta
+        database.query( consulta.str() );
+
+        // Vuelve a buscar el producto
+        consulta.str( "" );
+        string empresa_id;
+        consulta << "select id_empresa from Empresas where razon_social like '%" << empresa_nombre << "'";
+		database.query( consulta.str() );
+        if( results.size() > 0 ){
+            // Registra el nuevo producto
+            empresa_id = (* results.at( 0 ))[ "id_empresa" ];
+        }
+
+        // Cierra la conexión con la base de datos
+        database.close();
+
+        return empresa_id;
+    }
+    catch( invalid_argument &ia ){
+        throw ia;
+    }
 }

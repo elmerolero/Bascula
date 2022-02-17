@@ -254,7 +254,7 @@ void bascula_eliminar( GtkWidget *widget, gpointer info ){
     app_mostrar_exito( "Bascula eliminada correctamente." );
 }
 
-void bascula_lector_abrir( GtkWidget *widget, gpointer info ){
+void bascula_lector_abrir( void ){
     cout << "bascula_lector_abrir" << endl;
     
     // Establece el lector en ceros
@@ -278,7 +278,6 @@ void bascula_lector_abrir( GtkWidget *widget, gpointer info ){
 
     // Conecta la señal
     conectar_senal( senal_opcion_seleccionar, G_CALLBACK( bascula_lector_seleccionar ), nullptr );
-    conectar_senal( senal_bascula_registrar_pesaje, G_CALLBACK( bascula_registrar_pesaje ), info );
     conectar_senal( senal_bascula_cancelar_pesaje, G_CALLBACK( bascula_lector_cerrar ), nullptr  );
 
     // Abre la ventana
@@ -298,10 +297,18 @@ void bascula_lector_seleccionar( GtkComboBox *lista, gpointer info ){
         return;
     }
     else if( opcion.compare( "Manual" ) == 0 ){
+        bascula_entrada_manual_habilitado = true;
+        gtk_widget_hide( GTK_WIDGET( buscar_objeto( "EtiquetaPeso" ) ) );
+        gtk_widget_show( GTK_WIDGET( buscar_objeto( "CajaPeso" ) ) );
         return;
     }
 
     try{
+        // HAbilita el modo clasico
+        bascula_entrada_manual_habilitado = false;
+        gtk_widget_hide( GTK_WIDGET( buscar_objeto( "CajaPeso" ) ) );
+        gtk_widget_show( GTK_WIDGET( buscar_objeto( "EtiquetaPeso" ) )  );
+
         // Obtiene el id de la báscula
         id_bascula = stoi( opcion );
 
@@ -457,13 +464,10 @@ void bascula_lector_finalizar( void ){
     CloseHandle( manejador );
 }
 
-void bascula_registrar_pesaje( GtkWidget *widget, gpointer info ){
+void bascula_registrar_pesaje( string etiquetaPeso, string etiquetaHora ){
     try{
         // Estream para obtener de forma separada las etiquetas
-        stringstream stream;
-        string etiquetaHora;
-        string etiquetaPeso;
-        string peso;
+        double peso;
 
         // Detiene el lector
         bascula_lector_finalizar();
@@ -473,25 +477,18 @@ void bascula_registrar_pesaje( GtkWidget *widget, gpointer info ){
             hilo -> join();
             hilo = nullptr;
         }
-        
-        // Carga los datos en el stream
-        stream << (char *)info;
-        
-        // Obtiene la etiqueta hora
-        stream >> etiquetaHora;
-        stream >> etiquetaPeso;
 
         // Obtiene el texto de l
         if( bascula_entrada_manual_habilitado ){
-            peso  = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaPeso" ) ) );
+            peso  = stoi( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaPeso" ) ) ) );
         }
         else{
-            peso = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EtiquetaPeso" ) ) );
+            peso = stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EtiquetaPeso" ) ) ) );
         }
 
         // Registra la hora y el peso
         gtk_label_set_text( GTK_LABEL( buscar_objeto( etiquetaHora ) ), tiempo_leer_hora( 1 ).c_str() );
-        gtk_label_set_text( GTK_LABEL( buscar_objeto( etiquetaPeso ) ), peso.c_str() );
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( etiquetaPeso ) ), pesoString( peso, 2 ).c_str() );
 
         // Desconecta la señal de seleccion de bascula
         desconectar_senal( senal_opcion_seleccionar );
@@ -500,7 +497,11 @@ void bascula_registrar_pesaje( GtkWidget *widget, gpointer info ){
         gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaLectorPeso" ) ) );   
     }
     catch( exception e ){
-        cout << e.what() << endl;
+        string what = e.what();
+        cout << what << endl;
+        if( what.compare( "stod" ) != 0 ){
+            app_mostrar_error( "El peso leído no es válido." );
+        }
     }
 }
 

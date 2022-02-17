@@ -182,7 +182,7 @@ void registrarEmpresa()
 string pesoString( double peso, int precision )
 {
 	stringstream pesoStr;
-	pesoStr << fixed << setprecision( precision ) << peso << " Kg" << endl;
+	pesoStr << fixed << setprecision( precision ) << peso << " Kg";
 	return pesoStr.str();
 }
 

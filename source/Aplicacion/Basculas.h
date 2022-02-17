@@ -13,12 +13,14 @@ extern Signal senal_bascula_guardar;
 extern Signal senal_bascula_registrar_pesaje;
 extern Signal senal_bascula_cancelar_pesaje;
 
+extern bool bascula_entrada_manual_habilitado;
+
 // Vistas
 void bascula_registros_listar( GtkWidget *widget, gpointer info );
 void bascula_nuevo( GtkWidget *widget, gpointer info );
 void bascula_editar( GtkWidget *widget, gpointer info );
 void bascula_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer info );
-void bascula_lector_abrir( GtkWidget *widget, gpointer info );
+void bascula_lector_abrir( void );
 void bascula_lector_seleccionar( GtkComboBox *lista, gpointer info );
 bool bascula_lector_leer( gpointer info );
 bool bascula_lector_iniciar( std::unordered_map< std::string, std::string > *bascula );
@@ -32,7 +34,7 @@ void bascula_eliminar( GtkWidget *widget, gpointer info );
 void bascula_cancelar_nuevo( GtkWidget *widget, gpointer info );
 void bascula_guardar_edicion( GtkWidget *widget, gpointer info );
 void bascula_cancelar_edicion( GtkWidget *widget, gpointer info );
-void bascula_registrar_pesaje( GtkWidget *widget, gpointer info );
+void bascula_registrar_pesaje( std::string etiquetaPeso, std::string etiquetaHora );
 
 std::string bascula_nombre_validar( std::string nombre );
 std::string bascula_puerto_validar( std::string puerto );

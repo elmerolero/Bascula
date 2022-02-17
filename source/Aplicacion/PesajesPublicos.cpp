@@ -2,8 +2,10 @@
 #include "Aplicacion.h"
 #include "Funciones.h"
 #include "Producto.h"
+#include "Basculas.h"
 #include "Imagen.h"
 #include "Vistas.h"
+#include "Senales.h"
 #include <iostream>
 #include <sstream>
 #include <fstream>
@@ -14,14 +16,25 @@
 #include <Windows.h>
 using namespace std;
 
-TicketPublico *registroPublico = nullptr;
-bool publicoPendiente = true;
+Signal senal_publico_opcion = { "BotonRegistrosBasculaPublica", "clicked", 0 };
+Signal senal_publico_numero_placas = { "EntradaNumeroPlacasPublico", "insert-text", 0 };
 
-Signal senal_listar_registros_pendientes = { "BotonBasculaPublica", "clicked", 0 };
+Signal senal_publico_pendientes_listar = { "BotonBasculaPublica", "clicked", 0 };
 Signal senal_publico_editar_pendiente = { "BotonRegistrarPendientePublico", "clicked", 0 };
+Signal senal_publico_pendiente_finalizar = { "BotonFinalizarPendientePublico", "clicked", 0 };;
 
-Signal senal_publico_nuevo_pendiente = { "BotonBasculaNuevo", "clicked", 0 };
+Signal senal_publico_leer_bruto = { "BotonLeerPesoBrutoPublico", "clicked", 0 };
+Signal senal_publico_leer_tara = { "BotonLeerPesoTaraPublico", "clicked", 0 };
+
 Signal senal_publico_editar = { "ContenedorPesajesPendientes", "row-activated", 0 };
+
+Signal senal_pesajes_nuevo_pendiente = { "BotonBasculaNuevo", "clicked", 0 };
+Signal senal_pesajes_periodo_seleccionar = { "BotonRegistrosPesajeSeleccionarDia", "clicked", 0 };
+Signal senal_pesajes_obtener_seleccionados = { "BotonObtenerRegistrosRango", "clicked", 0 };
+Signal senal_pesajes_seleccionar = { "ContenedorRegistrosPesaje", "row-activated", 0 };
+Signal senal_publico_eliminar = { "EliminarRegistroPublico", "clicked", 0 };
+Signal senal_pesajes_exportar_seleccionados = { "BotonRegistrosPesajesExportar", "clicked", 0 };
+Signal senal_publico_imprimir = { "ImprimirRegistroPublico", "clicked", 0 };
 
 void publico_registros_listar_pendientes( GtkWidget *widget, gpointer info ){
 	cout << "publico_registros_listar_pendientes" << endl;
@@ -30,14 +43,18 @@ void publico_registros_listar_pendientes( GtkWidget *widget, gpointer info ){
 	publico_registros_actualizar_pendientes();
 
 	// Conecta las señales
-	conectar_senal( senal_publico_nuevo_pendiente, G_CALLBACK( publico_nuevo_pendiente ), nullptr );
-	conectar_senal( senal_publico_editar_pendiente, G_CALLBACK( publico_pendiente_guardar_nuevo ), nullptr );
+    conectar_senal( senal_publico_numero_placas, G_CALLBACK( convertirMayusculas ), nullptr );
+    conectar_senal( senal_publico_leer_bruto, G_CALLBACK( publico_leer_bruto ), nullptr );
+    conectar_senal( senal_publico_leer_tara, G_CALLBACK( publico_leer_tara ), nullptr );
+	conectar_senal( senal_publico_pendiente_finalizar, G_CALLBACK( publico_pendiente_finalizar ), nullptr );
+	conectar_senal( senal_pesajes_nuevo_pendiente, G_CALLBACK( publico_pendiente_nuevo ), nullptr );
+	conectar_senal( senal_publico_editar, G_CALLBACK( publico_pendiente_seleccionar ), nullptr );
 
 	// Redirige a la vista de pesajes pendientes
 	irA( "PesajesPendientes", false );
 }
 
-void publico_nuevo_pendiente( GtkWidget *widget, gpointer info ){
+void publico_pendiente_nuevo( GtkWidget *widget, gpointer info ){
 	// Folio
 	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), "No asignado." );
 	
@@ -70,10 +87,73 @@ void publico_nuevo_pendiente( GtkWidget *widget, gpointer info ){
 	// Establece el completador de producto
 	//  gtk_entry_set_completion( GTK_ENTRY( objecto ), completador );
 	//establecerCompletadorEntrada( "EntradaNombreProductoInterno", NULL );
-	//establecerCompletadorEntrada( "EntradaNombreProductoPublico", productos.obtenerCompletador() ); 
+	//establecerCompletadorEntrada( "EntradaNombreProductoPublico", productos.obtenerCompletador() );
+
+	// Conecta la señal
+	conectar_senal( senal_publico_editar_pendiente, G_CALLBACK( publico_pendiente_guardar_nuevo ), nullptr );
 	
 	// Establece la vista de nuevo ticket
 	irA( "PesajePublicoEditable", false );
+}
+
+void publico_pendiente_seleccionar( GtkWidget *widget, GtkListBoxRow *row, gpointer data ){
+	cout << "publico_pendiente_seleccionar" << endl;
+	// Obtiene el folio del registro de pesaje
+	unsigned int folio = obtenerFolioSelector( row );
+
+	string consulta = "select id_pesaje, fecha, Producto.nombre as producto, numero_placas, nombre_conductor, hora_entrada, hora_salida, peso_bruto, peso_tara, peso_neto "
+					  "from PesajesPublicos join Producto on Producto.id_producto = PesajesPublicos.id_producto " 
+					  "where id_pesaje = ";
+
+	// Obtiene el registro de pesaje
+	database.open( databaseFile );
+	database.query( consulta + to_string( folio ) );
+	database.close();
+	if( results.size() > 0 ){
+		// Obtiene el pesaje
+		unordered_map< string, string > *pesaje = results.at( 0 );
+
+		// Folio
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), (* pesaje)[ "id_pesaje" ].c_str() );
+		
+		// Fecha
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico" ) ), (* pesaje)[ "fecha" ].c_str() );
+		
+		// Producto
+		gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaNombreProductoPublico" ) ), TRUE );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ), (* pesaje)[ "producto" ].c_str() );
+		
+		// Nombre del conductor
+		gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaNombreConductorPublico"  ) ), TRUE );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ), (* pesaje)[ "nombre_conductor" ].c_str() );
+		
+		// Numero de placas
+		gtk_editable_set_editable( GTK_EDITABLE( buscar_objeto( "EntradaNumeroPlacasPublico"  ) ), TRUE );
+		gtk_entry_set_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ), (* pesaje)[ "numero_placas" ].c_str() );
+		
+		// Hora entrada y Peso Bruto
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ), (* pesaje)[ "hora_entrada" ].c_str() );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ), ((* pesaje)[ "peso_bruto" ] + " Kg.").c_str() );
+		
+		// Hora salida y Peso Tara
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ), "No establecida" );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ), "No establecido" );
+		if( (* pesaje)[ "peso_tara" ].compare( "null" ) != 0 && (* pesaje)[ "hora_salida" ].compare( "null" ) != 0 ){
+			gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ), (* pesaje)[ "hora_salida" ].c_str() );
+			gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ), ((* pesaje)[ "peso_tara" ] + " Kg." ).c_str() );
+		}
+		
+		// Peso neto
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), "No establecido" );
+		if( (* pesaje)[ "peso_neto" ].compare( "null" ) != 0 ){
+			gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), ((* pesaje)[ "peso_neto" ] + "Kg.").c_str()  );
+		}
+
+		// Conecta las señales
+		conectar_senal( senal_publico_editar_pendiente, G_CALLBACK( publico_pendiente_guardar_edicion ), nullptr );
+
+		irA( "PesajePublicoEditable", false );
+	}
 }
 
 void publico_pendiente_guardar_nuevo( GtkWidget *widget, gpointer info ){
@@ -106,17 +186,13 @@ void publico_pendiente_guardar_nuevo( GtkWidget *widget, gpointer info ){
 		}
 		
 		// Registra el peso neto
-		try{
-			peso_neto = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ) ) );
-		}
-		catch( invalid_argument &ia ){
-			peso_neto = 0.f;
-		}
+		peso_neto = abs( peso_bruto - peso_tara );
 
 		stringstream consulta;
 		consulta << "insert into PesajesPublicos values( null, '" << fecha << "', " << id_producto << ", '"
 				 << numero_placas << "', '" << conductor << "', '" << hora_entrada << "', '" << hora_salida << "', "
-				 << peso_bruto << ", " << peso_tara << ", " << usuario.obtenerClave() << ", 1, 0 )";
+				 << peso_bruto << ", " << peso_tara << ", "  << peso_neto << ", " << usuario.obtenerClave() << ", 1, "
+				 << bascula_entrada_manual_habilitado << " )";
 		
 		database.open( databaseFile );
 		database.query( consulta.str() );
@@ -133,8 +209,319 @@ void publico_pendiente_guardar_nuevo( GtkWidget *widget, gpointer info ){
 		app_mostrar_exito( "Registro creado correctamente." );
 	}
 	catch( invalid_argument &ia ){
+		string error = ia.what();
 		app_mostrar_error( ia.what() );
+		if( error.compare( "stod" ) == 0 ){
+			app_mostrar_error( "Es necesario registrar el peso bruto." );
+		}
 	}
+}
+
+void publico_pendiente_guardar_edicion( GtkWidget *widget, gpointer info ){
+	try{
+		// Obtiene el producto introducido
+		string folio = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ) );
+   		string id_producto = producto_buscar_existente( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ) ) );
+    	string fecha = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico" ) ) );
+		string conductor = publico_conductor_validar( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ) ) );
+		string numero_placas = publico_placas_validar( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ) ) );
+		string id_basculista = to_string( usuario.obtenerClave() );
+
+		// Registra el peso bruto
+		double peso_bruto = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ) ) );
+		string hora_entrada = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ) );
+		double peso_tara = 0.f;
+		string hora_salida;
+		double peso_neto = 0.f;
+		
+		try{
+			// Registra el peso tara
+			peso_tara = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ) ) );
+			hora_salida = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ) );
+		}
+		catch( invalid_argument &ia ){
+			// registra el peso tara en cero
+			peso_tara = 0.f;
+			hora_salida = "";
+		}
+		
+		// Registra el peso neto
+		peso_neto = abs( peso_bruto - peso_tara );
+
+		stringstream consulta;
+		consulta << "update PesajesPublicos set id_producto = " << id_producto << ", "
+				 << "numero_placas = '" << numero_placas << "', " << " nombre_conductor = '" << conductor << "', " 
+				 << "hora_entrada = '" << hora_entrada << "', hora_salida = '" << hora_salida << "', "
+				 << "peso_bruto = " << peso_bruto << ", peso_tara = " << peso_tara << ", peso_neto = "  << peso_neto << ", "
+				 << "entrada_manual = " << bascula_entrada_manual_habilitado << "  where id_pesaje = " << folio;
+		
+		database.open( databaseFile );
+		database.query( consulta.str() );
+		database.close();
+
+		// Obtiene los tickets pendientes
+		publico_registros_actualizar_pendientes();
+
+		//
+		regresarVista();
+
+		
+		// Crea o registra el registro según corresponda
+		app_mostrar_exito( "Registro actualizado correctamente." );
+	}
+	catch( invalid_argument &ia ){
+		string error = ia.what();
+		app_mostrar_error( ia.what() );
+		if( error.compare( "stod" ) == 0 ){
+			app_mostrar_error( "Es necesario registrar el peso bruto." );
+		}
+	}
+}
+
+void publico_pendiente_finalizar( GtkWidget *widget, gpointer info ){
+	try{
+		// Obtiene el producto introducido
+		string folioStr = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ) );
+   		string id_producto = producto_buscar_existente( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ) ) );
+    	string fecha = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico" ) ) );
+		string conductor = publico_conductor_validar( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ) ) );
+		string numero_placas = publico_placas_validar( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ) ) );
+		string id_basculista = to_string( usuario.obtenerClave() );
+
+		// Registra el peso bruto, el tara y revisa el peso neto.
+		double peso_bruto = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ) ) );
+		string hora_entrada = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ) );
+		double peso_tara = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ) ) );
+		string hora_salida = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ) );;
+		double peso_neto = abs( peso_bruto - peso_tara );
+
+		stringstream consulta;
+
+		try{
+			unsigned long folio = stoul( folioStr );
+			consulta << "update PesajesPublicos set id_producto = " << id_producto << ", "
+				 << "numero_placas = '" << numero_placas << "', " << " nombre_conductor = '" << conductor << "', " 
+				 << "hora_entrada = '" << hora_entrada << "', hora_salida = '" << hora_salida << "', "
+				 << "peso_bruto = " << peso_bruto << ", peso_tara = " << peso_tara << ", peso_neto = "  << peso_neto << ", "
+				 << "pendiente = 0, entrada_manual = " << bascula_entrada_manual_habilitado << "  where id_pesaje = " << folio;
+		}
+		catch( invalid_argument &ia ){
+			consulta << "insert into PesajesPublicos values( null, '" << fecha << "', " << id_producto << ", '"
+				 << numero_placas << "', '" << conductor << "', '" << hora_entrada << "', '" << hora_salida << "', "
+				 << peso_bruto << ", " << peso_tara << ", "  << peso_neto << ", " << usuario.obtenerClave() << ", 0, "
+				 << bascula_entrada_manual_habilitado << " )";
+		}
+		
+		database.open( databaseFile );
+		database.query( consulta.str() );
+		database.close();
+
+		// Obtiene los tickets pendientes
+		publico_registros_actualizar_pendientes();
+
+		publico_hacer_impresion( nullptr, nullptr );
+
+		//
+		regresarVista();
+
+		// Crea o registra el registro según corresponda
+		app_mostrar_exito( "Registro finalizado correctamente." );
+	}
+	catch( invalid_argument &ia ){
+		string error = ia.what();
+		app_mostrar_error( ia.what() );
+		if( error.compare( "stod" ) == 0 ){
+			app_mostrar_error( "Es necesario registrar el peso bruto." );
+		}
+	}
+}
+
+// Abre el cuadro de dialogo para leer el peso bruto
+void publico_leer_bruto( GtkWidget *widget, gpointer info ){
+	// Abre el lector
+	bascula_lector_abrir();
+
+	// COnecta la señal
+	conectar_senal( senal_bascula_registrar_pesaje, G_CALLBACK( publico_registrar_bruto ), nullptr );
+}
+
+// Registra el peso bruto
+void publico_registrar_bruto( GtkWidget *widget, gpointer info ){
+	// Registra el peso bruto
+	bascula_registrar_pesaje( "EntradaPesoBrutoPublico", "EntradaHoraEntradaPublico" );
+	
+    // Intenta calcular el peso neto
+    publico_calcular_neto();
+}
+
+// Abre el cuadro de dialogo para leer el peso bruto
+void publico_leer_tara( GtkWidget *widget, gpointer info ){
+	// Abre el lector
+	bascula_lector_abrir();
+
+	// COnecta la señal
+	conectar_senal( senal_bascula_registrar_pesaje, G_CALLBACK( publico_registrar_tara ), nullptr );
+}
+
+// Registra el peso tara
+void publico_registrar_tara( GtkWidget *widget, gpointer info ){
+	// Registra el peso tara
+	bascula_registrar_pesaje( "EntradaPesoTaraPublico", "EntradaHoraSalidaPublico" );
+    
+    // Calcula el peso neto
+    publico_calcular_neto();
+}
+
+// Actualiza el peso neto
+void publico_calcular_neto( void ){
+	try{
+		// Obtiene el peso bruto y tara registrados
+		double bruto = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ) ) );
+		double tara = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ) ) );
+
+		// Calcula el peso neto
+		double neto = abs( bruto - tara );
+
+		gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeError" ) ) );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), pesoString( neto, 2 ).c_str() );
+	}
+	catch( invalid_argument &ia ){
+		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), "No establecido" );
+	}
+}
+
+void publico_registros_listar( GtkWidget *widget, gpointer info ){
+	cout << "publico_registros_listar" << endl;
+	// Limpia el contenedor
+	limpiar_contenedor( "ContenedorRegistrosPesaje" );
+
+	// Consulta los registros a actualizar
+	cout << tiempo_leer_fecha_corta() << endl;
+	string consulta = "select id_pesaje, numero_placas, fecha, Producto.nombre as producto from PesajesPublicos " 
+					  "join Producto on PesajesPublicos.id_producto = Producto.id_producto where pendiente = 0 and fecha = '";
+	database.open( databaseFile );
+	database.query( consulta + tiempo_leer_fecha_corta() + "'" );
+	database.close();
+
+	// Si no hay resultados regresa
+	if( results.size() > 0 ){
+		for( unordered_map< string, string > *pesaje : results ){
+			GError *error = nullptr;
+			GtkBuilder *builder = gtk_builder_new();
+			GdkPixbuf *imagen = nullptr;
+			
+			// Clave del registro
+			if( gtk_builder_add_from_file( builder, "../recursos/interfaces/ElementoTicketPublico.glade", &error ) == 0 ){
+				throw runtime_error( "Ha ocurrido un error al caragar ElementoTicketPublico.glade" );
+			}
+
+			string id_pesaje = (*pesaje)[ "id_pesaje" ];
+
+			gtk_widget_set_name( GTK_WIDGET( gtk_builder_get_object( builder, "Pesaje" ) ), (*pesaje)[ "id_pesaje" ].c_str() );
+			gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajeFolio" ) ), (*pesaje)[ "id_pesaje" ].c_str() );
+			gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajePlaca" ) ), (*pesaje)[ "numero_placas" ].c_str() );
+			gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajeFecha" ) ), (*pesaje)[ "fecha" ].c_str() );
+			gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajeProducto" ) ), (*pesaje)[ "producto" ].c_str() );
+				
+			gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( "ContenedorRegistrosPesaje" ) ), GTK_WIDGET( gtk_builder_get_object( builder, "Pesaje" ) ), stoi( id_pesaje.c_str() ) );
+		}
+	}
+
+	database.open( databaseFile );
+	consulta = "select count( id_pesaje ) as cuenta from PesajesPublicos where fecha = '";
+	database.query( consulta + tiempo_leer_fecha_corta() + "'" );
+	database.close();
+	if( results.size() > 0 ){
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsContados" ) ), (* results.at( 0 ))[ "cuenta" ].c_str() );
+	}
+
+	conectar_senal( senal_pesajes_periodo_seleccionar, G_CALLBACK( irHacia ), (void *)"SeleccionarPeriodo" );
+	conectar_senal( senal_pesajes_obtener_seleccionados, G_CALLBACK( publico_registros_listar_rango ), nullptr );
+	conectar_senal( senal_pesajes_exportar_seleccionados, G_CALLBACK( publico_registros_exportar ), nullptr );
+	conectar_senal( senal_pesajes_seleccionar, G_CALLBACK( publico_seleccionar ), nullptr );
+	
+	irA( "Pesajes", false );
+}
+
+void publico_seleccionar( GtkWidget *widget, GtkListBoxRow *row, gpointer data ){
+	cout << "publico_seleccionar" << endl;
+	// Obtiene el folio del registro de pesaje
+	unsigned int folio = obtenerFolioSelector( row );
+
+	string consulta = "select id_pesaje, fecha, Producto.nombre as producto, numero_placas, nombre_conductor, hora_entrada, hora_salida, peso_bruto, peso_tara, peso_neto, entrada_manual "
+					  "from PesajesPublicos join Producto on Producto.id_producto = PesajesPublicos.id_producto " 
+					  "where id_pesaje = ";
+
+	// Obtiene el registro de pesaje
+	database.open( databaseFile );
+	database.query( consulta + to_string( folio ) );
+	database.close();
+	if( results.size() > 0 ){
+		// Obtiene el pesaje
+		unordered_map< string, string > *pesaje = results.at( 0 );
+
+		// Folio
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ), (* pesaje)[ "id_pesaje" ].c_str() );
+		
+		// Fecha
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "FechaPublico" ) ), (* pesaje)[ "fecha" ].c_str() );
+		
+		// Producto
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreProductoPublico" ) ), (* pesaje)[ "producto" ].c_str() );
+		
+		// Nombre del conductor
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreConductorPublico" ) ), (* pesaje)[ "nombre_conductor" ].c_str() );
+		
+		// Numero de placas
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "NumeroPlacasPublico" ) ), (* pesaje)[ "numero_placas" ].c_str() );
+		
+		// Hora entrada y Peso Bruto
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraEntradaPublico" ) ), (* pesaje)[ "hora_entrada" ].c_str() );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoBrutoPublico" ) ), ((* pesaje)[ "peso_bruto" ] + " Kg.").c_str() );
+		
+		// Hora salida y Peso Tara
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "HoraSalidaPublico" ) ), (* pesaje)[ "hora_salida" ].c_str() );
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoTaraPublico" ) ), ((* pesaje)[ "peso_tara" ] + " Kg." ).c_str() );
+		
+		// Peso neto
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "PesoNetoPublico" ) ), ((* pesaje)[ "peso_neto" ] + "Kg.").c_str()  );
+
+		// 
+		gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreBasculistaPublico" ) ), ( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() ).c_str() );
+
+		gtk_widget_hide( GTK_WIDGET( buscar_objeto( "EntradaManualPublico" ) ) );
+		if( ( stoi( (* pesaje)[ "entrada_manual" ] ) ) ){
+			gtk_widget_show( GTK_WIDGET( buscar_objeto( "EntradaManualPublico" ) ) );
+		}
+
+		// Conecta las señales
+		conectar_senal( senal_publico_editar_pendiente, G_CALLBACK( publico_pendiente_guardar_edicion ), nullptr );
+		conectar_senal( senal_publico_eliminar, G_CALLBACK( app_alerta ), (void *)"¿Deseas eliminar este registro?" );
+		conectar_senal( senal_publico_imprimir, G_CALLBACK( publico_hacer_impresion ), nullptr );
+		conectar_senal( botonSi, G_CALLBACK( publico_eliminar ), nullptr );
+
+		irA( "PesajePublico", false );
+	}
+}
+
+void publico_eliminar( GtkWidget *widget, gpointer info ){
+	// Obtiene el folio del elemento a eliminar
+	unsigned long folio = stoul( gtk_label_get_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ) ) );
+
+	// Obtiene la cantidad extraída del producto
+	database.open( databaseFile );
+	database.query( "delete from PesajesPublicos where id_pesaje = " + to_string( folio ) );
+	database.close();
+
+	// Cierra la ventana
+	gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
+
+	//
+	publico_registros_listar_rango( nullptr, nullptr );
+
+	// Muestra el mensaje de éxito
+	app_mostrar_exito( "Pesaje eliminado correctamente." );
 }
 
 void publico_registros_actualizar_pendientes( void ){
@@ -144,7 +531,8 @@ void publico_registros_actualizar_pendientes( void ){
 
 	// Consulta los registros a actualizar
 	database.open( databaseFile );
-	database.query( "select * from PesajesPublicos where pendiente = 1" );
+	database.query( "select id_pesaje, numero_placas, fecha, Producto.nombre as producto from PesajesPublicos "
+ 					"join Producto on PesajesPublicos.id_producto = Producto.id_producto where pendiente = 1" );
 	database.close();
 
 	// Si no hay resultados regresa
@@ -168,207 +556,71 @@ void publico_registros_actualizar_pendientes( void ){
 		gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajeFolio" ) ), (*pesaje)[ "id_pesaje" ].c_str() );
 		gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajePlaca" ) ), (*pesaje)[ "numero_placas" ].c_str() );
 		gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajeFecha" ) ), (*pesaje)[ "fecha" ].c_str() );
-
-		// Busca la imagen del producto y la establece
-		database.open( databaseFile );
-		database.query( "select nombre from Producto where id_producto = " + (*pesaje)[ "id_producto" ] );
-		database.close();
-		if( results.size() > 0 ){
-			unordered_map< string, string > *producto = results.at( 0 );
-			gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajeProducto" ) ), (*pesaje)[ "nombre" ].c_str() );
-		}
+		gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajeProducto" ) ), (*pesaje)[ "producto" ].c_str() );
 			
 		gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( "ContenedorPesajesPendientes" ) ), GTK_WIDGET( gtk_builder_get_object( builder, "Pesaje" ) ), stoi( id_pesaje.c_str() ) );
 	}
 }
 
-// Finalizar ticket
-void publicoFinalizarPendiente()
-{
-	// Bandera que indica si se va a actualizar o registrar el nuevo ticket
-	bool esRegistroNuevo = false;
+void publico_registros_listar_rango(GtkWidget *widget, gpointer info ){
+	cout << "publico_registros_listar_rango" << endl;
+	// Limpia el contenedor
+	limpiar_contenedor( "ContenedorRegistrosPesaje" );
 
-	// Crea el nuevo registro
-	TicketPublico *registroPublico;
-
-	try{
-		// Revisa si el ticket con el folio indicado existe como pendiente, si no, se crea uno nuevo
-		registroPublico = buscarRegistroPublicoPorFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ) ) ), registrosPublicosPendientes );
-		if( registroPublico == nullptr ){
-			++folioActualPublico;
-			esRegistroNuevo = true;
-			registroPublico = new TicketPublico();
-			registroPublico -> establecerFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ) ) ) );
-		}
-
-		// Obtiene el producto introducido
-   		string nombreProducto = gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ) );
-    	Registro *producto = productos.buscarRegistroPorNombre( nombreProducto );
-
-    	// Establece los datos obligatorios
-		registroPublico -> establecerFecha( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFechaPublico" ) ) ) );
-		registroPublico -> establecerProducto( producto == nullptr ? productos.agregarNuevoRegistro( nombreProducto ) : producto );
-		registroPublico -> establecerNombreConductor( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNombreConductoPublico" ) ) ) );
-		registroPublico -> establecerNumeroPlacas( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ) ) );
-		registroPublico -> establecerEntradaManual( 0 );//lectorBascula.lecturaManualActivada() );
-		registroPublico -> establecerNombreBasculista( usuario.obtenerNombre() + " " + usuario.obtenerApellidos() );
-
-		// Registra el tipo de registro
-		if( gtk_toggle_button_get_active( GTK_TOGGLE_BUTTON( buscar_objeto( "ViajeLocal" ) ) ) ){
-	    	registroPublico -> establecerTipoViaje( VIAJE_LOCAL );
-		}
-		else{
-	    	registroPublico -> establecerTipoViaje( VIAJE_FORANEO );
-		}
-
-		// Registra el peso bruto
-		registroPublico -> establecerPesoBruto( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ) ) );
-		registroPublico -> establecerHoraEntrada( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraEntradaPublico" ) ) ) );
-		registroPublico -> establecerPesoBrutoEstablecido( true );
-
-		// Registra el peso tara
-		registroPublico -> establecerPesoTara( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ) ) );
-		registroPublico -> establecerHoraSalida( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ) ) );
-		registroPublico -> establecerPesoTaraEstablecido( true );
-
-		// Registra el peso neto
-		// ¿Están establecidos el peso bruto y el peso tara?
-		if( registroPublico -> estaPesoBrutoEstablecido() && registroPublico -> estaPesoTaraEstablecido() ){
-			registroPublico -> establecerPesoNeto( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ) ) );
-			registroPublico -> establecerPesoNetoEstablecido( true );
-		}
-		else{
-			app_mostrar_error( "No se han establecido todos los campos necesarios para\nregistrar el peso neto." );
-			if( esRegistroNuevo ){
-				delete registroPublico;
-				registroPublico = nullptr;
-				folioActualPublico--;
-			}
-			return;
-		}
-
-		// Registro correcto, ya no es un registro pendiente
-		registroPublico -> establecerPendiente( false );
-
-		// Finaliza el registro
-		finalizarRegistroPublico( registroPublico, esRegistroNuevo );
-
-		// Actualiza la vista de tickets
-		publicoActualizarRegistros( registrosPublicosPendientes, "ContenedorTickets" );
-		
-		// Indica que se creo correctamente el registro
-		app_mostrar_error( "Registro finalizado. Se creará formato de impresión si se encuentra habilitado." );
-
-		// Establece las vistas
-		regresarVista();
-	}
-	catch( invalid_argument &ia ){
-		app_mostrar_error( ia.what() );
-		if( esRegistroNuevo ){
-			delete registroPublico;
-			registroPublico = nullptr;
-			folioActualPublico--;
-		}
-	}
-}
-
-// Registra el peso bruto
-void publicoRegistrarPesoBruto()
-{
-	// Registra el peso bruto
-	//basculaRegistrarPeso( "EntradaPesoBrutoPublico", "EntradaHoraEntradaPublico" );
-	
-    // Intenta calcular el peso neto
-    publicoActualizarPesoNeto();
-}
-
-// Registra el peso tara
-void publicoRegistrarPesoTara()
-{
-	// Registra el peso tara
-	//basculaRegistrarPeso( "EntradaPesoTaraPublico", "EntradaHoraSalidaPublico" );
-    
-    // Calcula el peso neto
-    publicoActualizarPesoNeto();
-}
-
-//
-double publicoCalcularPesoNeto( double pesoBruto, double pesoTara )
-{
-	return abs( pesoBruto - pesoTara );
-}
-
-// Actualiza el peso neto
-void publicoActualizarPesoNeto()
-{
-	// Variables
-	double pesoBruto;
-	double pesoTara;
-	bool completo = true;
-
-	// Intenta obtener el peso bruto leído
-	try{
-		pesoBruto = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoBrutoPublico" ) ) ) );
-	}
-	catch( invalid_argument &ia ){
-		completo = false;
-	}
-
-	// Intenta obtener el peso tara
-	try{
-		pesoTara = stod( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaPesoTaraPublico" ) ) ) );
-	}
-	catch( invalid_argument &ia ){
-		completo = false;
-	}
-
-	// Intenta calculara el peso neto
-	if( completo ){
-		gtk_widget_hide( GTK_WIDGET( buscar_objeto( "MensajeError" ) ) );
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), pesoString( publicoCalcularPesoNeto( pesoBruto, pesoTara ), 2 ).c_str() );
-	}
-	else{
-		// No pasa nada, solo indicamos que no se estableció el peso neto e impedimos que lo registre como finalizado
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoInterno" ) ), "No establecido" );
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "BotonRegistrarInterno" ) ), "Pendiente" );
-	}
-}
-
-// Cancela la finalización publico
-void publicoCancelarFinalizacion()
-{
-    registroPublico = nullptr;
-	
-    regresarVista();
-}
-
-// Obtiene los tickets del día seleccionado
-void publicoSeleccionarDia()
-{
-	// Variables de la fecha del dia seleccionado
-	unsigned int dia, mes, anio;
+	// Variables de la fecha de los días seleccionado
+	unsigned int diaInicio, mesInicio, anioInicio;
+	unsigned int diaFin, mesFin, anioFin;
 
 	// Obtiene la fecha
-	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "EntradaDiaConsultar" ) ), &dia, &mes, &anio );
+	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "FechaInicio" ) ), &diaInicio, &mesInicio, &anioInicio );
+	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "FechaFin" ) ), &diaFin, &mesFin, &anioFin );
 
-	// Obtiene los tickets de la fecha seleccionada
-	publicoObtenerPorFecha( registrosPublicosConsultados, tiempo_construir_fecha( dia, mes + 1, anio ) );
+	stringstream consulta;
+	consulta << "select id_pesaje, numero_placas, fecha, Producto.nombre as producto from PesajesPublicos join Producto on PesajesPublicos.id_producto = Producto.id_producto "
+			 << " where fecha between '" << tiempo_construir_fecha( diaInicio, mesInicio + 1, anioInicio ) << "' and '" << tiempo_construir_fecha( diaFin, mesFin + 1, anioFin ) << "' "
+			 << " order by fecha";
 
-	// Establece la fecha del ticket que se está consultando
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsRegistrados" ) ), ( "Registros del día " + tiempo_construir_fecha( dia, mes, anio ) + ":" ).c_str() );
+			 cout << consulta.str() << endl;
 
-	// Establece el número de tickets
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "TicketsContados" ) ), ( to_string( registrosPublicosConsultados.size() ) + " registros" ).c_str() );
+	// Consulta los registros a actualizar
+	database.open( databaseFile );
+	database.query( consulta.str() );
+	database.close();
 
-	// Actualiza la lista de tickets
-	publicoActualizarRegistros( registrosPublicosConsultados, "ContenedorRegistrosPesaje" );
-
-	// Regresa a la vista anterior
 	regresarVista();
+
+	// Si no hay resultados regresa
+	if( results.size() > 0 ){
+		for( unordered_map< string, string > *pesaje : results ){
+			GError *error = nullptr;
+			GtkBuilder *builder = gtk_builder_new();
+			GdkPixbuf *imagen = nullptr;
+			
+			// Clave del registro
+			if( gtk_builder_add_from_file( builder, "../recursos/interfaces/ElementoTicketPublico.glade", &error ) == 0 ){
+				throw runtime_error( "Ha ocurrido un error al caragar ElementoTicketPublico.glade" );
+			}
+
+			string id_pesaje = (*pesaje)[ "id_pesaje" ];
+
+			gtk_widget_set_name( GTK_WIDGET( gtk_builder_get_object( builder, "Pesaje" ) ), (*pesaje)[ "id_pesaje" ].c_str() );
+			gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajeFolio" ) ), (*pesaje)[ "id_pesaje" ].c_str() );
+			gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajePlaca" ) ), (*pesaje)[ "numero_placas" ].c_str() );
+			gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajeFecha" ) ), (*pesaje)[ "fecha" ].c_str() );
+			gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ElementoPesajeProducto" ) ), (*pesaje)[ "producto" ].c_str() );
+				
+			gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( "ContenedorRegistrosPesaje" ) ), GTK_WIDGET( gtk_builder_get_object( builder, "Pesaje" ) ), stoi( id_pesaje.c_str() ) );
+		}
+
+		app_mostrar_exito( "Registros encontrados." );
+	}
+	else{
+		app_mostrar_error( "No se encontraron registros en el perido seleccionado." );
+	}
 }
 
-void publicoObtenerRegistrosRango()
-{
+void publico_registros_exportar( GtkWidget *widget, gpointer info ){
+	cout << "publico_registros_exportar" << endl;
 	// Muestra un mensaje que indica que se está generando el informe
 	app_mostrar_mensaje( "Obteniendo registros.\nPor favor espere.");
 
@@ -377,146 +629,173 @@ void publicoObtenerRegistrosRango()
 	unsigned int diaFin, mesFin, anioFin;
 
 	// Obtiene las fechas
-	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "FechaInformeInicio" ) ), &diaInicio, &mesInicio, &anioInicio  );
-	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "FechaInformeFin" ) ), &diaFin, &mesFin, &anioFin );
+	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "FechaInicio" ) ), &diaInicio, &mesInicio, &anioInicio  );
+	gtk_calendar_get_date( GTK_CALENDAR( buscar_objeto( "FechaFin" ) ), &diaFin, &mesFin, &anioFin );
 
 	// Consulta a realizar
-    string consulta = "select folio, fecha, tipo_viaje, nombre_producto, numero_placas, nombre_conductor, hora_entrada, "
-    				  "hora_salida, peso_bruto, peso_tara, peso_neto, entrada_manual, nombre_basculista "
-    				  "from registros_publicos join productos on registros_publicos.clave_producto = productos.clave_producto "
+    string consulta = "select id_pesaje, fecha, Producto.nombre, numero_placas, nombre_conductor, hora_entrada, "
+    				  "hora_salida, peso_bruto, peso_tara, peso_neto, entrada_manual, Usuario.nombre "
+    				  "from PesajesPublicos join Producto on PesajesPublicos.id_producto = Producto.id_producto "
+					  "join Usuario on Usuario.id_usuario = PesajesPublicos.id_basculista "
     				  "where pendiente = 0 and fecha between '" + tiempo_construir_fecha( diaInicio, mesInicio + 1, anioInicio ) + 
     				  "' and '" + tiempo_construir_fecha( diaFin, mesFin + 1, anioFin ) + "' " + "order by fecha";
     
 	// Realiza la consulta y envía los resultados al archivos
 	database.open( databaseFile );
-	database.query( consulta, "../resources/data/Registros.csv" );
+	database.query( consulta, "../recursos/datos/Registros.csv" );
     database.close();
 
-    ShellExecute(NULL, "open", "../resources/data/Registros.csv", NULL, NULL, SW_HIDE );
+    ShellExecute(NULL, "open", "../recursos/datos/Registros.csv", NULL, NULL, SW_HIDE );
+	app_mostrar_exito( "Datos exportados correctamente." );
 	regresarVista();
 }
 
-// Obtiene los registros de la fecha seleccionada
-void publicoObtenerPorFecha( list< TicketPublico * > &registros, std::string fecha )
-{
-	// Limpia la lista de los registros a consultar
-	limpiarRegistrosPublicos( registrosPublicosConsultados );
-	
-	// Conecta con la base de datos
-	database.open( databaseFile );
+static void publico_hacer_impresion( GtkWidget* widget, GtkWidget* info ){
+    GtkPrintOperation *print = nullptr;
+    GtkPrintOperationResult res;
+    GError *error;
 
-	// Genera el comando de consulta para obtener los tickets
-	string consulta = "select * from registros_publicos where pendiente = 0 and fecha = '" + fecha + "'";
-
-	// Realiza la consulta
-	database.query( consulta );
-
-	// ¿Hay resultados?
-	if( results.size() > 0 ){
-		for( auto row : results ){
-			try{
-				Registro *producto = productos.buscarRegistroPorClave( stoi( (* row)[ "clave_producto" ] ) );
-
-				// Crea el nuevo ticket
-				TicketPublico *ticket = new TicketPublico( row, producto );
-    				
-    		    // Lo agrega al campo de registros internos pendientes
-    		    registros.push_back( ticket );
-    	    }
-    	    catch( invalid_argument &ia ){
-    			cerr << ia.what() << endl;
-    	    }
-		}
-	}
-	else{
-		app_mostrar_mensaje( "No se encontraron registros del día seleccionado." );
-	}
-
-	// Cierra la base de datos
-	database.close();
-}
-
-// Actualiza los registros publicos pendientes
-void publicoActualizarRegistros( list< TicketPublico * > &ticketsPublicos, std::string idContenedor )
-{
-    // Limpia el contenedor
-	limpiar_contenedor( idContenedor );
-
-    // Itera a través de la lista de tickets pendientes y crea los tickets necesarios
-    for( list< TicketPublico * >::iterator ticket = ticketsPublicos.begin(); ticket != ticketsPublicos.end(); ticket++ ){
-		// Crea un elemento que será añadido a la interfaz
-		GtkBuilder *builder = gtk_builder_new();
-		GError *error = NULL;
-
-		stringstream clave;
-		clave << setfill( '0' ) << setw( 7 ) << (*ticket) -> obtenerFolio();
-
-		try{
-			if( gtk_builder_add_from_file( builder, "../recursos/interfaces/ElementoTicketPublico.glade", &error ) != 0 ){
-				gtk_widget_set_name( GTK_WIDGET( gtk_builder_get_object( builder, "Ticket" ) ), to_string( (*ticket) -> obtenerFolio() ).c_str() );
-				gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaFolioInterno" ) ), clave.str().c_str() );
-				gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaFechaInterno" ) ), (*ticket) -> obtenerFecha().c_str() );
-				gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaProductoInterno" ) ), (*ticket) -> obtenerProducto() -> obtenerNombre().c_str() );
-				gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaPlacaInterno" ) ), (*ticket) -> obtenerNumeroPlacas().c_str() );
-
-				gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( idContenedor ) ), GTK_WIDGET( buscar_objeto( "Ticket" ) ), (*ticket) -> obtenerFolio() );
-			}
-	    }
-	    catch( runtime_error &re ){
-		    cerr << re.what() << endl;
-	    }
-
+    print = gtk_print_operation_new();
+    if( print == nullptr ){
+        throw runtime_error( "Ah ocurrido un error al crear la configuración de la impresora." );
     }
+
+	GtkPrintSettings *settings = gtk_print_settings_new();
+    gtk_print_operation_set_n_pages(print, 1);
+
+    guint senal = g_signal_connect(print, "draw_page", G_CALLBACK( publico_imprimir ), info );
+
+    res = gtk_print_operation_run( print, GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG, GTK_WINDOW( gtk_builder_get_object( builder, "VentanaPrincipal" ) ), NULL);
+
+    if (res == GTK_PRINT_OPERATION_RESULT_APPLY){
+        if (settings != NULL){
+            g_object_unref (settings);
+        }
+
+        settings = GTK_PRINT_SETTINGS(g_object_ref (gtk_print_operation_get_print_settings (print)));
+    }
+
+    g_object_unref( print );
 }
 
-// Eliminar el registro seleccionado
-void publicoEliminarSeleccionado()
-{
-	// Elimina el registro de la base de datos
+static void publico_imprimir(GtkPrintOperation *operation, GtkPrintContext *context, int page_nr, GtkWidget *data){
+    cout << "publico_imprimir" << endl;
+    unsigned long folio = stoul( gtk_label_get_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ) ) );
+	unordered_map< string, string > pesaje;
+	unordered_map< string, string > empresa;
+	string domicilio = "\n";
+
+	string consulta = "select id_pesaje, fecha, Producto.nombre as producto, numero_placas, nombre_conductor, hora_entrada, hora_salida, peso_bruto, peso_tara, peso_neto "
+					  "from PesajesPublicos join Producto on Producto.id_producto = PesajesPublicos.id_producto " 
+					  "where id_pesaje = " + to_string( folio );
+
+	// Obtiene el registro
 	database.open( databaseFile );
-
-	// Comando de consulta
-	string consulta = "delete from registros_publicos where folio = " + to_string( registroPublico -> obtenerFolio() );
 	database.query( consulta );
-
+	if( results.size() > 0 ){
+		pesaje = (* results.at( 0 ) );
+	}
+	database.query( "select * from EmpresaPropia where id_empresa = 1" );
+	if( results.size() > 0 ){
+		empresa = (* results.at( 0 ) );
+	}
+	database.query( "select * from DomicilioEmpresaPropia" );
+	if( results.size() > 0 ){
+		unordered_map< string, string > resultado = (* results.at( 0 ));
+		domicilio = resultado[ "calle" ] + " " + resultado[ "numero" ] + ", " + resultado[ "colonia" ] + " " +
+					resultado[ "codigo_postal" ] + ", " + resultado[ "municipio" ] + ", " + resultado[ "estado" ] + ", " +
+					resultado[ "pais" ] + "\n";
+	}
 	database.close();
 
-	// Elimina el registro de la lista
-	if( registroPublico != nullptr ){
-		registrosPublicosConsultados.remove( registroPublico );
-		delete registroPublico;
-		registroPublico = nullptr;
-	}
-	else{
-		cerr << "Alerta, intento de eliminación de un registro nulo." << endl;
-	}
+	// Ancho y alto de la página
+	gdouble ancho, alto;
+	GdkRGBA color;
+	int a, b, c;
 
-	// Muestra un mensaje que indica que el registro fue eliminado correctamente
-	app_mostrar_mensaje( "Registro eliminado" );
+	// Obtiene el contexto de impresión
+	cairo_t *cr = gtk_print_context_get_cairo_context( context );
+	
+	// Obtiene las dimensiones de la página
+	ancho = gtk_print_context_get_width( context );
+	alto = gtk_print_context_get_height( context );
 
-	// Cierra la ventana
-	gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
+	cairo_move_to (cr, 0, 0);
+	cairo_set_source_rgb( cr, 0, 0, 0 );
 
-	// Redirige hacia la vista de consulta de registros
-	publicoActualizarRegistros( registrosPublicosConsultados, "ContenedorRegistrosPesaje" );
-	irHacia( nullptr, (void *)"Pesajes" );
-}
+	// Crea el formato pango y establece las opciones generales
+	PangoLayout* layout = gtk_print_context_create_pango_layout(context);
+	PangoFontDescription *fuente = pango_font_description_from_string( "sans 8" );
+	pango_layout_set_font_description( layout, fuente );
+	pango_font_description_free( fuente );
+	pango_layout_set_single_paragraph_mode( layout, FALSE );
+	pango_layout_set_width( layout, ancho * PANGO_SCALE );
+	pango_layout_set_wrap (layout, PANGO_WRAP_WORD);
+	
+	string texto = empresa[ "razon_social" ] + "\n" + domicilio;
 
-// Manda a imprimir el registro interno seleccionado
-void publicoImprimirSeleccionado()
-{
-	// Busca el ticket publico y lo imprime
-	TicketPublico *registroPublico = buscarRegistroPublicoPorFolio( stoi( gtk_label_get_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ) ) ), registrosPublicosConsultados );
-	if( registroPublico != nullptr ){
-		registroPublico -> imprimir( empresa_razon_social );
+	// 
+	pango_layout_set_alignment (layout, PANGO_ALIGN_CENTER);
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_layout_get_pixel_size( layout, &a, &b );
 
-		app_mostrar_mensaje( "Formato de impresión creado." );
-	}
-}
+	pango_cairo_layout_path( cr, layout );
+	cairo_move_to (cr, 0, b );
 
-void publicoGenerarInforme()
-{
-	app_mostrar_mensaje( "Los informes para registros públicos\nno están disponibles." );
+	texto = "Folio: " + pesaje[ "id_pesaje" ] + "\n";
+	pango_layout_set_alignment (layout, PANGO_ALIGN_RIGHT);
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	pango_layout_get_pixel_size( layout, &a, &c );
+	cairo_move_to( cr, 0, b );
+
+	texto = "Fecha: " + pesaje[ "fecha" ] + "\n";
+	pango_layout_set_alignment( layout, PANGO_ALIGN_LEFT );
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	pango_layout_get_pixel_size( layout, &a, &c );
+	b = b + c;
+	cairo_move_to( cr, 0, b );
+
+	// Derecha
+	texto = "Producto: " + pesaje[ "producto" ] + "\n\n"
+			"Conductor: " + pesaje[ "nombre_conductor" ] + "\n";
+	
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	pango_layout_get_pixel_size( layout, &a, &c );
+	b = b + c;
+	cairo_move_to( cr, 0, b );
+
+	texto = "Peso bruto: \n"
+			"Peso tara: \n\n"
+			"Peso neto: \n";
+
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	cairo_move_to( cr, 0, b );
+
+	texto = pesaje[ "peso_bruto" ] + " Kg\n" +
+			pesaje[ "peso_tara" ]  +" Kg\n\n" +
+			pesaje[ "peso_neto" ] + " Kg\n";
+
+	pango_layout_set_alignment (layout, PANGO_ALIGN_RIGHT);
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	b = b + c;
+	cairo_move_to( cr, 0, b );
+
+	texto = "\n\n\n_________________________\n"
+			"Autoriza\n\n"
+			"Realizado con Sistema de Control de Báscula\n";
+	pango_layout_set_alignment( layout, PANGO_ALIGN_CENTER );
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	b = b + c;
+	cairo_move_to( cr, 0, b );
+
+    //
+    cairo_fill (cr);
 }
 
 // VALIDACION DE DATOS

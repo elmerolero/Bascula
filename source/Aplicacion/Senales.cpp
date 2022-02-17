@@ -3,7 +3,7 @@
 #include "Sesion.h"
 #include "Funciones.h"
 #include "GestorRegistros.h"
-#include "RegistrosInternos.h"
+#include "PesajesInternos.h"
 #include "PesajesPublicos.h"
 #include "Producto.h"
 #include "Widget.h"
@@ -16,7 +16,6 @@ Signal botonUsuarios{ "BotonUsuarios", "clicked", 0 };
 Signal botonRegistrosEmpresas{ "BotonRegistrosEmpresas", "clicked", 0 };
 Signal botonRegistrosProductos{ "BotonRegistrosProductos", "clicked", 0 };
 Signal botonRegistrosPesajesInternos{ "BotonRegistrosPesajesInternos", "clicked", 0 };
-Signal botonRegistrosBasculaPublica{ "BotonRegistrosBasculaPublica", "clicked", 0 };
 
 /* SEÑALES BASE (son necesarias para iniciar en el programa */
 Signal enlaceRegresar{ "EnlaceRegresar", "activate-link", 0 };
@@ -69,13 +68,6 @@ Signal entradaNumeroPlacasInterno{ "EntradaNumeroPlacasInterno", "insert-text", 
 Signal botonCalcularDescuento{ "BotonCalcularDescuento", "clicked", 0 };
 Signal opcionDescuentoInterno{ "NoDescuentoInterno", "toggled", 0 };
 Signal opcionRegistraEntrada{ "RegistraEntrada", "toggled", 0 };
-
-// Nuevo para ticket publico
-Signal entradaNumeroPlacasPublico{ "EntradaNumeroPlacasPublico", "insert-text", 0 };
-Signal botonLeerPesoBrutoPublico{ "BotonLeerPesoBrutoPublico", "clicked", 0 };
-Signal botonLeerPesoTaraPublico{ "BotonLeerPesoTaraPublico", "clicked", 0 };
-Signal botonRegistrarPendientePublico{ "BotonRegistrarPendientePublico", "clicked", 0 };
-Signal botonFinalizarPendientePublico{ "BotonFinalizarPendientePublico", "clicked", 0 };
     
 // Vista que solicita la contrasena
 Signal botonPermitirCambios{ "BotonPermitirCambios", "clicked", 0 };
@@ -107,26 +99,21 @@ Signal botonRegistroCancelarEdicion{ "BotonRegistroCancelarEdicion", "clicked", 
 // Noc
 Signal imprimirRegistroPublico{ "ImprimirRegistroPublico", "clicked", 0 };
 Signal eliminarRegistroInterno{ "EliminarRegistroInterno", "clicked", 0 };
-Signal eliminarRegistroPublico{ "EliminarRegistroPublico", "clicked", 0 };
 Signal botonRegistroGuardarNuevo{ "BotonRegistroGuardarNuevo", "clicked", 0 };
 Signal botonRegistroCancelarNuevo{ "BotonRegistroCancelarNuevo", "clicked", 0 };
 Signal botonSi{ "BotonSi", "clicked", 0 };
 Signal botonNo{ "BotonNo", "clicked", 0 };
 
-Signal botonRegistrosPesajeSeleccionarDia{ "BotonRegistrosPesajeSeleccionarDia", "clicked", 0 };
 Signal botonRegistrosPesajeObtenerInforme{ "BotonRegistrosPesajeObtenerInforme", "clicked", 0 };
 Signal entradaRegistrosPesajeFolio{ "EntradaRegistrosPesajeFolio", "activate", 0 };
 Signal botonRegistrosPesajeConsultarRegistro{ "BotonRegistrosPesajeConsultarRegistro", "clicked" };
 
 Signal botonConsultarDia{ "BotonConsultarDia", "clicked", 0 };
-Signal botonObtenerRegistrosRango{ "BotonObtenerRegistrosRango", "clicked", 0 };
 Signal botonObtenerRegistros{ "BotonObtenerRegistros", "clicked", 0 };
 
 Signal botonEliminarUsuario{ "BotonEliminarUsuario", "clicked", 0 };
 Signal botonCambiarContrasena{ "BotonCambiarContrasena", "clicked", 0 };
 Signal entradaReemplazarConfirmacion{ "EntradaReemplazarConfirmacion", "activate", 0 };
-
-Signal ticketsConsultadosSeleccionados{ "ContenedorRegistrosPesaje", "row-activated", 0 };
 
 // Ventana lector peso
 Signal ventanaLectorPeso{ "VentanaLectorPeso", "delete-event", 0 };

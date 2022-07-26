@@ -13,6 +13,9 @@ using namespace std;
 
 Signal senal_producto_imagen_seleccionar = { "EnlaceProductoCambiarFoto", "activate-link", 0 };
 
+// Lista de productos registrados
+GtkListStore *listaProductos = nullptr;
+
 Signal senal_producto_nuevo = { "BotonRegistroNuevo", "clicked", 0 };
 Signal senal_producto_guardar_nuevo = { "BotonRegistroGuardarNuevo", "clicked", 0 };
 Signal senal_producto_cancelar_nuevo = { "BotonRegistroCancelarNuevo", "clicked", 0 };
@@ -44,6 +47,26 @@ void producto_conectar_senales( void ){
     conectar_senal( senal_producto_imagen_seleccionar, G_CALLBACK( seleccionar_archivo ), nullptr );
     conectar_senal( senal_imagen_guardar_edicion, G_CALLBACK( producto_escribir_imagen ), nullptr );
     conectar_senal( senal_imagen_cancelar_edicion, G_CALLBACK( imagen_cancelar ), nullptr );
+}
+
+// Obtiene una lista con el nombre de los productos para un autocompletador
+void producto_obtener_registros( void ){
+    // Crea una nueva lista
+    listaProductos = gtk_list_store_new( 1, G_TYPE_STRING );
+
+    // Obtiene el nombre de todos los productos
+    database.open( databaseFile );
+    database.query( "select nombre from Producto" );
+    database.close();
+
+    // ¿Hay resultados?
+    if( results.size() > 0 ){
+        for( auto producto : results ){
+            GtkTreeIter iterador;
+            gtk_list_store_append( listaProductos, &iterador );
+            gtk_list_store_set( listaProductos, &iterador, 0, ( (* producto)[ "nombre" ] ).c_str(), -1 );
+        }
+    }
 }
  
 void producto_desconectar_senales( GtkWidget *widget, gpointer info ){

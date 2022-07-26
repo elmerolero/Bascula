@@ -88,21 +88,12 @@ void cargarInformacion()
     try{
         // Carga el nombre de la empresa
         empresa_leer_informacion();
-
-        // Obtiene los tickets registrados y pendientes
-        /*obtenerFolioActualInterno();
-        obtenerFolioActualPublico();
-        obtenerRegistrosInternosPendientes();
-        obtenerRegistrosPublicosPendientes();
         
-        // Obtine los registros de completado de conductor y numero de placas
-        actualizarElementosLista( &listaNombresConductor, &completadorNombresConductor, "nombre_conductor" );
-        actualizarElementosLista( &listaNumerosPlaca, &completadorNumerosPlaca, "numero_placas" );
-        gtk_entry_set_completion( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorInterno" ) ), completadorNombresConductor ); 
-        gtk_entry_set_completion( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasInterno" ) ), completadorNumerosPlaca  );*/
+        empresa_obtener_registros();
+        producto_obtener_registros();
+        interno_iniciar();
+        publico_iniciar();
 
-        // Carga la configuración de la bascula
-        //cargarOpcionesImpresion();
         basculaObtenerPuertosDisponibles();
     }
     catch( runtime_error re ){
@@ -134,6 +125,9 @@ void conectarSenalesBase()
     // Ventana que contiene un mensaje
     conectar_senal( botonAceptar, G_CALLBACK( app_aceptar_mensaje ), nullptr );
     conectar_senal( botonNo, G_CALLBACK( cancelarAccion ), nullptr );
+
+    // Ventana de edición de imagen
+    conectar_senal( senal_imagen_cancelar_edicion, G_CALLBACK( imagen_cancelar ), nullptr );
 }
 
 // Conecta las señales de cada una de las vistas
@@ -142,16 +136,10 @@ void conectarSenales()
     // Vista Inicio
     conectar_senal( enlaceCreditos, G_CALLBACK( irHacia ), (void *)"Creditos" );
     conectar_senal( botonConfiguracion, G_CALLBACK( vistaConfiguracion ), nullptr );
-    
-    // Barra de usuario
-    conectar_senal( botonActualizarCuenta, G_CALLBACK( autorizarCambios ), nullptr );
 
     // Vista seleccion servicio
     conectar_senal( senal_publico_pendientes_listar, G_CALLBACK( publico_registros_listar_pendientes ), nullptr );
     conectar_senal( senal_interno_pendientes_listar, G_CALLBACK( interno_registros_listar_pendientes ), nullptr );
-     
-    // Vista que solicita la contrasena
-    conectar_senal( botonPermitirCambios, G_CALLBACK( actualizarDatosUsuario ), nullptr );
 
     // Vista de configuración
     conectar_senal( botonGuardarConfiguracion, G_CALLBACK( guardarConfiguracion ), nullptr );
@@ -159,11 +147,9 @@ void conectarSenales()
 
 //
 void conectarSenalesAdministrador(){
-    // Vista de registro de empresa (primer inicio)
 
     // Vista de registros
     conectar_senal( botonRegistros, G_CALLBACK( irHacia ), (void *)"Registros" );
-    conectar_senal( botonUsuarios, G_CALLBACK( vistaConsultarUsuarios ), nullptr );
 
     // Vista Registros
     conectar_senal( botonRegistrosEmpresas, G_CALLBACK( empresa_listar_registros ), (void *)(&empresas) );

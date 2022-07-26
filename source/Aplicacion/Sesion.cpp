@@ -7,12 +7,15 @@
 #include <ctime>
 #include <string>
 #include <fstream>
+#include "Imagen.h"
 #include "Vistas.h"
 #include "Funciones.h"
 using namespace std;
 
 string nombreUsuario;
 string codigoRecuperacion;
+
+Signal enlaceSesionCerrar{ "EnlaceCerrarSesion", "activate-link", 0 };
 
 void registrarUsuario(){
 	cout << "usuario_registrar" << endl;
@@ -26,7 +29,7 @@ void registrarUsuario(){
 		string confirmacion = Usuario::validarContrasena( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaRegistroConfirmarContrasena" ) ) ) );
 		
 		// Se asegura de que el usuario que se desea registrar no existe
-		nombreUsuarioOcupado( nombreUsuario );
+		usuario_PseudonimoOcupado( nombreUsuario );
 		
 		// Se asegura que las contraseñas introducidas sean iguales
 		Usuario::compararContrasenas( contrasena, confirmacion );
@@ -47,61 +50,6 @@ void registrarUsuario(){
 	}
 	catch( invalid_argument &ia ){
 		app_mostrar_error( ia.what() ); 
-	}
-}
-
-void actualizarDatosUsuario()
-{
-	try{
-		// Lee la contraseña actual y cierra la ventana
-		ocultar_elemento( "VentanaEntradaContrasena" ); 	
-		string contrasenaActual = obtener_texto_entrada( "EntradaContrasenaAutorizacion" );
-		establecer_texto_entrada( "EntradaContrasenaAutorizacion", "" );
-		
-		// Verifica la autenticidad de la contrasena
-		verificarContrasena( contrasenaActual, usuario.obtenerHash() );
-		
-		// Obtiene los datos del formulario
-		string nombre = Usuario::validarNombre( obtener_texto_entrada( "EntradaCuentaNombre" ) );
-		string apellidos = Usuario::validarApellidos( obtener_texto_entrada( "EntradaCuentaApellidos" ) );
-		string nombreUsuario = Usuario::validarNombreUsuario( obtener_texto_entrada( "EntradaCuentaNombreUsuario" ) );
-		string contrasena = obtener_texto_entrada( "EntradaCuentaContrasenaNueva" );
-		string confirmacion = obtener_texto_entrada( "EntradaCuentaContrasenaConfirmacion" );
-		
-		// ¿Se introdujo un nombre de usuario diferente?
-		if( nombreUsuario.compare( usuario.obtenerNombreUsuario() ) != 0 ){
-			nombreUsuarioOcupado( nombreUsuario );
-		}
-		
-		// ¿Se introdujo una nueva contraseña?
-		if( !contrasena.empty() ){
-			// Se asegura que las contraseñas introducidas sean válidas
-			contrasena = Usuario::validarContrasena( contrasena );
-			confirmacion = Usuario::validarContrasena( confirmacion );
-			
-			// Se asegura que las contraseñas introducidas sean iguales
-			cambiarContrasena( usuario.obtenerNombreUsuario(), contrasena, confirmacion );
-		}
-		
-		// Actualiza la información de usuario en el usuario
-		usuario.establecerNombre( nombre );
-		usuario.establecerApellidos( apellidos );
-		usuario.establecerNombreUsuario( nombreUsuario );
-
-		// Actualiza la información en la base de datos
-		database.open( databaseFile );
-		database.query( "update Usuario set nombre = '" + usuario.obtenerNombre() + "', apellidos = '" + usuario.obtenerApellidos() + "', pseudonimo = '" + usuario.obtenerNombreUsuario() + "' where pseudonimo = '" + usuario.obtenerNombreUsuario() + "'" );
-		database.close();
-		
-		// Actuliza los datos de la interfaz
-		gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreUsuario" ) ), ( usuario.obtenerNombre() + "\n" + usuario.obtenerApellidos() ).c_str() );
-		
-		// Muestra que el registro fue exitoso
-		app_mostrar_mensaje( "Datos actualizados de forma exitosa." );
-		usuario_cuenta_leer( nullptr, nullptr );
-	}
-	catch( invalid_argument &ia ){
-		app_mostrar_error( ia.what() );
 	}
 }
 
@@ -135,8 +83,15 @@ void iniciarSesion(){
 			usuario.establecerHash( (* resultado)[ "contrasena" ] );
 			usuario.establecerAdministrador( stoi( (* resultado)[ "administrador" ] ) );
 
+			// Si hay una foto de perfil establecida, la cambia
+			gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenUsuario" ) ), "../recursos/imagenes/iconos/Usuario64.png" );
+			if( (* resultado)[ "imagen" ].compare( "null" ) != 0 ){
+				gtk_image_set_from_pixbuf( GTK_IMAGE( buscar_objeto( "ImagenUsuario" ) ), imagen_cargar_escalar( "../recursos/imagenes/usuarios/" + (* resultado)[ "imagen" ], 60, 60 ) );
+			}
+
 			// Muestra al usuario
-			mostrarUsuario();
+			gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreUsuario" ) ), ( usuario.obtenerNombre() + "\n" + usuario.obtenerApellidos() ).c_str() );
+			gtk_widget_show( GTK_WIDGET( buscar_objeto( "Usuario" ) ) );
 			
 			// Redirige hacia la vista de inicio
 			irA( "Inicio", true );
@@ -154,6 +109,8 @@ void iniciarSesion(){
 
 			// Carga la información
 			cargarInformacion();
+			conectar_senal( enlaceSesionCerrar, G_CALLBACK( sesion_Cerrar ), nullptr );
+			
 		}
 		else{
 			app_mostrar_error( "El usuario " + nombreUsuario + " no está registrado." );
@@ -164,30 +121,20 @@ void iniciarSesion(){
 	}
 }
 
-void mostrarUsuario(){
-	gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreUsuario" ) ), ( usuario.obtenerNombre() + "\n" + usuario.obtenerApellidos() ).c_str() );
-	gtk_widget_show( GTK_WIDGET( buscar_objeto( "Usuario" ) ) );
-}
+void sesion_Cerrar( GtkWidget *widget, gpointer ptr ){
+	cout << "sesion_Cerrar" << endl;
 
-void nombreUsuarioOcupado( std::string nombreUsuario )
-{
-	// Abre la base de datos
-	database.open( databaseFile );
-	
-	string consulta = "select * from Usuario where pseudonimo = '" + nombreUsuario + "'";
-	database.query( consulta );
-	if( results.size() > 0 ){
-		throw invalid_argument( "El nombre de usuario que deseas registrar ya está en uso." );
-	}	
-	
-	// Cierra la conexión
-	database.close();
-}
+	// Establece el usuario en cero
+	usuario.establecerClave( 0 );
 
-void autorizarCambios()
-{
-	// Solicita la contraseña para autorizar cambios
-	gtk_widget_show( GTK_WIDGET( buscar_objeto( "VentanaEntradaContrasena" ) ) );
+	// Oculta el usuario
+	gtk_widget_hide( GTK_WIDGET( buscar_objeto( "Usuario" ) ) );
+
+	// Desconecta la señal de cerrar sesion
+	desconectar_senal( enlaceSesionCerrar );
+
+	// Lo redirige hacia la aplicacion
+	irA( "IniciarSesion", true );
 }
 
 string crearSal()

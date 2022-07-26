@@ -1,10 +1,14 @@
 #include "Usuario.h"
 #include "GestorRegistros.h"
 #include "Aplicacion.h"
+#include "Funciones.h"
+#include "Imagen.h"
 #include <stdexcept>
 #include <iostream>
 #include <sstream>
+#include <random>
 #include <string>
+#include <cmath>
 #include <regex>
 using namespace std;
 
@@ -12,6 +16,18 @@ using namespace std;
 Usuario usuario;
 
 Signal enlaceCuenta{ "EnlaceCuenta", "activate-link", 0 };
+Signal senal_usuario_foto_seleccionar{ "UsuarioCambiarFoto", "clicked", 0 };
+Signal senal_usuario_nombre_editar{ "EnlaceCambiarNombre", "activate-link", 0 };
+Signal senal_usuario_nombre_cancelar_edicion { "BotonUsuarioNombreCancelar", "clicked", 0 };
+Signal senal_usuario_nombre_guardar_edicion { "BotonUsuarioNombreGuardar", "clicked", 0 };
+
+Signal senal_usuario_apellidos_editar { "EnlaceUsuarioCambiarApellidos", "activate-link", 0 };
+Signal senal_usuario_apellidos_cancelar_edicion{ "BotonUsuarioApellidosCancelar", "clicked", 0 };
+Signal senal_usuario_apellidos_guardar_edicion{ "BotonUsuarioApellidosGuardar", "clicked", 0 };
+
+Signal senal_usuario_pseudonimo_editar { "EnlaceUsuarioCambiarPseudonimo", "activate-link", 0 };
+Signal senal_usuario_pseudonimo_cancelar_edicion{ "BotonUsuarioPseudonimoCancelar", "clicked", 0 };
+Signal senal_usuario_pseudonimo_guardar_edicion{ "BotonUsuarioPseudonimoGuardar", "clicked", 0 };
 
 // Constructor
 Usuario::Usuario():
@@ -39,10 +55,6 @@ Usuario::Usuario( unordered_map< string, string > *renglon ):
 
 // Clave
 void Usuario::establecerClave( unsigned int clave ){
-	if( clave < 1 ){
-		throw invalid_argument( "Ha ocurrido un error estableciendo la clave." );
-	}
-	
 	this -> clave = clave;
 }
 
@@ -253,7 +265,7 @@ void usuario_cuenta_leer( GtkWidget *widget, gpointer ptr ){
         unordered_map< string, string > *cuenta = results.at( 0 );
 
         // Establece los datos base
-        gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaClave" ) ), (* cuenta)[ "id_usuario" ].c_str() );
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "UsuarioClave" ) ), (* cuenta)[ "id_usuario" ].c_str() );
         gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaNombre" ) ), (* cuenta)[ "nombre" ].c_str() );
         gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaApellidos" ) ), (* cuenta)[ "apellidos" ].c_str() );
         gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaPseudonimo" ) ), (* cuenta)[ "pseudonimo" ].c_str() );
@@ -273,8 +285,211 @@ void usuario_cuenta_leer( GtkWidget *widget, gpointer ptr ){
         if( (* cuenta)[ "correo" ].compare( "null" ) != 0 ){
             gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaCorreoElectronico" ) ), (* cuenta)[ "correo" ].c_str() );
         }
+
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaFechaRegistro" ) ), ( "Registrado el " + (* cuenta)[ "fecha_registro" ] ).c_str() );
+
+        gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenUsuarioPerfil" ) ), "../recursos/imagenes/iconos/Usuario.png" );
+        if( (* cuenta)[ "imagen" ].compare( "null" ) != 0 ){
+            gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenUsuarioPerfil" ) ), ("../recursos/imagenes/usuarios/" + (* cuenta)[ "imagen" ] ).c_str() );
+        }
     }
+
+    // Conecta las señales
+    conectar_senal( senal_usuario_foto_seleccionar, G_CALLBACK( seleccionar_archivo ), nullptr );
+    conectar_senal( senal_usuario_nombre_editar, G_CALLBACK( irHacia ), (void *)"UsuarioEscribirNombre" );
+    conectar_senal( senal_usuario_nombre_guardar_edicion, G_CALLBACK( usuario_nombre_actualizar ), nullptr );
+    conectar_senal( senal_usuario_nombre_cancelar_edicion, G_CALLBACK( regresarVista ), nullptr );
+    conectar_senal( senal_imagen_guardar_edicion, G_CALLBACK( usuario_escribir_imagen ), nullptr );
+
+    conectar_senal( senal_usuario_apellidos_editar, G_CALLBACK( irHacia ), (void *)"UsuarioEscribirApellidos" );
+    conectar_senal( senal_usuario_apellidos_guardar_edicion, G_CALLBACK( usuario_apellidos_actualizar ), nullptr );
+    conectar_senal( senal_usuario_apellidos_cancelar_edicion, G_CALLBACK( regresarVista ), nullptr );
+
+    conectar_senal( senal_usuario_pseudonimo_editar, G_CALLBACK( irHacia ), (void *)"UsuarioEscribirPseudonimo" );
+    conectar_senal( senal_usuario_pseudonimo_guardar_edicion, G_CALLBACK( usuario_pseudonimo_actualizar ), nullptr );
+    conectar_senal( senal_usuario_pseudonimo_cancelar_edicion, G_CALLBACK( regresarVista ), nullptr );
 
 	// Se dirige a cuenta
 	irA( "Cuenta", false );
+}
+
+void usuario_escribir_imagen( GtkWidget *widget, gpointer info ){
+    cout << "usuario_escribir_imagen" << endl;
+
+    // Obtiene la clave de usuario
+    string clave = gtk_label_get_text( GTK_LABEL( buscar_objeto( "UsuarioClave" ) ) );
+
+    // Motor para generar numeros aleatorios
+    default_random_engine motor( static_cast< unsigned int >( time( 0 ) ) );
+    uniform_int_distribution< unsigned int > intAleatorio;
+
+    // Crea el nombre del archivo
+    stringstream s;
+    s << gtk_label_get_text( GTK_LABEL( buscar_objeto( "UsuarioClave" ) ) ) 
+      << gtk_label_get_text( GTK_LABEL( buscar_objeto( "CuentaPseudonimo" ) ) ) << intAleatorio( motor );
+    string usuario_imagen = crearHash( s.str() ) + ".png";
+
+    cairo_format_t formato = ( gdk_pixbuf_get_has_alpha( imagen.superficie ) ? CAIRO_FORMAT_ARGB32 : CAIRO_FORMAT_RGB24 );
+    imagen_temporal = cairo_image_surface_create( formato, 128, 128 );
+    if( imagen_temporal == nullptr ){
+        throw runtime_error( "Error de conversión de imagen." );
+    }
+
+    // Crea un contexto a partir de la superficie creada
+    cairo_t *cr = cairo_create( imagen_temporal );
+    if( cr == nullptr ){
+        throw runtime_error( "Error de conversión de imagen." );
+    }
+
+    GdkPixbuf *corte = gdk_pixbuf_new_subpixbuf( imagen_escalada.superficie, abs( imagen_posicion_x ), abs( imagen_posicion_y ), TAMANIO_FOTO, TAMANIO_FOTO );
+    GdkPixbuf *escala = gdk_pixbuf_scale_simple( corte, 128, 128, GDK_INTERP_BILINEAR );
+
+    cairo_set_source_rgba(cr, 1, 1, 1, 1.f );
+    cairo_rectangle(cr, 0, 0, 128, 128 );
+    cairo_fill(cr);  
+
+    gdk_cairo_set_source_pixbuf(cr, escala, 0, 0 );
+    cairo_arc(cr, 64, 64, 64, 0, 2*M_PI);
+    cairo_clip(cr);
+    cairo_paint( cr );
+
+    // Destruye el contexto
+    cairo_destroy( cr );
+    cr = nullptr;
+
+    // Carga la nueva imagen
+    gtk_image_set_from_surface( GTK_IMAGE( buscar_objeto( "ImagenUsuarioPerfil" ) ), imagen_temporal );
+
+    // Guarda el archivo del nuevo producto
+    if( imagen_temporal != nullptr && !usuario_imagen.empty() ){
+        // Variables de entrada
+        string ruta_nuevo = "../recursos/imagenes/usuarios/" + usuario_imagen;
+        string ruta_anterior;
+
+        // Obtiene el nombre anterior de la imagen
+        database.open( databaseFile );
+        database.query( "select imagen from Usuario where id_usuario = " + clave );
+        database.close();
+
+        if( results.size() > 0 && (* results.at( 0 ))[ "imagen" ].compare( "null" ) != 0 ){
+            // Construye la ruta en la que se guardará el archivo nuevo y en la que se guardaba el archivo anterior
+            ruta_anterior = "../recursos/imagenes/usuarios/" + (* results.at( 0 ))[ "imagen" ];
+
+            // Si la ruta anterior es distinta de la ruta nueva se elimina el archivo anterior
+            if( ruta_nuevo.compare( ruta_anterior ) != 0 ){
+                cout << "Eliminando " << ruta_anterior << endl;
+                remove( ruta_anterior.c_str() );
+            }
+        }
+
+        // Guarda la imagen editada
+        imagen_guardar( ruta_nuevo );
+
+        // Registra el nuevo nombre de la imagen
+        database.open( databaseFile );
+        database.query( "update Usuario set imagen = '" + usuario_imagen + "' where id_usuario = " + clave );
+        database.close();
+
+        // Cancela la imagen
+        imagen_cancelar();
+
+        gtk_image_set_from_pixbuf( GTK_IMAGE( buscar_objeto( "ImagenUsuario" ) ), imagen_cargar_escalar( ruta_nuevo, 60, 60 ) );
+        app_mostrar_exito( "Imagen cambiada exitosamente." );
+    }
+}
+
+void usuario_nombre_actualizar( GtkWidget *widget, gpointer info ){
+    cout << "usuario_nombre_actualizar" << endl;
+
+    // Valida el nombre introducido
+    string nombre = Usuario::validarNombre( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaUsuarioNombre" ) ) ) );
+
+    // Registra al usuario en la base de datos
+	database.open( databaseFile );
+	database.query( "update Usuario set nombre = '" + nombre + "' where id_usuario = " + to_string( usuario.obtenerClave() ) );
+	database.close();
+
+    // Actualiza la información del usuario
+    usuario.establecerNombre( nombre );
+    
+    // Actualiza la información de la interfaz
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaNombre" ) ), nombre.c_str() );
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreUsuario" ) ), ( nombre + "\n" + usuario.obtenerApellidos() ).c_str() );
+
+    //
+    regresarVista();
+
+    // Muestra un mensaje exitoso
+    app_mostrar_exito( "Nombre actualizado correctamente." );
+}
+
+void usuario_apellidos_actualizar( GtkWidget *widget, gpointer info ){
+    cout << "usuario_apellidos_actualizar" << endl;
+
+    // Valida el nombre introducido
+    string apellidos = Usuario::validarApellidos( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaUsuarioApellidos" ) ) ) );
+
+    // Registra al usuario en la base de datos
+	database.open( databaseFile );
+	database.query( "update Usuario set apellidos = '" + apellidos + "' where id_usuario = " + to_string( usuario.obtenerClave() ) );
+	database.close();
+
+    // Actualiza la información del usuario
+    usuario.establecerApellidos( apellidos );
+    
+    // Actualiza la información de la interfaz
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaApellidos" ) ), apellidos.c_str() );
+    gtk_label_set_text( GTK_LABEL( buscar_objeto( "NombreUsuario" ) ), ( usuario.obtenerNombre() + "\n" + apellidos ).c_str() );
+
+    //
+    regresarVista();
+
+    // Muestra un mensaje exitoso
+    app_mostrar_exito( "Apellidos actualizados correctamente." );
+}
+
+void usuario_PseudonimoOcupado( string pseudonimo ){
+    // Abre la base de datos
+	database.open( databaseFile );
+	
+	string consulta = "select * from Usuario where pseudonimo = '" + pseudonimo + "'";
+	database.query( consulta );
+	if( results.size() > 0 ){
+		throw invalid_argument( "El pseudónimo que deseas utilizar ya está en uso." );
+	}	
+	
+	// Cierra la conexión
+	database.close();
+}
+
+void usuario_pseudonimo_actualizar( GtkWidget *widget, gpointer info ){
+    cout << "usuario_pseudonimo_actualizar" << endl;
+
+    try{
+        // Valida el nombre introducido
+        string pseudonimo = Usuario::validarNombreUsuario( gtk_entry_get_text( GTK_ENTRY( buscar_objeto( "EntradaUsuarioPseudonimo" ) ) ) );
+
+        // Revisa que el nombre de usuario no esté siendo usado por alguien más
+        usuario_PseudonimoOcupado( pseudonimo );
+
+        // Registra al usuario en la base de datos
+        database.open( databaseFile );
+        database.query( "update Usuario set pseudonimo = '" + pseudonimo + "' where id_usuario = " + to_string( usuario.obtenerClave() ) );
+        database.close();
+
+        // Actualiza la información del usuario
+        usuario.establecerNombreUsuario( pseudonimo );
+
+        // Actualiza la información de la interfaz
+        gtk_label_set_text( GTK_LABEL( buscar_objeto( "CuentaPseudonimo" ) ), pseudonimo.c_str() );
+
+        //
+        regresarVista();
+
+        // Muestra un mensaje exitoso
+        app_mostrar_exito( "Pseudónimo actualizado correctamente." );
+    }
+    catch( invalid_argument ia ){
+        app_mostrar_error( ia.what() );
+    }
 }

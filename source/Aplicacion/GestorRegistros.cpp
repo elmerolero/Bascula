@@ -680,8 +680,8 @@ void eliminarUsuario()
             
             registrosUsuarios.remove( usuarioConsultado );
             delete usuarioConsultado;
-            actualizarRegistrosUsuarios( registrosUsuarios, "ContenedorUsuarios" );
-            irHacia( nullptr, (void *)"ConsultarUsuarios" );
+            usuario_ConsultarRegistros( nullptr, nullptr );
+            regresarVista();
         }
         catch( invalid_argument &ia ){
             app_mostrar_mensaje( "Ha ocurrido un error al intentar\neliminar el usuario." );
@@ -690,36 +690,36 @@ void eliminarUsuario()
 }
 
 // Actualiza los registros publicos pendientes
-void actualizarRegistrosUsuarios( list< Usuario * > &usuarios, std::string idContenedor )
-{
-    // Limpia el contenedor
-    limpiar_contenedor( idContenedor );
+void usuario_ConsultarRegistros( GtkWidget *widget, gpointer info ){
+    // Limpia el contendor
+    limpiar_contenedor( "ContenedorUsuarios" );
 
-    // Itera a través de la lista de tickets pendientes y crea los tickets necesarios
-    unsigned int contador = 0;
+    // Busca los usuarios registrados
     database.open( databaseFile );
     database.query( "select * from Usuario" );
     database.close();
     if( results.size() > 0 ){
-        // Crea un elemento que será añadido a la interfaz
-        GtkBuilder *builder = gtk_builder_new();
-        GError *error = NULL;
+        for( auto usuario : results ){
+            // Crea un elemento que será añadido a la interfaz
+            GtkBuilder *builder = gtk_builder_new();
+            GError *error = NULL;
 
-        if( gtk_builder_add_from_file( builder, "../recursos/interfaces/ElementoUsuario.glade", &error ) ){
-            for( unordered_map< string, string > *usuario : results ){
+            if( gtk_builder_add_from_file( builder, "../recursos/interfaces/ElementoUsuario.glade", &error ) ){
                 gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaClaveUsuario" ) ), (* usuario)[ "id_usuario" ].c_str() );
                 gtk_label_set_text( GTK_LABEL( gtk_builder_get_object( builder, "ItemEntradaNombre" ) ), ( (* usuario)[ "nombre" ] + " " + (* usuario)[ "apellidos" ] ).c_str() );
                 if( (* usuario)[ "imagen" ].compare( "null" ) != 0 ){
                     GdkPixbuf *imagen = imagen_cargar_escalar( "../recursos/imagenes/usuarios/" + (*usuario)[ "imagen" ], 64, 64 );
                     if( imagen != nullptr ){
-                        gtk_image_set_from_pixbuf( GTK_IMAGE( gtk_builder_get_object( builder, "ElementoUsuarioImagen" ) ), imagen );
+                        gtk_image_set_from_pixbuf( GTK_IMAGE( gtk_builder_get_object( builder, "ImagenUsuario" ) ), imagen );
                     }
                 }
 
-                gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( idContenedor ) ), GTK_WIDGET( gtk_builder_get_object( builder, "ItemUsuario" ) ), stoi( (*usuario)[ "id_usuario" ] ) );
+                gtk_list_box_insert( GTK_LIST_BOX( buscar_objeto( "ContenedorUsuarios" ) ), GTK_WIDGET( gtk_builder_get_object( builder, "ItemUsuario" ) ), stoi( (*usuario)[ "id_usuario" ] ) );
             }
         }
     }
+
+    irA( "ConsultarUsuarios", false );
 }
 
 void generarCodigoRecuperacion()

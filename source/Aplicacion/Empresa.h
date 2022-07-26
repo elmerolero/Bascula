@@ -7,9 +7,14 @@
 
 extern Signal senal_empresa_propia_editar;
 
+// Lista de empresas registradas
+extern GtkListStore *listaEmpresas;
+
 //
 void empresa_inicio_senales_conectar();
 
+
+void empresa_obtener_registros( void );
 void empresa_listar_registros( GtkWidget *widget, gpointer info );
 void empresa_actualizar_registros( void );
 

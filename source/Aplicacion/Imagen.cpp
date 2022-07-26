@@ -124,7 +124,6 @@ void leer_mouse( GtkWidget *widget, GdkEventButton evento, gpointer data ){
 }
 
 gboolean imagen_mover( GtkWidget* widget, GdkEventButton evento, gpointer data ){
-    cout << "imagen_mover" << endl;
     // Obtiene el cambio entre la posición original del cursor y su posición actual
     int cambioX = imagen_ultimo_x - evento.x;
     int cambioY = imagen_ultimo_y - evento.y;

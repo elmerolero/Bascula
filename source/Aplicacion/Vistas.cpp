@@ -56,7 +56,7 @@ void vistaConfiguracion( GtkWidget *widget, gpointer ptr ){
 	conectar_senal( senal_domicilio_guardar_nuevo, G_CALLBACK( empresa_propia_domicilio_guardar_nuevo ), nullptr );
 	conectar_senal( senal_domicilio_cancelar_nuevo, G_CALLBACK( regresarVista ), nullptr );
 	conectar_senal( senal_bascula_registros_listar, G_CALLBACK( bascula_registros_listar ), nullptr );
-	conectar_senal( botonConsultarUsuario, G_CALLBACK( vistaConsultarUsuarios ), nullptr );
+	conectar_senal( botonConsultarUsuario, G_CALLBACK( usuario_ConsultarRegistros ), nullptr );
 	//conectar_senal( botonSi, G_CALLBACK( basculaEliminar ), nullptr );
 
 	// Se dirige a la vista
@@ -162,17 +162,6 @@ void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer d
 	
 	// Va hacia la vista
 	irHacia( nullptr, (void *)"NuevoTicketInterno" );
-}
-
-void vistaConsultarUsuarios(){
-	// Obtiene todos los usuarios registrados
-	//obtenerUsuariosRegistrados();
-
-	// Establece el contenedor de usuarios registrados
-	actualizarRegistrosUsuarios( registrosUsuarios, "ContenedorUsuarios" );
-
-
-	irA( "ConsultarUsuarios", false );
 }
 
 void regresarInicio()

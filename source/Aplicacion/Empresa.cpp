@@ -12,6 +12,8 @@
 #include <random>
 using namespace std;
 
+GtkListStore *listaEmpresas = nullptr;
+
 Signal botonInicioRazonSocial{ "BotonRegistrarEmpresaPropia", "clicked", 0 };
 
 Signal senal_empresa_propia_editar = { "OpcionEmpresa", "clicked", 0 };
@@ -42,6 +44,26 @@ void empresa_senales_conectar( void ){
     conectar_senal( senal_imagen_guardar_edicion, G_CALLBACK( empresa_imagen_escribir ), nullptr );
     conectar_senal( senal_imagen_cancelar_edicion, G_CALLBACK( imagen_cancelar ), nullptr );
     conectar_senal( senal_producto_seleccionar, G_CALLBACK( empresa_seleccionar ), nullptr );
+}
+
+void empresa_obtener_registros( void ){
+    // Crea una nueva lista
+    listaEmpresas = gtk_list_store_new( 1, G_TYPE_STRING );
+
+    // Obtiene el nombre de todas las empresas
+    database.open( databaseFile );
+    database.query( "select razon_social from Empresas" );
+    database.close();
+
+    // ¿Hay resultados?
+    if( results.size() > 0 ){
+        cout << "results" << results.size() << endl;
+        for( auto empresa : results ){
+            GtkTreeIter iterador;
+            gtk_list_store_append( listaEmpresas, &iterador );
+            gtk_list_store_set( listaEmpresas, &iterador, 0, ( (* empresa)[ "razon_social" ] ).c_str(), -1 );
+        }
+    }
 }
 
 void empresa_listar_registros( GtkWidget *widget, gpointer info ){
@@ -766,7 +788,7 @@ void empresa_propia_guardar_edicion( GtkWidget *widget, gpointer info ){
         database.close();
 
         //
-        gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenEmpresaPropia" ) ), ( "../recursos/imagenes/empresas" + nombreTemporal ).c_str() );
+        gtk_image_set_from_file( GTK_IMAGE( buscar_objeto( "ImagenEmpresaPropia" ) ), ( "../recursos/imagenes/empresas/" + nombreTemporal ).c_str() );
 
         // Cancela la imagen
         imagen_cancelar();

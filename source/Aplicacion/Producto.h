@@ -5,6 +5,9 @@
 #include "Imagen.h"
 #include <string>
 
+// Lista de productos registrados
+extern GtkListStore *listaProductos;
+
 extern Signal senal_producto_imagen_seleccionar;
 
 extern Signal senal_producto_nuevo;
@@ -19,6 +22,7 @@ extern Signal senal_producto_seleccionar;
 
 extern Signal senal_producto_buscar;
 
+void producto_obtener_registros( void );
 void producto_validar_nombre( std::string nombre );
 void producto_listar_registros( GtkWidget *widget, gpointer info );
 void producto_nuevo( GtkWidget *widget, gpointer info );

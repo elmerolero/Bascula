@@ -10,6 +10,10 @@
 
 extern Signal enlaceCuenta;
 
+ 
+extern Signal senal_usuario_foto_seleccionar;
+
+
 class Usuario
 {
     public:
@@ -63,7 +67,14 @@ class Usuario
 // Usuario
 extern Usuario usuario;
 
+// 
+void usuario_PseudonimoOcupado( std::string pseudonimo );
+
 void usuario_cuenta_leer( GtkWidget *widget, gpointer info );
+void usuario_escribir_imagen( GtkWidget *widget, gpointer info );
+void usuario_nombre_actualizar( GtkWidget *widget, gpointer info );
+void usuario_apellidos_actualizar( GtkWidget *widget, gpointer info );
+void usuario_pseudonimo_actualizar( GtkWidget *widget, gpointer info );
 
 #endif
 

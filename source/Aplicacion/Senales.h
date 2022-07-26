@@ -39,9 +39,6 @@ extern Signal botonConfiguracion;
 
 // Enlace hacia los créditos
 extern Signal enlaceCreditos;
-    
-// Barra de usuario
-extern Signal botonActualizarCuenta;
 
 // Seleccion servicio
 extern Signal botonBasculaAdministrativo;
@@ -56,10 +53,6 @@ extern Signal entradaSeguimientoMayusculas;
 extern Signal entradaSeguimiento;
 
 // Nuevo para ticket interno
-extern Signal botonLeerPesoBrutoInterno;
-extern Signal botonLeerPesoTaraInterno;
-extern Signal botonRegistrarPendienteInterno;
-extern Signal botonFinalizarPendienteInterno;
 extern Signal entradaNumeroPlacasInterno;
 extern Signal botonCalcularDescuento;
 extern Signal opcionDescuentoInterno;
@@ -68,15 +61,9 @@ extern Signal opcionRegistraEntrada;
 // Vista de registro de peso
 extern Signal botonCancelarLectura;
 extern Signal ventanaLectorPeso;
-    
-// Vista que solicita la contrasena
-extern Signal botonPermitirCambios;
 
 // Vista de configuración
 extern Signal botonGuardarConfiguracion;
-
-// Consultar registro interno
-extern Signal imprimirRegistroInterno;
 
 // Señales utilizadas para la gestión de usuarios
 extern Signal entradaConsultarUsuario;
@@ -97,7 +84,6 @@ extern Signal botonRegistroCancelarEdicion;
 
 // Noc
 extern Signal imprimirRegistroPublico;
-extern Signal eliminarRegistroInterno;
 
 extern Signal botonRegistroGuardarNuevo;
 extern Signal botonRegistroCancelarNuevo;

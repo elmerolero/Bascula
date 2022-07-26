@@ -12,7 +12,6 @@ void vistaObtenerInforme();
 void vistaInternoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data );
 void vistaInternoEditarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data );
 void vistaPublicoConsultarRegistro( GtkListBox *box, GtkListBoxRow *row, gpointer data );
-void vistaConsultarUsuarios();
 void vistaConsultarUsuario();
 
 void internoLimpiarFormulario();

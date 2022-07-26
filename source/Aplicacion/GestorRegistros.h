@@ -114,7 +114,7 @@ void actualizarEstadoAdministrador();
 void internoSeleccionarDia();
 void internoGenerarInforme();
 
-void actualizarRegistrosUsuarios( std::list< Usuario * > &usuarios, std::string idContenedor );
+void usuario_ConsultarRegistros( GtkWidget *widget, gpointer info );
 void generarCodigoRecuperacion();
 void validarCodigoRecuperacion();
 

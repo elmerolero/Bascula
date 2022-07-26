@@ -36,6 +36,72 @@ Signal senal_publico_eliminar = { "EliminarRegistroPublico", "clicked", 0 };
 Signal senal_pesajes_exportar_seleccionados = { "BotonRegistrosPesajesExportar", "clicked", 0 };
 Signal senal_publico_imprimir = { "ImprimirRegistroPublico", "clicked", 0 };
 
+GtkListStore *listaPublicoConductores = nullptr;
+GtkListStore *listaPublicoPlacas = nullptr;
+
+GtkEntryCompletion *completadorPublicoProducto = nullptr;
+GtkEntryCompletion *completadorPublicoConductor = nullptr;
+GtkEntryCompletion *completadorPublicoPlacas = nullptr;
+
+// Inicializa los completadores
+void publico_iniciar(){
+	// Inicializa el completador de productos
+	completadorPublicoProducto = gtk_entry_completion_new();
+
+	// Se se creó una lista de empresas y un completador interno se asocian a la entrada de registros internos
+	if( completadorPublicoProducto != nullptr && listaProductos != nullptr ){
+		gtk_entry_completion_set_model( completadorPublicoProducto, GTK_TREE_MODEL( listaProductos ) );
+		gtk_entry_completion_set_text_column( completadorPublicoProducto, 0);
+		gtk_entry_set_completion( GTK_ENTRY( buscar_objeto( "EntradaNombreProductoPublico" ) ), completadorPublicoProducto );
+	}
+
+	// Crea una nueva lista para los conductores
+    listaPublicoConductores = gtk_list_store_new( 1, G_TYPE_STRING );
+
+    // Obtiene el nombre de todos los productos
+    database.open( databaseFile );
+    database.query( "select DISTINCT nombre_conductor from PesajesPublicos" );
+    database.close();
+    if( results.size() > 0 ){
+        for( auto conductor : results ){
+            GtkTreeIter iterador;
+            gtk_list_store_append( listaPublicoConductores, &iterador );
+            gtk_list_store_set( listaPublicoConductores, &iterador, 0, ( (* conductor)[ "nombre_conductor" ] ).c_str(), -1 );
+        }
+    }
+
+	// Inicializa el completador de conductores
+	completadorPublicoConductor = gtk_entry_completion_new();
+	if( completadorPublicoConductor != nullptr && listaPublicoConductores != nullptr ){
+		gtk_entry_completion_set_model( completadorPublicoConductor, GTK_TREE_MODEL( listaPublicoConductores ) );
+		gtk_entry_completion_set_text_column( completadorPublicoConductor, 0);
+		gtk_entry_set_completion( GTK_ENTRY( buscar_objeto( "EntradaNombreConductorPublico" ) ), completadorPublicoConductor );
+	}
+
+	// Crea una nueva lista para los números de placa
+    listaPublicoPlacas = gtk_list_store_new( 1, G_TYPE_STRING );
+
+    // Obtiene el nombre de todos los número de placa
+    database.open( databaseFile );
+    database.query( "select DISTINCT numero_placas from PesajesPublicos" );
+    database.close();
+    if( results.size() > 0 ){
+        for( auto placa : results ){
+            GtkTreeIter iterador;
+            gtk_list_store_append( listaPublicoPlacas, &iterador );
+            gtk_list_store_set( listaPublicoPlacas, &iterador, 0, ( (* placa)[ "numero_placas" ] ).c_str(), -1 );
+        }
+    }
+
+	// Inicializa el completador de las placas
+	completadorPublicoPlacas = gtk_entry_completion_new();
+	if( completadorPublicoPlacas != nullptr && listaPublicoPlacas != nullptr ){
+		gtk_entry_completion_set_model( completadorPublicoPlacas, GTK_TREE_MODEL( listaPublicoPlacas ) );
+		gtk_entry_completion_set_text_column( completadorPublicoPlacas, 0);
+		gtk_entry_set_completion( GTK_ENTRY( buscar_objeto( "EntradaNumeroPlacasPublico" ) ), completadorPublicoPlacas);
+	}
+}
+
 void publico_registros_listar_pendientes( GtkWidget *widget, gpointer info ){
 	cout << "publico_registros_listar_pendientes" << endl;
 	
@@ -83,11 +149,6 @@ void publico_pendiente_nuevo( GtkWidget *widget, gpointer info ){
 	
 	// Peso neto
 	gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaPesoNetoPublico" ) ), "No establecido" );
-	
-	// Establece el completador de producto
-	//  gtk_entry_set_completion( GTK_ENTRY( objecto ), completador );
-	//establecerCompletadorEntrada( "EntradaNombreProductoInterno", NULL );
-	//establecerCompletadorEntrada( "EntradaNombreProductoPublico", productos.obtenerCompletador() );
 
 	// Conecta la señal
 	conectar_senal( senal_publico_editar_pendiente, G_CALLBACK( publico_pendiente_guardar_nuevo ), nullptr );
@@ -192,11 +253,17 @@ void publico_pendiente_guardar_nuevo( GtkWidget *widget, gpointer info ){
 		consulta << "insert into PesajesPublicos values( null, '" << fecha << "', " << id_producto << ", '"
 				 << numero_placas << "', '" << conductor << "', '" << hora_entrada << "', '" << hora_salida << "', "
 				 << peso_bruto << ", " << peso_tara << ", "  << peso_neto << ", " << usuario.obtenerClave() << ", 1, "
-				 << bascula_entrada_manual_habilitado << " )";
+				 << bascula_entrada_manual_habilitado << " );  select last_insert_rowid() as Pesaje from PesajesPublicos";
 		
 		database.open( databaseFile );
 		database.query( consulta.str() );
 		database.close();
+		if( results.size() > 0 ){
+			unordered_map< string, string > *resultado = results.at( 0 );
+			gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), (*resultado)[ "Pesaje" ].c_str() );
+		}
+
+		publico_hacer_impresion_parcial();
 
 		// Obtiene los tickets pendientes
 		publico_registros_actualizar_pendientes();
@@ -258,6 +325,12 @@ void publico_pendiente_guardar_edicion( GtkWidget *widget, gpointer info ){
 		database.open( databaseFile );
 		database.query( consulta.str() );
 		database.close();
+		if( results.size() > 0 ){
+			unordered_map< string, string > *resultado = results.at( 0 );
+			gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), (*resultado)[ "Pesaje" ].c_str() );
+		}
+
+		publico_hacer_impresion_parcial();
 
 		// Obtiene los tickets pendientes
 		publico_registros_actualizar_pendientes();
@@ -295,6 +368,8 @@ void publico_pendiente_finalizar( GtkWidget *widget, gpointer info ){
 		string hora_salida = gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaHoraSalidaPublico" ) ) );;
 		double peso_neto = abs( peso_bruto - peso_tara );
 
+		bool nuevo = false;
+
 		stringstream consulta;
 
 		try{
@@ -309,12 +384,19 @@ void publico_pendiente_finalizar( GtkWidget *widget, gpointer info ){
 			consulta << "insert into PesajesPublicos values( null, '" << fecha << "', " << id_producto << ", '"
 				 << numero_placas << "', '" << conductor << "', '" << hora_entrada << "', '" << hora_salida << "', "
 				 << peso_bruto << ", " << peso_tara << ", "  << peso_neto << ", " << usuario.obtenerClave() << ", 0, "
-				 << bascula_entrada_manual_habilitado << " )";
+				 << bascula_entrada_manual_habilitado << " ); select last_insert_rowid() as Pesaje from PesajesPublicos";
+		
+			nuevo = true;
 		}
 		
 		database.open( databaseFile );
 		database.query( consulta.str() );
 		database.close();
+
+		if( nuevo && results.size() > 0 ){
+			unordered_map< string, string > *resultado = results.at( 0 );
+			gtk_label_set_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ), (*resultado)[ "Pesaje" ].c_str() );
+		}
 
 		// Obtiene los tickets pendientes
 		publico_registros_actualizar_pendientes();
@@ -650,6 +732,34 @@ void publico_registros_exportar( GtkWidget *widget, gpointer info ){
 	regresarVista();
 }
 
+static void publico_hacer_impresion_parcial( void){
+    GtkPrintOperation *print = nullptr;
+    GtkPrintOperationResult res;
+    GError *error;
+
+    print = gtk_print_operation_new();
+    if( print == nullptr ){
+        throw runtime_error( "Ah ocurrido un error al crear la configuración de la impresora." );
+    }
+
+	GtkPrintSettings *settings = gtk_print_settings_new();
+    gtk_print_operation_set_n_pages(print, 1);
+
+    guint senal = g_signal_connect(print, "draw_page", G_CALLBACK( publico_imprimir_parcial ), nullptr );
+
+    res = gtk_print_operation_run( print, GTK_PRINT_OPERATION_ACTION_PRINT_DIALOG, GTK_WINDOW( gtk_builder_get_object( builder, "VentanaPrincipal" ) ), NULL);
+
+    if (res == GTK_PRINT_OPERATION_RESULT_APPLY){
+        if (settings != NULL){
+            g_object_unref (settings);
+        }
+
+        settings = GTK_PRINT_SETTINGS(g_object_ref (gtk_print_operation_get_print_settings (print)));
+    }
+
+    g_object_unref( print );
+}
+
 static void publico_hacer_impresion( GtkWidget* widget, GtkWidget* info ){
     GtkPrintOperation *print = nullptr;
     GtkPrintOperationResult res;
@@ -678,9 +788,137 @@ static void publico_hacer_impresion( GtkWidget* widget, GtkWidget* info ){
     g_object_unref( print );
 }
 
+static void  publico_imprimir_parcial(GtkPrintOperation *operation, GtkPrintContext *context, int page_nr, GtkWidget *data){
+    cout << "publico_imprimir_parcial" << endl;
+	unsigned long folio;
+	try{
+		folio = stoul( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ) ) );
+	}
+	catch( exception e ){
+		folio = stoul( gtk_label_get_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ) ) );
+	}
+    
+	unordered_map< string, string > pesaje;
+	unordered_map< string, string > empresa;
+	string domicilio = "\n";
+
+	string consulta = "select id_pesaje, fecha, Producto.nombre as producto, numero_placas, nombre_conductor, hora_entrada, hora_salida, peso_bruto, peso_tara, peso_neto "
+					  "from PesajesPublicos join Producto on Producto.id_producto = PesajesPublicos.id_producto " 
+					  "where id_pesaje = " + to_string( folio );
+
+	// Obtiene el registro
+	database.open( databaseFile );
+	database.query( consulta );
+	if( results.size() > 0 ){
+		pesaje = (* results.at( 0 ) );
+	}
+	database.query( "select * from EmpresaPropia where id_empresa = 1" );
+	if( results.size() > 0 ){
+		empresa = (* results.at( 0 ) );
+	}
+	database.query( "select * from DomicilioEmpresaPropia" );
+	if( results.size() > 0 ){
+		unordered_map< string, string > resultado = (* results.at( 0 ));
+		domicilio = resultado[ "calle" ] + " " + resultado[ "numero" ] + ", " + resultado[ "colonia" ] + " " +
+					resultado[ "codigo_postal" ] + ", " + resultado[ "municipio" ] + ", " + resultado[ "estado" ] + ", " +
+					resultado[ "pais" ] + "\n";
+	}
+	database.close();
+
+	// Ancho y alto de la página
+	gdouble ancho, alto;
+	GdkRGBA color;
+	int a, b, c;
+
+	// Obtiene el contexto de impresión
+	cairo_t *cr = gtk_print_context_get_cairo_context( context );
+	
+	// Obtiene las dimensiones de la página
+	ancho = gtk_print_context_get_width( context );
+	alto = gtk_print_context_get_height( context );
+
+	cairo_move_to (cr, 0, 0);
+	cairo_set_source_rgb( cr, 0, 0, 0 );
+
+	// Crea el formato pango y establece las opciones generales
+	PangoLayout* layout = gtk_print_context_create_pango_layout(context);
+	PangoFontDescription *fuente = pango_font_description_from_string( "sans 8" );
+	pango_layout_set_font_description( layout, fuente );
+	pango_font_description_free( fuente );
+	pango_layout_set_single_paragraph_mode( layout, FALSE );
+	pango_layout_set_width( layout, ancho * PANGO_SCALE );
+	pango_layout_set_wrap (layout, PANGO_WRAP_WORD);
+	
+	string texto = empresa[ "razon_social" ] + "\n" + domicilio;
+
+	// 
+	pango_layout_set_alignment (layout, PANGO_ALIGN_CENTER);
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_layout_get_pixel_size( layout, &a, &b );
+
+	pango_cairo_layout_path( cr, layout );
+	cairo_move_to (cr, 0, b );
+
+	texto = "Folio: " + pesaje[ "id_pesaje" ] + "\n";
+	pango_layout_set_alignment (layout, PANGO_ALIGN_RIGHT);
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	pango_layout_get_pixel_size( layout, &a, &c );
+	cairo_move_to( cr, 0, b );
+
+	texto = "Fecha: " + pesaje[ "fecha" ] + "\n";
+	pango_layout_set_alignment( layout, PANGO_ALIGN_LEFT );
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	pango_layout_get_pixel_size( layout, &a, &c );
+	b = b + c;
+	cairo_move_to( cr, 0, b );
+
+	// Derecha
+	texto = "Producto: " + pesaje[ "producto" ] + "\n\n"
+			"Conductor: " + pesaje[ "nombre_conductor" ] + "\n";
+	
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	pango_layout_get_pixel_size( layout, &a, &c );
+	b = b + c;
+	cairo_move_to( cr, 0, b );
+
+	texto = "Peso bruto: \n";
+
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	cairo_move_to( cr, 0, b );
+
+	texto = pesaje[ "peso_bruto" ] + " Kg\n";
+
+	pango_layout_set_alignment (layout, PANGO_ALIGN_RIGHT);
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	b = b + c;
+	cairo_move_to( cr, 0, b );
+
+	texto = "Realizado con Sistema de Control de Báscula\n";
+	pango_layout_set_alignment( layout, PANGO_ALIGN_CENTER );
+	pango_layout_set_text( layout, texto.c_str(), -1);
+	pango_cairo_layout_path( cr, layout );
+	b = b + c;
+	cairo_move_to( cr, 0, b );
+
+    //
+    cairo_fill (cr);
+}
+
 static void publico_imprimir(GtkPrintOperation *operation, GtkPrintContext *context, int page_nr, GtkWidget *data){
     cout << "publico_imprimir" << endl;
-    unsigned long folio = stoul( gtk_label_get_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ) ) );
+	unsigned long folio;
+	try{
+		folio = stoul( gtk_label_get_text( GTK_LABEL( buscar_objeto( "EntradaFolioPublico" ) ) ) );
+	}
+	catch( exception e ){
+		folio = stoul( gtk_label_get_text( GTK_LABEL( buscar_objeto( "FolioPublico" ) ) ) );
+	}
+    
 	unordered_map< string, string > pesaje;
 	unordered_map< string, string > empresa;
 	string domicilio = "\n";

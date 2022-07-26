@@ -48,7 +48,6 @@ Signal enlaceCreditosRegresar{ "EnlaceCreditosRegresar", "activate-link", 0 };
     
 // Barra de usuario
 Signal enlaceCuentaRegresar{ "EnlaceCuentaRegresar", "activate-link", 0 };
-Signal botonActualizarCuenta{ "BotonActualizarCuenta", "clicked", 0 };
 
 // Seleccion servicio
 Signal enlaceTipoBasculaRegresar{ "EnlaceTipoBasculaRegresar", "activate-link", 0 };
@@ -60,23 +59,13 @@ Signal entradaSeguimientoMayusculas{ "EntradaSeguimiento", "insert-text", 0 };
 Signal entradaSeguimiento{ "EntradaSeguimiento", "activate", 0 };
     
 // Nuevo para ticket interno
-Signal botonLeerPesoBrutoInterno{ "BotonLeerPesoBrutoInterno", "clicked", 0 };
-Signal botonLeerPesoTaraInterno{ "BotonLeerPesoTaraInterno", "clicked", 0 };
-Signal botonRegistrarPendienteInterno{ "BotonRegistrarPendienteInterno", "clicked", 0 };
-Signal botonFinalizarPendienteInterno{ "BotonFinalizarPendienteInterno", "clicked", 0 };
 Signal entradaNumeroPlacasInterno{ "EntradaNumeroPlacasInterno", "insert-text", 0 };
 Signal botonCalcularDescuento{ "BotonCalcularDescuento", "clicked", 0 };
 Signal opcionDescuentoInterno{ "NoDescuentoInterno", "toggled", 0 };
 Signal opcionRegistraEntrada{ "RegistraEntrada", "toggled", 0 };
-    
-// Vista que solicita la contrasena
-Signal botonPermitirCambios{ "BotonPermitirCambios", "clicked", 0 };
 
 // Vista de configuración
 Signal botonGuardarConfiguracion{ "BotonGuardarConfiguracion", "clicked", 0 };
-
-// Consultar registro interno
-Signal imprimirRegistroInterno{ "ImprimirRegistroInterno", "clicked", 0 };
 
 // Señales utilizadas para la gestión de usuarios
 Signal entradaConsultarUsuario{ "EntradaConsultarUsuario", "activate", 0 }; 
@@ -98,7 +87,6 @@ Signal botonRegistroCancelarEdicion{ "BotonRegistroCancelarEdicion", "clicked", 
 
 // Noc
 Signal imprimirRegistroPublico{ "ImprimirRegistroPublico", "clicked", 0 };
-Signal eliminarRegistroInterno{ "EliminarRegistroInterno", "clicked", 0 };
 Signal botonRegistroGuardarNuevo{ "BotonRegistroGuardarNuevo", "clicked", 0 };
 Signal botonRegistroCancelarNuevo{ "BotonRegistroCancelarNuevo", "clicked", 0 };
 Signal botonSi{ "BotonSi", "clicked", 0 };

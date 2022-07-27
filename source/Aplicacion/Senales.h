@@ -62,9 +62,6 @@ extern Signal opcionRegistraEntrada;
 extern Signal botonCancelarLectura;
 extern Signal ventanaLectorPeso;
 
-// Vista de configuración
-extern Signal botonGuardarConfiguracion;
-
 // Señales utilizadas para la gestión de usuarios
 extern Signal entradaConsultarUsuario;
 extern Signal botonConsultarUsuario;

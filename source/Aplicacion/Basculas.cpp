@@ -594,6 +594,8 @@ void basculaObtenerPuertosDisponibles(){
 		}
 	}
 
+    // Revisa si hay conectado un puerto LPT1
+
 	if( contadorDispositivos < 1 ){
         app_mostrar_mensaje( "No se detectaron básculas." );
     }

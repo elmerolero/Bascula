@@ -140,9 +140,6 @@ void conectarSenales()
     // Vista seleccion servicio
     conectar_senal( senal_publico_pendientes_listar, G_CALLBACK( publico_registros_listar_pendientes ), nullptr );
     conectar_senal( senal_interno_pendientes_listar, G_CALLBACK( interno_registros_listar_pendientes ), nullptr );
-
-    // Vista de configuración
-    conectar_senal( botonGuardarConfiguracion, G_CALLBACK( guardarConfiguracion ), nullptr );
 }
 
 //
@@ -152,8 +149,8 @@ void conectarSenalesAdministrador(){
     conectar_senal( botonRegistros, G_CALLBACK( irHacia ), (void *)"Registros" );
 
     // Vista Registros
-    conectar_senal( botonRegistrosEmpresas, G_CALLBACK( empresa_listar_registros ), (void *)(&empresas) );
-    conectar_senal( botonRegistrosProductos, G_CALLBACK( producto_listar_registros ), (void *)(&productos) );
+    conectar_senal( botonRegistrosEmpresas, G_CALLBACK( empresa_listar_registros ), nullptr );
+    conectar_senal( botonRegistrosProductos, G_CALLBACK( producto_listar_registros ), nullptr );
     conectar_senal( senal_interno_opcion, G_CALLBACK( interno_registros_listar ), nullptr );
     conectar_senal( senal_publico_opcion, G_CALLBACK( publico_registros_listar ), nullptr ); // vistaConsultarPesajesPublicos
 

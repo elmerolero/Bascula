@@ -1,7 +1,7 @@
 CC=g++
 CFLAGS= `pkg-config --cflags gtk+-3.0 sqlite3`
 LIBS= `pkg-config --libs gtk+-3.0 sqlite3`
-OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Ticket.o Empresa.o Registro.o Database.o ContenedorRegistros.o Vistas.o GestorRegistros.o Sesion.o sha256.o PesajesInternos.o PesajesPublicos.o TicketPublico.o Senales.o Imagen.o Producto.o Domicilio.o Basculas.o aplicacion.res
+OBJS= Aplicacion.o Widget.o Usuario.o Funciones.o Empresa.o Registro.o Database.o Vistas.o GestorRegistros.o Sesion.o sha256.o PesajesInternos.o PesajesPublicos.o Senales.o Imagen.o Producto.o Domicilio.o Basculas.o aplicacion.res
 
 ../../build/aplicacion:  main.cpp $(OBJS)
 	$(CC) main.cpp $(CFLAGS) -lwinspool -mwindows -g -o ../../build/aplicacion $(OBJS) $(LIBS)
@@ -21,17 +21,11 @@ Usuario.o:	Usuario.h Usuario.cpp
 Funciones.o: Funciones.h Funciones.cpp
 	$(CC) $(CFLAGS) -c -g Funciones.h Funciones.cpp
 
-Ticket.o: Ticket.h Ticket.cpp
-	$(CC) -c -g Ticket.h Ticket.cpp
-
 Registro.o: Registro.h Registro.cpp
 	$(CC) -c -g Registro.h Registro.cpp
 
 Database.o: Database.h Database.cpp
 	$(CC) $(CFLAGS) -g -c Database.h Database.cpp $(LIBS)
-
-ContenedorRegistros.o: ContenedorRegistros.h ContenedorRegistros.cpp
-	$(CC) $(CFLAGS) -c -g ContenedorRegistros.h ContenedorRegistros.cpp $(LIBS)
 
 Vistas.o: Vistas.h Vistas.cpp
 	$(CC) $(CFLAGS) -c -g Vistas.h Vistas.cpp $(LIBS)
@@ -47,9 +41,6 @@ PesajesInternos.o: PesajesInternos.h PesajesInternos.cpp
 
 PesajesPublicos.o: PesajesPublicos.h PesajesPublicos.cpp
 	$(CC) $(CFLAGS) -c -g PesajesPublicos.h PesajesPublicos.cpp $(LIBS)
-
-TicketPublico.o: TicketPublico.h TicketPublico.cpp
-	$(CC) -c TicketPublico.h TicketPublico.cpp $(LIBS)
 
 Senales.o: Senales.h Senales.cpp
 	$(CC) $(CFLAGS) -c Senales.h Senales.cpp $(LIBS)

@@ -4,14 +4,8 @@
 #include <gtk/gtk.h>
 #include <list>
 #include <string>
-#include "Ticket.h"
 #include "sha256.h"
 
-extern Registro *registro;
-
-void crearRegistro( GtkWidget *widget, gpointer data );
-void actualizarRegistro( GtkWidget *widget, gpointer data );
-void eliminarRegistro( GtkWidget *widget, gpointer data );
 void registrarEmpresa();
 void cancelarAccion();
 void registroCancelarEdicion( GtkWidget *widget, gpointer ptr );

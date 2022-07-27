@@ -64,9 +64,6 @@ Signal botonCalcularDescuento{ "BotonCalcularDescuento", "clicked", 0 };
 Signal opcionDescuentoInterno{ "NoDescuentoInterno", "toggled", 0 };
 Signal opcionRegistraEntrada{ "RegistraEntrada", "toggled", 0 };
 
-// Vista de configuración
-Signal botonGuardarConfiguracion{ "BotonGuardarConfiguracion", "clicked", 0 };
-
 // Señales utilizadas para la gestión de usuarios
 Signal entradaConsultarUsuario{ "EntradaConsultarUsuario", "activate", 0 }; 
 Signal botonConsultarUsuario{ "OpcionUsuarios", "clicked", 0 };

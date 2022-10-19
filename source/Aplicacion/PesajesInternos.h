@@ -12,6 +12,9 @@
 #include "GestorRegistros.h"
 #include "PesajesPublicos.h"
 
+const int TIPO_REGISTRO_ENTRADA = 0;
+const int TIPO_REGISTRO_SALIDA = 1;
+
 extern GtkEntryCompletion *completadorInterno;
 extern GtkEntryCompletion *completadorInternoProducto;
 extern GtkEntryCompletion *completadorInternoConductor;

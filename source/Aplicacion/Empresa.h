@@ -5,6 +5,7 @@
 #include <gtk/gtk.h>
 #include <string>
 
+extern Signal senal_empresa_domicilio_guardar;
 extern Signal senal_empresa_propia_editar;
 
 // Lista de empresas registradas
@@ -46,7 +47,6 @@ void empresa_guardar_edicion( GtkWidget *widget, gpointer info );
 void empresa_seleccionar( GtkListBox *box, GtkListBoxRow *row, gpointer data );
 
 void empresa_inicio_senales_conectar();
-void empresa_inicio_senales_desconectar();
 void empresa_senales_conectar( void );
 
 std::string empresa_buscar_existente( std::string empresa_nombre );

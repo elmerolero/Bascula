@@ -9,7 +9,6 @@
 
 #include <list>
 #include "GestorRegistros.h"
-#include "TicketPublico.h"
 
 extern GtkEntryCompletion *completadorPublicoProducto;
 

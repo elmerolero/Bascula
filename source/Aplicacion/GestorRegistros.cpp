@@ -36,8 +36,7 @@ GtkListStore *listaNumerosPlaca = nullptr;
 GtkEntryCompletion *completadorNumerosPlaca = nullptr;
 
 // Obtiene los usuarios registrados
-void obtenerUsuariosRegistrados()
-{
+void obtenerUsuariosRegistrados(){
     // Conecta con la base de datos
     database.open( databaseFile );
     

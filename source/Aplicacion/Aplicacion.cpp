@@ -27,11 +27,7 @@ vector< string > pilaVistas;
 
 struct tm tiempo;
 
-void cancelarAccion( GtkWidget *widget, gpointer info ){
-    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
-}
-
-void iniciar( GtkApplication *aplicacion, gpointer informacion ){
+void app_iniciar( GtkApplication *aplicacion, gpointer informacion ){
     try{
         // Elemento para obtener los errores que ocurran al cargar el widget
         GError *error = nullptr;
@@ -44,13 +40,12 @@ void iniciar( GtkApplication *aplicacion, gpointer informacion ){
         }
 
         // Carga la ventana principal y conecta la función para cerrar la ventana y finalizar el programa
-        GObject *objeto = gtk_builder_get_object( builder, "VentanaPrincipal" );
-        gtk_application_add_window( aplicacion, GTK_WINDOW( objeto ) );
-        gtk_widget_show( GTK_WIDGET( objeto ) );
+        gtk_application_add_window( aplicacion, GTK_WINDOW( buscar_objeto( "VentanaPrincipal" ) ) );
+        gtk_widget_show( GTK_WIDGET( buscar_objeto( "VentanaPrincipal" ) ) );
         conectar_senal( ventanaPrincipal, G_CALLBACK( gtk_widget_destroy ), nullptr );
 
         // Agrega los eventos a área edición
-        objeto = gtk_builder_get_object( builder, ( "AreaEdicion" ) );
+        GObject *objeto = gtk_builder_get_object( builder, ( "AreaEdicion" ) );
         gtk_widget_add_events( GTK_WIDGET( objeto ), GDK_BUTTON_MOTION_MASK | GDK_BUTTON_PRESS_MASK );
         senal_presionado = g_signal_connect( GTK_WIDGET( objeto), "button-press-event", G_CALLBACK( leer_mouse ), nullptr );
         senal_movimiento = g_signal_connect( GTK_WIDGET( objeto ), "motion-notify-event", G_CALLBACK( imagen_mover ), nullptr );
@@ -80,6 +75,10 @@ void iniciar( GtkApplication *aplicacion, gpointer informacion ){
         string error = "<- Aplicacion::iniciar() ";
         throw runtime_error( error + re.what() );
     }
+}
+
+void cancelarAccion( GtkWidget *widget, gpointer info ){
+    gtk_widget_hide( GTK_WIDGET( buscar_objeto( "VentanaSiNo" ) ) );
 }
 
 // Carga la información necesaria
@@ -153,15 +152,6 @@ void conectarSenalesAdministrador(){
     conectar_senal( botonRegistrosProductos, G_CALLBACK( producto_listar_registros ), nullptr );
     conectar_senal( senal_interno_opcion, G_CALLBACK( interno_registros_listar ), nullptr );
     conectar_senal( senal_publico_opcion, G_CALLBACK( publico_registros_listar ), nullptr ); // vistaConsultarPesajesPublicos
-
-    // Vista de listado de registros
-    //conectar_senal( botonRegistroCancelarEdicion, nullptr );
-
-    // Vista de ticket interno
-    //conectar_senal( eliminarRegistroInterno, nullptr );
-
-    // Vista de ticket interno
-    //conectar_senal( eliminarRegistroPublico, nullptr );
 
     // Vista de administración de usuarios
 	conectar_senal( entradaConsultarUsuario, G_CALLBACK( vistaConsultarUsuario ), nullptr );

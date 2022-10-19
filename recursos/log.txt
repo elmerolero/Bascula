@@ -12,3 +12,5 @@
 [Fecha: 2022-02-15 Hora: 17:11:35]: Error querying. Error: Unknown error
 [Fecha: 2022-04-10 Hora: 17:26:18]: Error al cargar la imagen. No se pudo reconocer el formato de imagen del archivo «D:\msys\home\ismas\Documentos\Proyectos\Bascula\recursos\interfaces\Principal.glade»
 [Fecha: 2022-04-22 Hora: 16:00:09]: Error al cargar la imagen. No se pudo reconocer el formato de imagen del archivo «C:\Users\Ismael\Pictures\uva.webp»
+[Fecha: 2022-07-28 Hora: 01:57:22]: <- Aplicacion::iniciar() Error querying. Error: no such table: Usuario
+[Fecha: 2022-07-29 Hora: 23:19:28]: Error querying. Error: no such column: entrada_manual

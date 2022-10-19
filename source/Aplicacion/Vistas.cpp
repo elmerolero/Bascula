@@ -10,6 +10,7 @@
 #include "Imagen.h"
 #include "GestorRegistros.h"
 #include "Basculas.h"
+#include "Empresa.h"
 #include "PesajesInternos.h"
 #include "PesajesPublicos.h"
 #include "Domicilio.h"
@@ -53,7 +54,7 @@ void vistaConfiguracion( GtkWidget *widget, gpointer ptr ){
 	conectar_senal( senal_domicilio_empresa_propia_eliminar, G_CALLBACK( domicilio_empresa_propia_eliminar ), nullptr );
 	conectar_senal( senal_empresa_propia_editar, G_CALLBACK( empresa_propia_editar ), nullptr );
 
-	conectar_senal( senal_domicilio_guardar_nuevo, G_CALLBACK( empresa_propia_domicilio_guardar_nuevo ), nullptr );
+	conectar_senal( senal_empresa_domicilio_guardar, G_CALLBACK( empresa_propia_domicilio_guardar_nuevo ), nullptr );
 	conectar_senal( senal_domicilio_cancelar_nuevo, G_CALLBACK( regresarVista ), nullptr );
 	conectar_senal( senal_bascula_registros_listar, G_CALLBACK( bascula_registros_listar ), nullptr );
 	conectar_senal( botonConsultarUsuario, G_CALLBACK( usuario_ConsultarRegistros ), nullptr );

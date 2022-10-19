@@ -23,7 +23,7 @@ void irHacia( GtkWidget *widget, gpointer ptr );
 void irA( std::string idVista, bool reiniciarPila );
 
 // Inicializa la aplicacion
-void iniciar( GtkApplication *aplicacion, gpointer informacion );
+void app_iniciar( GtkApplication *aplicacion, gpointer informacion );
 
 void empresa_domicilio_cancelar( GtkWidget *widget, gpointer info );
 

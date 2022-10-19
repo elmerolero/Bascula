@@ -9,13 +9,10 @@ void establecerUsuario( GtkWidget *widget, gpointer ptr );
  
 int main( int argc, char *argv[] )
 {
-    // Activa la aplicacion
-    //aplicacionActiva = true;
-
     try{
         // Crea la aplicación 
         GtkApplication *aplicacion = gtk_application_new( "mx.com.minipluss.scb", G_APPLICATION_FLAGS_NONE );
-        g_signal_connect( aplicacion, "activate", G_CALLBACK( iniciar ), nullptr );
+        g_signal_connect( aplicacion, "activate", G_CALLBACK( app_iniciar ), nullptr );
         g_application_run( G_APPLICATION( aplicacion ), argc, argv );
         g_object_unref( aplicacion );
     }
